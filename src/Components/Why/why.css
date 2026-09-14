@@ -1,0 +1,30 @@
+.why {
+  margin: 40px;
+  /* background-color: #020092; */
+}
+
+.why > h1 {
+  margin-top: 0;
+  padding-top: 0;
+  text-align: center;
+}
+
+.why > h1 > span {
+  color: #fd7304;
+}
+
+.why > section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.why > section > div > video {
+  height: 160px;
+  border-radius: 50%;
+}
+
+.why > section > div > p {
+  text-align: center;
+  font-weight: 550;
+}

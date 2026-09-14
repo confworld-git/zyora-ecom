@@ -5,6 +5,7 @@ import Navbar from "./Navbar/Navbar";
 import Home from "./Home/Home";
 import Welcome from "./Welcome/Welcome";
 import Highlights from "./Highlights/Highlights";
+import Featured from "./Featured/Featured";
 import Why from "./Why/Why";
 
 const Homepage = () => {
@@ -31,6 +32,7 @@ const Homepage = () => {
       <Home />
       <Welcome />
       <Highlights />
+      <Featured />
       <Why />
     </div>
   );
