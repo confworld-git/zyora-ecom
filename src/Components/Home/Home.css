@@ -1,0 +1,258 @@
+.home-container {
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.image-wrapper > img {
+  height: 300px;
+  border-radius: 20px;
+  display: block;
+  margin-bottom: -75px;
+}
+
+.image-wrapper::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-bottom: -75px;
+  height: 100px;
+  border-radius: 0 0 20px 20px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 40%,
+    white 100%
+  );
+  pointer-events: none;
+}
+
+.home-container > img {
+  height: 300px;
+  border-radius: 20px;
+  margin-bottom: -75px;
+  /* position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1; */
+}
+
+.home-container > h1 {
+  font-family: "Newsreader", serif;
+  font-style: italic;
+  text-align: center;
+  letter-spacing: 2px;
+  font-size: 50px;
+  position: relative;
+}
+
+.home-container > h1 > span {
+  color: #fd7304;
+}
+
+.home-container > span {
+  text-align: center;
+  font-weight: 700;
+  font-size: 17px;
+  background-color: #020092;
+  color: white;
+  padding: 4px 12px;
+  letter-spacing: 1px;
+}
+
+.home-container > p {
+  color: black;
+  font-size: 18px;
+  text-align: center;
+}
+
+.confetti-burst {
+  position: fixed;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.confetti-left {
+  left: 0;
+}
+.confetti-right {
+  right: 0;
+}
+
+.confetti-piece,
+.confetti-emoji,
+.confetti-streamer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  opacity: 1;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+}
+
+.confetti-piece {
+  animation-name: natural-fall;
+}
+.confetti-emoji {
+  animation-name: natural-fall-emoji;
+}
+
+.confetti-streamer {
+  width: 4px;
+  height: 36px;
+  border-radius: 2px;
+  transform-origin: center;
+  animation-name: natural-fall-streamer;
+}
+
+/* Two-phase motion: fast easeOut launch to peak, then easeIn gravity fall,
+   blended into one keyframe timeline with a wobble drift near the end */
+@keyframes natural-fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.4);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.12, 0.85, 0.25, 1);
+  }
+  35% {
+    transform: translate(var(--peakX), var(--peakY)) rotate(var(--rotMid))
+      scale(1);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.85, 0.35);
+  }
+  75% {
+    transform: translate(
+        calc(var(--peakX) + var(--fallX) * 0.6),
+        calc(var(--peakY) + var(--fallDist) * 0.7)
+      )
+      rotate(calc(var(--rotMid) + (var(--rotEnd) - var(--rotMid)) * 0.7))
+      scale(0.85);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+        calc(var(--peakX) + var(--fallX)),
+        calc(var(--peakY) + var(--fallDist))
+      )
+      rotate(var(--rotEnd)) scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes natural-fall-emoji {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.3);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.12, 0.85, 0.25, 1);
+  }
+  35% {
+    transform: translate(var(--peakX), var(--peakY))
+      rotate(calc(var(--rotMid) * 0.4)) scale(1.25);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.85, 0.35);
+  }
+  100% {
+    transform: translate(
+        calc(var(--peakX) + var(--fallX)),
+        calc(var(--peakY) + var(--fallDist))
+      )
+      rotate(calc(var(--rotEnd) * 0.4)) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes natural-fall-streamer {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scaleY(0.6);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.12, 0.85, 0.25, 1);
+  }
+  35% {
+    transform: translate(var(--peakX), var(--peakY))
+      rotate(calc(var(--rotEnd) * 0.3)) scaleY(1);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.85, 0.35);
+  }
+  100% {
+    transform: translate(var(--peakX), calc(var(--peakY) + var(--fallDist)))
+      rotate(var(--rotEnd)) scaleY(1);
+    opacity: 0;
+  }
+}
+
+.celebrate-btn {
+  position: relative;
+  z-index: 1000;
+  margin-top: 20px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease;
+}
+
+.celebrate-btn:active {
+  transform: scale(0.95);
+}
+
+.category-showcase {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.category-card-3d {
+  width: 160px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.category-card-3d:hover {
+  transform: translateY(-6px);
+}
+
+.category-label {
+  display: block;
+  margin-top: 0.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Responsive: shrink cards on smaller screens */
+@media (max-width: 768px) {
+  .category-showcase {
+    gap: 1rem;
+  }
+  .category-card-3d {
+    width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-card-3d {
+    width: 90px;
+  }
+  .category-label {
+    font-size: 0.8rem;
+  }
+}
