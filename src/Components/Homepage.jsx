@@ -5,6 +5,7 @@ import Navbar from "./Navbar/Navbar";
 import Home from "./Home/Home";
 import Welcome from "./Welcome/Welcome";
 import Highlights from "./Highlights/Highlights";
+import Why from "./Why/Why";
 
 const Homepage = () => {
   const [showIntro, setShowIntro] = useState(() => {
@@ -30,6 +31,7 @@ const Homepage = () => {
       <Home />
       <Welcome />
       <Highlights />
+      <Why />
     </div>
   );
 };
