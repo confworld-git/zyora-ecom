@@ -2,8 +2,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 150px;
-  background-color: #ffffff;
+  padding: 10px 100px;
+  background-color: #ffffff71;
+  backdrop-filter: blur(50px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .navbar > h1 {
@@ -48,7 +52,13 @@
   transition: 0.3s ease;
 }
 
-.navbar > ul > li:hover {
+.navbar > ul > li > a {
+  text-decoration: none;
+  color: black;
+  transition: 0.3s ease;
+}
+
+.navbar > ul > li:hover > a {
   color: #fd7304;
   /* font-size: 17px; */
   letter-spacing: 1px;

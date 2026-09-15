@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import "../index.css";
 import Intro from "./Intro/Intro";
-import Navbar from "./Navbar/Navbar";
 import Home from "./Home/Home";
 import Welcome from "./Welcome/Welcome";
 import Highlights from "./Highlights/Highlights";
@@ -28,7 +27,6 @@ const Homepage = () => {
   return (
     <div>
       {showIntro && <Intro />}
-      <Navbar />
       <Home />
       <Welcome />
       <Highlights />

@@ -1,5 +1,6 @@
 import "./welcome.css";
 import globe from "../../assets/Videos/globe.mp4";
+// import world from "../../assets/Videos/world.mp4";
 
 const Welcome = () => {
   return (

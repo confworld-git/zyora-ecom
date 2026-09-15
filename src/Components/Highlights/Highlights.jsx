@@ -12,13 +12,13 @@ import home from "../../assets/Videos/home.mp4";
 const Highlights = () => {
   return (
     <div className="highlights">
-      <h1>
-        Category Highlights
-        <span>
+      <div>
+        <h1>Category <span>Highlights</span></h1>
+        <p>
           View products
           <i class="bi bi-arrow-right"></i>
-        </span>
-      </h1>
+        </p>
+      </div>
       <p>Explore our signature pillars of everyday quality</p>
       <section>
         <div>
@@ -52,7 +52,7 @@ const Highlights = () => {
           {/* <img src={bags} alt="Handbags" /> */}
           <video src={bag} autoPlay muted loop playsInline/>
           <div>
-            <h1>Handbags</h1>
+            <h1>Fashion</h1>
             <p>Everyday elegance for the modern woman.</p>
           </div>
         </div>

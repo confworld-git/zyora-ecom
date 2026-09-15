@@ -1,0 +1,151 @@
+.Contact {
+  display: flex;
+  justify-content: space-between;
+  padding: 60px;
+  gap: 40px;
+}
+
+.Contact > div {
+  flex: 1;
+}
+
+.Contact > div > h1 > span {
+  color: #fd7304;
+}
+
+.contact_form {
+  padding: 40px;
+  border-radius: 30px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.contact_form > p {
+  font-size: 15px;
+  margin: 0;
+  font-style: italic;
+  color: #020092;
+  font-weight: 500;
+}
+
+.contact_form > h1 {
+  font-size: 24px;
+  font-style: italic;
+  color: #020092;
+  margin-top: 5px;
+}
+
+.contact_form > form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.contact_form > form > :nth-child(5),
+.contact_form > form > :nth-child(6) {
+  grid-column: span 2;
+}
+
+.contact_form > form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.contact_form > form > div > label {
+  font-weight: 550;
+}
+
+.contact_form > form > div > input {
+  padding: 10px;
+  font-family: "Quicksand", sans-serif;
+  border: 1px solid #dbd9d9;
+  border-radius: 5px;
+}
+
+.contact_form > form > div > textarea {
+  padding: 10px;
+  font-family: "Quicksand", sans-serif;
+  border: 1px solid #dbd9d9;
+  border-radius: 5px;
+}
+
+.contact_form > form > div > span {
+  font-family: "Quicksand", sans-serif;
+  color: red;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.contact_form .PhoneInput {
+  padding: 2px 2px 2px 10px;
+  font-family: "Quicksand", sans-serif;
+  border: 1px solid #dbd9d9;
+  border-radius: 5px;
+}
+
+.contact_form .PhoneInputInput {
+  padding: 8px;
+  border: none;
+  outline: none;
+  font-family: "Quicksand", sans-serif;
+}
+
+.contact_form > form > button {
+  padding: 10px;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 650;
+  cursor: pointer;
+  border: none;
+  background-color: #fd7304;
+  color: white;
+  font-size: 15px;
+  border-radius: 500px;
+  border: 1px solid #ff7300;
+}
+
+.contact_content > h1 {
+  margin: 0;
+}
+
+.contact_content > p {
+  margin-top: 10px;
+}
+
+.contact_content > li {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
+  margin-top: 30px;
+}
+
+.contact_content > li > p {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Playfair Display SC", serif;
+  font-size: 17px;
+  font-weight: 550;
+  margin-bottom: 5px;
+}
+
+.contact_content > li > p > i {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #020092;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 20px;
+}
+
+.contact_content > li > span {
+  font-family: "Quicksand", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  margin-left: 50px;
+}
