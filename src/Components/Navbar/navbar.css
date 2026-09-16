@@ -81,6 +81,8 @@
 .cart_icon {
   cursor: pointer;
   transition: 0.3s ease;
+  text-decoration: none;
+  color: black;
 }
 
 .cart_icon > .bi {

@@ -3,6 +3,20 @@
   justify-content: space-between;
   padding: 60px;
   gap: 40px;
+  position: relative;
+}
+
+.contact_main {
+  position: relative;
+  background-color: #faf7ef;
+}
+
+.contact_main > img {
+  height: 200px;
+  position: absolute;
+  top: -15px;
+  left: -50px;
+  transform: rotate(40deg);
 }
 
 .Contact > div {
@@ -16,7 +30,8 @@
 .contact_form {
   padding: 40px;
   border-radius: 30px;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  box-shadow: #eceae2 0px 7px 29px 0px;
+  background-color: white;
 }
 
 .contact_form > p {
@@ -115,8 +130,10 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  margin-bottom: 30px;
-  margin-top: 30px;
+  margin-bottom: 15px;
+  margin-top: 10px;
+  border-bottom: 2px solid #f5f5f5;
+  padding-bottom: 15px;
 }
 
 .contact_content > li > p {
