@@ -30,8 +30,9 @@
 .contact_form {
   padding: 40px;
   border-radius: 30px;
-  box-shadow: #eceae2 0px 7px 29px 0px;
+  box-shadow: #efe7dd 0px 7px 29px 0px;
   background-color: white;
+  border: 1px solid #f3ece5;
 }
 
 .contact_form > p {
