@@ -4,7 +4,8 @@ import { HiOutlineTrash } from "react-icons/hi2";
 const Cart = () => {
   return (
     <div className="cart">
-      <h1 className="cart_title">Your Cart</h1>
+      <h1 className="cart_title">Your <span>Cart</span></h1>
+      <p>You’ve got taste.</p>
       <section className="cart_section">
         <div className="cart_left_section">
           <div className="cart_item">
@@ -67,17 +68,17 @@ const Cart = () => {
 
           <div className="summary_row">
             <span>Subtotal</span>
-            <strong>₹4,799</strong>
+            <strong><i className="bi bi-currency-rupee"></i>4,799</strong>
           </div>
 
           <div className="summary_row">
             <span>Shipping</span>
-            <strong>₹250</strong>
+            <strong><i className="bi bi-currency-rupee"></i>250</strong>
           </div>
 
           <div className="summary_row">
             <span>Discount</span>
-            <strong className="discount">-₹500</strong>
+            <strong className="discount">-<i className="bi bi-currency-rupee"></i>500</strong>
           </div>
 
           <div className="promo_code">
@@ -91,7 +92,6 @@ const Cart = () => {
           </div>
 
           <button className="checkout_btn">Proceed to Checkout</button>
-          <p className="summary_note">Free delivery on orders above ₹5,000</p>
         </aside>
       </section>
     </div>
