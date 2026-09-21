@@ -101,6 +101,11 @@
   margin-bottom: 5px;
 }
 
+#product_price {
+  font-weight: 800;
+  font-size: 16px;
+}
+
 .category_heading {
   display: flex;
   justify-content: space-between;

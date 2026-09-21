@@ -219,7 +219,7 @@ const Featured = () => {
                   <img src={product.image} alt={product.name} />
                   <div className="product_info">
                     <h2>{product.name}</h2>
-                    <p className="product_price">₹{product.price}</p>
+                    <p id="product_price">₹{product.price}</p>
                     <p className="product_description">{product.description}</p>
                   </div>
                 </div>

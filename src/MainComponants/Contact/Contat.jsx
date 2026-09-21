@@ -1,8 +1,13 @@
 import "./Contact.css";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import axios from "axios";
 import contactus from "../../assets/Images/contactus.png";
+import toast from "react-hot-toast";
+
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Contact = () => {
   const {
@@ -13,9 +18,26 @@ const Contact = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    reset();
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/contact/Submit-Contact`,
+        data,
+      );
+      toast.success(res.data.message);
+      reset();
+    } catch (error) {
+      const errMsg =
+        error.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(errMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,21 +55,21 @@ const Contact = () => {
           <br />
           <li>
             <p>
-              <i class="bi bi-envelope-open-heart"></i>
+              <i className="bi bi-envelope-open-heart"></i>
               Email
             </p>
             <span>support@zyora.com</span>
           </li>
           <li>
             <p>
-              <i class="bi bi-whatsapp"></i>
+              <i className="bi bi-whatsapp"></i>
               Phone / WhatsApp
             </p>
             <span>+91 9965165261</span>
           </li>
           <li>
             <p>
-              <i class="bi bi-headset"></i>
+              <i className="bi bi-headset"></i>
               Customer Support
             </p>
             <span>Monday-Saturday, 10 AM - 7 PM</span>
@@ -108,11 +130,11 @@ const Contact = () => {
               <input
                 type="text"
                 placeholder="Enter your enquiry type"
-                {...register("enquiry", {
-                  required: "enquiry is required",
+                {...register("enquiryType", {
+                  required: "Enquiry type is required",
                 })}
               />
-              {errors.enquiry && <span>{errors.enquiry.message}</span>}
+              {errors.enquiryType && <span>{errors.enquiryType.message}</span>}
             </div>
 
             <div>
@@ -131,7 +153,19 @@ const Contact = () => {
               {errors.message && <span>{errors.message.message}</span>}
             </div>
 
-            <button type="submit">Send Message</button>
+            {/* {statusMsg && (
+              <p
+                className={
+                  statusMsg.type === "success" ? "success-msg" : "error-msg"
+                }
+              >
+                {statusMsg.text}
+              </p>
+            )} */}
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Sending..." : "Send Message"}
+            </button>
           </form>
         </div>
       </div>

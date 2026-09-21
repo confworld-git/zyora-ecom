@@ -8,7 +8,9 @@ const Navbar = () => {
         <li>
           <a href="/">Home</a>
         </li>
-        <li>Category</li>
+        <li>
+          <a href="/Zyora_Category">Category</a>
+        </li>
         <li>
           <a href="/About_Us">About Us</a>
         </li>
