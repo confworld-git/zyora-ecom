@@ -30,9 +30,7 @@ const App = () => {
       />
 
       <Routes>
-        {/* Common Layout */}
         <Route element={<Layout />}>
-          {/* Public Pages */}
           <Route path="/" element={<Homepage />} />
           <Route path="/About_Us" element={<About />} />
           <Route path="/Contact_Us" element={<Contat />} />
