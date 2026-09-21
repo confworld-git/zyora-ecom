@@ -1,0 +1,126 @@
+.favourites {
+  background-color: #f9f6f0;
+  padding: 40px;
+}
+
+.favourites > h1 {
+  margin: 0;
+}
+
+.favourites>h1>span{
+    color: #FD7304;
+}
+
+.favourites > p {
+  margin-top: 5px;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.favourite_products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.favourite_products > div {
+  width: 250px;
+  padding: 12px;
+  border-radius: 30px;
+  background-color: white;
+  position: relative;
+  border: 1px solid #f3ece5;
+}
+
+.favourite_products > div > i {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #ff344f;
+  font-size: 20px;
+  padding: 5px;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.favourite_products > div > button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  border-radius: 50%;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  height: 35px;
+  width: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  font-size: 17px;
+  z-index: 20;
+}
+
+.favourite_products > div > button:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+.favourite_products > div > button::before {
+  content: "Add to Cart";
+  top: 50%;
+  left: -90px;
+  transform: translateY(-50%);
+  border: 1px solid #f5f5f5;
+  background-color: #ffd28e;
+  border: 1px solid #ffc671;
+  position: absolute;
+  color: black;
+  font-size: 12px;
+  padding: 5px 10px;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 600;
+  border-radius: 500px;
+  text-wrap: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%) translateX(10px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    visibility 0.25s ease;
+}
+
+.favourite_products > div > img {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 20px;
+}
+
+.favourite_products > div > h1 {
+  font-size: 18px;
+  margin-bottom: 0;
+  margin-top: 10px;
+}
+
+.favourite_products > div > p {
+  font-weight: 450;
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.favourite_products > div > :last-child {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 5px;
+}

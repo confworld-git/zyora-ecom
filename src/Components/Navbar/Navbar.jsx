@@ -19,10 +19,10 @@ const Navbar = () => {
           <i class="bi bi-bag-check-fill"></i>
           {/* <i class="bi bi-bag-check"></i> */}
         </a>
-        <p className="cart_icon">
+        <a className="cart_icon" href="/Favorites">
           <i class="bi bi-heart-fill"></i>
           {/* <i class="bi bi-heart"></i> */}
-        </p>
+        </a>
       </ul>
     </nav>
   );

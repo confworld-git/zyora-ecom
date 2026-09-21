@@ -5,6 +5,7 @@ import Homepage from "./Components/Homepage";
 import About from "./MainComponants/About/About";
 import Contat from "./MainComponants/Contact/Contat";
 import Cart from "./MainComponants/Cart/Cart";
+import Favorites from "./MainComponants/Favorites/Favorites";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/About_Us" element={<About />} />
         <Route path="/Contact_Us" element={<Contat />} />
         <Route path="/Cart" element={<Cart />} />
+        <Route path="/Favorites" element={<Favorites />} />
       </Routes>
       <Footer />
     </BrowserRouter>

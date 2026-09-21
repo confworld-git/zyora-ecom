@@ -16,10 +16,10 @@ const Footer = () => {
               products, stationery, and handbags — curated for quality, style,
               and everyday value.
             </p>
-            <p className="footer-location">
+            {/* <p className="footer-location">
               📍Old No.1A, New No.3, Second Floor, Ragavan Street, Perambur,
               Chennai - 600011, Tamil nadu, India.
-            </p>
+            </p> */}
           </div>
           <div>
             <h4 className="footer-heading">Quick Links</h4>

@@ -2,6 +2,10 @@
   padding: 20px;
   text-align: center;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .image-wrapper {
@@ -238,7 +242,25 @@
   color: #333;
 }
 
-/* Responsive: shrink cards on smaller screens */
+.home-container > button {
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: none;
+  background-color: #fd7304;
+  color: white;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.home-container > button > svg {
+  font-size: 20px;
+}
+
 @media (max-width: 768px) {
   .category-showcase {
     gap: 1rem;

@@ -4,8 +4,10 @@ import { HiOutlineTrash } from "react-icons/hi2";
 const Cart = () => {
   return (
     <div className="cart">
-      <h1 className="cart_title">Your <span>Cart</span></h1>
-      <p>You’ve got taste.</p>
+      <h1 className="cart_title">
+        Your <span>Cart</span>
+      </h1>
+      <p>You’ve got taste, and honestly, we’re impressed.</p>
       <section className="cart_section">
         <div className="cart_left_section">
           <div className="cart_item">
@@ -34,7 +36,6 @@ const Cart = () => {
               <HiOutlineTrash />
             </div>
           </div>
-
           <div className="cart_item">
             <img
               src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=400&q=80"
@@ -49,7 +50,89 @@ const Cart = () => {
                 <span>Finish:</span> Matte
               </p>
               <h3>
-                <i className="bi bi-currency-rupee"></i> 799
+                <i className="bi bi-currency-rupee"></i>
+                <span>199</span>
+              </h3>
+            </div>
+            <div className="cart_quantity">
+              <i className="bi bi-dash"></i>
+              <span>1</span>
+              <i className="bi bi-plus"></i>
+            </div>
+            <div className="cart_trash">
+              <HiOutlineTrash />
+            </div>
+          </div>
+          <div className="cart_item">
+            <img
+              src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=400&q=80"
+              alt="Ruby red matte lipstick"
+            />
+            <div className="cart_item_details">
+              <h2>Matte Lipstick</h2>
+              <p>
+                <span>Shade:</span> Ruby Red
+              </p>
+              <p>
+                <span>Finish:</span> Matte
+              </p>
+              <h3>
+                <i className="bi bi-currency-rupee"></i>
+                <span>199</span>
+              </h3>
+            </div>
+            <div className="cart_quantity">
+              <i className="bi bi-dash"></i>
+              <span>1</span>
+              <i className="bi bi-plus"></i>
+            </div>
+            <div className="cart_trash">
+              <HiOutlineTrash />
+            </div>
+          </div>
+          <div className="cart_item">
+            <img
+              src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=400&q=80"
+              alt="Ruby red matte lipstick"
+            />
+            <div className="cart_item_details">
+              <h2>Matte Lipstick</h2>
+              <p>
+                <span>Shade:</span> Ruby Red
+              </p>
+              <p>
+                <span>Finish:</span> Matte
+              </p>
+              <h3>
+                <i className="bi bi-currency-rupee"></i>
+                <span>199</span>
+              </h3>
+            </div>
+            <div className="cart_quantity">
+              <i className="bi bi-dash"></i>
+              <span>1</span>
+              <i className="bi bi-plus"></i>
+            </div>
+            <div className="cart_trash">
+              <HiOutlineTrash />
+            </div>
+          </div>
+          <div className="cart_item">
+            <img
+              src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=400&q=80"
+              alt="Ruby red matte lipstick"
+            />
+            <div className="cart_item_details">
+              <h2>Matte Lipstick</h2>
+              <p>
+                <span>Shade:</span> Ruby Red
+              </p>
+              <p>
+                <span>Finish:</span> Matte
+              </p>
+              <h3>
+                <i className="bi bi-currency-rupee"></i>
+                <span>199</span>
               </h3>
             </div>
             <div className="cart_quantity">
@@ -68,17 +151,23 @@ const Cart = () => {
 
           <div className="summary_row">
             <span>Subtotal</span>
-            <strong><i className="bi bi-currency-rupee"></i>4,799</strong>
+            <strong>
+              <i className="bi bi-currency-rupee"></i>4,799
+            </strong>
           </div>
 
           <div className="summary_row">
             <span>Shipping</span>
-            <strong><i className="bi bi-currency-rupee"></i>250</strong>
+            <strong>
+              <i className="bi bi-currency-rupee"></i>250
+            </strong>
           </div>
 
           <div className="summary_row">
             <span>Discount</span>
-            <strong className="discount">-<i className="bi bi-currency-rupee"></i>500</strong>
+            <strong className="discount">
+              -<i className="bi bi-currency-rupee"></i>500
+            </strong>
           </div>
 
           <div className="promo_code">
@@ -88,7 +177,9 @@ const Cart = () => {
 
           <div className="summary_total">
             <span>Total</span>
-            <strong>₹4,549</strong>
+            <strong>
+              <i className="bi bi-currency-rupee"></i>4,549
+            </strong>
           </div>
 
           <button className="checkout_btn">Proceed to Checkout</button>

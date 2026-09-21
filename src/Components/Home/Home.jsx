@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import "./Home.css";
 import softtoys from "../../assets/Logo/soft_toys.png";
+import { HiShoppingBag } from "react-icons/hi2";
 
 const CONFETTI_COLORS = [
   "#ff6b6b",
@@ -147,6 +148,9 @@ const Home = () => {
         stylish handbags <br /> discover products that make everyday life a
         little more delightful.
       </p>
+      <button>
+        Shop Now <HiShoppingBag />
+      </button>
     </div>
   );
 };
