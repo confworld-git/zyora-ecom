@@ -10,6 +10,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import AddProduct from "./AddProducts";
 import { useNavigate } from "react-router-dom";
+import { RiLogoutCircleLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
 
 const Dashboard = () => {
@@ -76,7 +77,10 @@ const Dashboard = () => {
             <MdOutlinePersonOutline />
             Admin Panel
           </li>
-          <li onClick={handleLogout}>Logout</li>
+          <li onClick={handleLogout}>
+            <RiLogoutCircleLine />
+            Logout
+          </li>
         </div>
         <div className="dashboard_right_section">
           <EnquiryData enquiryData={enquiryData} />
