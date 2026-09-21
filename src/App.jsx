@@ -7,6 +7,7 @@ import Contat from "./MainComponants/Contact/Contat.jsx";
 import Cart from "./MainComponants/Cart/Cart";
 import Favorites from "./MainComponants/Favorites/Favorites";
 import Category from "./MainComponants/Category/Category.jsx";
+import Dashboard from "./Dashboard/Dashboard.jsx";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
@@ -33,6 +34,7 @@ const App = () => {
         <Route path="/Cart" element={<Cart />} />
         <Route path="/Favorites" element={<Favorites />} />
         <Route path="/Zyora_Category" element={<Category />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
       </Routes>
       <Footer />
     </BrowserRouter>

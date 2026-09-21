@@ -1,0 +1,344 @@
+{
+  "products": [
+    {
+      "id": "FITX-0032-PUR",
+      "category": "Sports & Fitness",
+      "title": "FlexCore Non-Slip Yoga Mat, 6mm Extra Thick TPE Foam, Double-Sided Textured Grip, Lightweight with Carry Strap – Lavender Purple, 72 x 24 Inch",
+      "brand": "FlexCore",
+      "price": {
+        "currency": "INR",
+        "mrp": 1799,
+        "selling_price": 999,
+        "discount_percent": 44
+      },
+      "rating": {
+        "average": 4.4,
+        "count": 4218
+      },
+      "images": [
+        "https://picsum.photos/seed/flexcore-yoga-mat-1/800/800",
+        "https://picsum.photos/seed/flexcore-yoga-mat-2/800/800",
+        "https://picsum.photos/seed/flexcore-yoga-mat-3/800/800"
+      ],
+      "about_this_item": [
+        "Extra cushioning – 6mm TPE foam protects knees, elbows, and spine during floor exercises and yoga poses",
+        "Superior grip – Double-sided textured surface prevents slipping even during sweaty workouts",
+        "Eco-friendly material – Free from PVC, latex, and harmful odors; safe for skin contact",
+        "Portable design – Lightweight at just 900g, includes adjustable carry strap and storage bag",
+        "Versatile use – Great for yoga, pilates, stretching, HIIT, and general floor workouts"
+      ],
+      "product_information": {
+        "features_specs": {
+          "Brand": "FlexCore",
+          "Material": "TPE Foam",
+          "Thickness": "6 mm",
+          "Special Feature": "Non-slip, double-sided texture, lightweight",
+          "Includes": "Carry strap, storage bag"
+        },
+        "style": {
+          "Style Name": "Classic Yoga Mat",
+          "Colour": "Lavender Purple",
+          "Pattern": "Solid",
+          "Texture": "Textured Grip"
+        },
+        "measurements": {
+          "Length": "72 inches (183 cm)",
+          "Width": "24 inches (61 cm)",
+          "Thickness": "6 mm",
+          "Weight": "900 g"
+        },
+        "materials_care": {
+          "Material": "TPE (Thermoplastic Elastomer)",
+          "Care Instructions": "Wipe with damp cloth after use; air dry flat; avoid direct sunlight for long periods",
+          "Country of Origin": "India"
+        },
+        "item_details": {
+          "Item Model Number": "FX-YM-072-PUR",
+          "Manufacturer": "FlexCore Fitness Pvt. Ltd.",
+          "Included Components": "1 Yoga Mat, 1 Carry Strap, 1 Storage Bag",
+          "Warranty": "3 months manufacturing defect warranty"
+        }
+      },
+      "variants": {
+        "colours": ["Lavender Purple", "Teal", "Charcoal Grey", "Coral"],
+        "sizes": ["4mm", "6mm", "8mm"]
+      },
+      "stock": {
+        "in_stock": true,
+        "quantity": 276
+      }
+    },
+    {
+      "id": "SONIC-0007-BLK",
+      "category": "Electronics",
+      "title": "SonicPulse TWS Wireless Earbuds, Bluetooth 5.3, Active Noise Cancellation, 30 Hour Playtime, IPX5 Water Resistant with Charging Case – Matte Black",
+      "brand": "SonicPulse",
+      "price": {
+        "currency": "INR",
+        "mrp": 3499,
+        "selling_price": 1799,
+        "discount_percent": 49
+      },
+      "rating": {
+        "average": 4.2,
+        "count": 8934
+      },
+      "images": [
+        "https://picsum.photos/seed/sonicpulse-earbuds-1/800/800",
+        "https://picsum.photos/seed/sonicpulse-earbuds-2/800/800",
+        "https://picsum.photos/seed/sonicpulse-earbuds-3/800/800"
+      ],
+      "about_this_item": [
+        "Immersive sound – 13mm dynamic drivers deliver deep bass and crisp highs for music and calls",
+        "Active Noise Cancellation – Hybrid ANC reduces ambient noise by up to 35dB for focused listening",
+        "Long battery life – Up to 8 hours on a single charge, 30 hours total with the compact charging case",
+        "Splash & sweat resistant – IPX5 rating makes them reliable for workouts and light rain",
+        "Seamless connectivity – Bluetooth 5.3 with low-latency gaming mode and quick auto-pairing"
+      ],
+      "product_information": {
+        "features_specs": {
+          "Brand": "SonicPulse",
+          "Connectivity Technology": "Bluetooth 5.3",
+          "Battery Life": "8 hrs (earbuds) + 22 hrs (case)",
+          "Special Feature": "Active Noise Cancellation, IPX5, Touch Controls",
+          "Driver Size": "13 mm"
+        },
+        "style": {
+          "Style Name": "Compact In-Ear",
+          "Colour": "Matte Black",
+          "Pattern": "Solid",
+          "Form Factor": "In-Ear with Charging Case"
+        },
+        "measurements": {
+          "Earbud Weight": "4.5 g each",
+          "Case Dimensions": "6 x 4.5 x 2.7 cm",
+          "Case Weight": "38 g"
+        },
+        "materials_care": {
+          "Material": "ABS Plastic, Silicone Ear Tips",
+          "Care Instructions": "Wipe with dry cloth; avoid submerging in water; store in case when not in use",
+          "Country of Origin": "India"
+        },
+        "item_details": {
+          "Item Model Number": "SP-TWS-007-BLK",
+          "Manufacturer": "SonicPulse Electronics Pvt. Ltd.",
+          "Included Components": "2 Earbuds, 1 Charging Case, 1 USB-C Cable, 3 Ear Tip Sizes",
+          "Warranty": "1 Year Manufacturer Warranty",
+          "Batteries Required": "Built-in rechargeable Li-ion"
+        }
+      },
+      "variants": {
+        "colours": ["Matte Black", "Pearl White", "Navy Blue"],
+        "sizes": ["Standard"]
+      },
+      "stock": {
+        "in_stock": true,
+        "quantity": 512
+      }
+    },
+    {
+      "id": "STRYD-0045-GRY",
+      "category": "Footwear",
+      "title": "StrydLite Men's Running Shoes, Lightweight Mesh Upper, Breathable & Cushioned Sole, Lace-Up Sports Shoes for Walking & Gym – Grey/Orange, Size 9",
+      "brand": "StrydLite",
+      "price": {
+        "currency": "INR",
+        "mrp": 2499,
+        "selling_price": 1299,
+        "discount_percent": 48
+      },
+      "rating": {
+        "average": 4.1,
+        "count": 7645
+      },
+      "images": [
+        "https://picsum.photos/seed/strydlite-shoes-1/800/800",
+        "https://picsum.photos/seed/strydlite-shoes-2/800/800",
+        "https://picsum.photos/seed/strydlite-shoes-3/800/800"
+      ],
+      "about_this_item": [
+        "Breathable comfort – Engineered mesh upper keeps feet cool and ventilated during long runs",
+        "Responsive cushioning – EVA midsole absorbs impact and provides spring-back energy return",
+        "Secure fit – Lace-up closure with padded collar for ankle support and a snug, stable fit",
+        "Durable outsole – High-density rubber sole offers reliable traction on roads and gym floors",
+        "All-day wear – Lightweight construction at just 260g per shoe, ideal for running, walking, or gym sessions"
+      ],
+      "product_information": {
+        "features_specs": {
+          "Brand": "StrydLite",
+          "Sole Material": "EVA + Rubber",
+          "Closure Type": "Lace-Up",
+          "Special Feature": "Breathable mesh, cushioned insole",
+          "Outer Material": "Mesh Fabric"
+        },
+        "style": {
+          "Style Name": "Running Sports Shoe",
+          "Colour": "Grey/Orange",
+          "Pattern": "Solid with Accent Stripe",
+          "Toe Style": "Round Toe"
+        },
+        "measurements": {
+          "Size": "UK 9 / EU 43",
+          "Weight (per shoe)": "260 g"
+        },
+        "materials_care": {
+          "Upper Material": "Engineered Mesh",
+          "Sole Material": "EVA Foam with Rubber Outsole",
+          "Care Instructions": "Wipe with a damp cloth; do not machine wash; air dry away from direct heat"
+        },
+        "item_details": {
+          "Item Model Number": "SL-RUN-045-GRY",
+          "Manufacturer": "StrydLite Footwear Pvt. Ltd.",
+          "Department": "Men",
+          "Available Sizes": "6, 7, 8, 9, 10, 11",
+          "Country of Origin": "India"
+        }
+      },
+      "variants": {
+        "colours": ["Grey/Orange", "Black/White", "Navy/Lime"],
+        "sizes": ["6", "7", "8", "9", "10", "11"]
+      },
+      "stock": {
+        "in_stock": true,
+        "quantity": 389
+      }
+    },
+    {
+      "id": "CHRONO-0019-TAN",
+      "category": "Watches",
+      "title": "ChronoCraft Men's Analog Wrist Watch, Genuine Leather Strap, Water Resistant up to 30m, Quartz Movement – Tan Brown Strap, Silver Dial",
+      "brand": "ChronoCraft",
+      "price": {
+        "currency": "INR",
+        "mrp": 3999,
+        "selling_price": 1999,
+        "discount_percent": 50
+      },
+      "rating": {
+        "average": 4.3,
+        "count": 2871
+      },
+      "images": [
+        "https://picsum.photos/seed/chronocraft-watch-1/800/800",
+        "https://picsum.photos/seed/chronocraft-watch-2/800/800",
+        "https://picsum.photos/seed/chronocraft-watch-3/800/800"
+      ],
+      "about_this_item": [
+        "Timeless design – Classic round dial with minute markers suits both formal and casual occasions",
+        "Reliable movement – Precise Japanese quartz movement ensures accurate timekeeping",
+        "Genuine leather strap – Soft, durable tan leather strap develops a rich patina over time",
+        "Everyday durability – Water resistant up to 30 metres; handles splashes and light rain",
+        "Thoughtful gift – Comes in a branded gift box, perfect for birthdays and anniversaries"
+      ],
+      "product_information": {
+        "features_specs": {
+          "Brand": "ChronoCraft",
+          "Movement": "Quartz (Japanese Module)",
+          "Water Resistance": "30 m (3 ATM)",
+          "Special Feature": "Scratch-resistant mineral glass, date display",
+          "Clasp Type": "Buckle"
+        },
+        "style": {
+          "Style Name": "Classic Analog",
+          "Colour": "Tan Brown / Silver",
+          "Dial Shape": "Round",
+          "Band Material": "Genuine Leather"
+        },
+        "measurements": {
+          "Dial Diameter": "40 mm",
+          "Case Thickness": "9 mm",
+          "Strap Width": "20 mm",
+          "Item Weight": "55 g"
+        },
+        "materials_care": {
+          "Case Material": "Stainless Steel",
+          "Strap Material": "Genuine Leather",
+          "Care Instructions": "Avoid prolonged water exposure; wipe strap dry after contact with moisture; store away from direct sunlight"
+        },
+        "item_details": {
+          "Item Model Number": "CC-AN-019-TAN",
+          "Manufacturer": "ChronoCraft Timepieces Pvt. Ltd.",
+          "Included Components": "1 Watch, 1 Gift Box, Warranty Card",
+          "Warranty": "2 Year Manufacturer Warranty",
+          "Country of Origin": "India"
+        }
+      },
+      "variants": {
+        "colours": ["Tan Brown", "Black", "Dark Brown"],
+        "sizes": ["Standard (40mm)", "Large (44mm)"]
+      },
+      "stock": {
+        "in_stock": true,
+        "quantity": 164
+      }
+    },
+    {
+      "id": "HYDRA-0028-TEA",
+      "category": "Home & Kitchen",
+      "title": "HydraFlask Vacuum Insulated Steel Water Bottle, 1 Litre, Keeps Cold 24 Hrs & Hot 12 Hrs, Leak-Proof, BPA Free – Teal, Wide Mouth",
+      "brand": "HydraFlask",
+      "price": {
+        "currency": "INR",
+        "mrp": 1299,
+        "selling_price": 749,
+        "discount_percent": 42
+      },
+      "rating": {
+        "average": 4.6,
+        "count": 5109
+      },
+      "images": [
+        "https://picsum.photos/seed/hydraflask-bottle-1/800/800",
+        "https://picsum.photos/seed/hydraflask-bottle-2/800/800",
+        "https://picsum.photos/seed/hydraflask-bottle-3/800/800"
+      ],
+      "about_this_item": [
+        "Superior insulation – Double-wall vacuum insulation keeps drinks cold for 24 hours or hot for 12 hours",
+        "Leak-proof design – Screw-tight lid with silicone gasket prevents spills inside bags",
+        "Food-grade material – 18/8 stainless steel interior, BPA-free and free of plastic aftertaste",
+        "No condensation – Sweat-free exterior keeps your bag and desk dry, even on hot days",
+        "Wide mouth convenience – Easy to fill with ice cubes and simple to clean"
+      ],
+      "product_information": {
+        "features_specs": {
+          "Brand": "HydraFlask",
+          "Capacity": "1 Litre",
+          "Insulation Type": "Double-Wall Vacuum",
+          "Special Feature": "Leak-proof, sweat-free, wide mouth",
+          "Lid Type": "Screw Cap with Handle"
+        },
+        "style": {
+          "Style Name": "Classic Wide Mouth",
+          "Colour": "Teal",
+          "Pattern": "Solid Matte Finish",
+          "Finish": "Powder Coated"
+        },
+        "measurements": {
+          "Height": "26 cm",
+          "Diameter": "8 cm",
+          "Capacity": "1000 ml",
+          "Item Weight": "380 g"
+        },
+        "materials_care": {
+          "Material": "18/8 Food-Grade Stainless Steel",
+          "Care Instructions": "Hand wash recommended; rinse immediately after use; avoid dishwasher for lid",
+          "Country of Origin": "India"
+        },
+        "item_details": {
+          "Item Model Number": "HF-WB-1L-TEA",
+          "Manufacturer": "HydraFlask Home Products Pvt. Ltd.",
+          "Included Components": "1 Water Bottle, 1 Cleaning Brush",
+          "Warranty": "1 Year Manufacturer Warranty"
+        }
+      },
+      "variants": {
+        "colours": ["Teal", "Matte Black", "Blush Pink", "Sunset Orange"],
+        "sizes": ["500 ml", "750 ml", "1 Litre"]
+      },
+      "stock": {
+        "in_stock": true,
+        "quantity": 421
+      }
+    }
+  ]
+}

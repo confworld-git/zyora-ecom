@@ -17,6 +17,9 @@ const Navbar = () => {
         <li>
           <a href="/Contact_Us">Contact Us</a>
         </li>
+        <li>
+          <a href="/Dashboard">Dashboard</a>
+        </li>
         <a className="cart_icon" href="/Cart">
           <i class="bi bi-bag-check-fill"></i>
           {/* <i class="bi bi-bag-check"></i> */}
