@@ -1,6 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./Components/Navbar/Navbar";
-import Footer from "./Components/Footer/Footer";
 import Homepage from "./Components/Homepage";
 import About from "./MainComponants/About/About";
 import Contat from "./MainComponants/Contact/Contat.jsx";
@@ -8,11 +6,15 @@ import Cart from "./MainComponants/Cart/Cart";
 import Favorites from "./MainComponants/Favorites/Favorites";
 import Category from "./MainComponants/Category/Category.jsx";
 import Dashboard from "./Dashboard/Dashboard.jsx";
+import Login from "./Login/Login.jsx";
 import { Toaster } from "react-hot-toast";
+import PublicRoute from "./ProtectedRoute/PublicRoute.jsx";
+import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.jsx";
+import Layout from "./ProtectedRoute/Layout.jsx";
 
 const App = () => {
   return (
-    <BrowserRouter>
+     <BrowserRouter>
       <Toaster
         position="top-center"
         reverseOrder={false}
@@ -26,17 +28,35 @@ const App = () => {
           },
         }}
       />
-      <Navbar />
+
       <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/About_Us" element={<About />} />
-        <Route path="/Contact_Us" element={<Contat />} />
-        <Route path="/Cart" element={<Cart />} />
-        <Route path="/Favorites" element={<Favorites />} />
-        <Route path="/Zyora_Category" element={<Category />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
+        {/* Common Layout */}
+        <Route element={<Layout />}>
+          {/* Public Pages */}
+          <Route path="/" element={<Homepage />} />
+          <Route path="/About_Us" element={<About />} />
+          <Route path="/Contact_Us" element={<Contat />} />
+          <Route path="/Cart" element={<Cart />} />
+          <Route path="/Favorites" element={<Favorites />} />
+          <Route path="/Zyora_Category" element={<Category />} />
+          <Route
+            path="/Dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/Login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+        </Route>
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 };

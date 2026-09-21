@@ -1,0 +1,361 @@
+.zyora-login-page {
+  min-height: 100vh;
+  width: 100%;
+  background: #faf7ef;
+  color: #001f3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+.zyora-login-page span {
+  font-family: "Quicksand", sans-serif;
+}
+
+.zyora-login-container {
+  width: 100%;
+  max-width: 1200px;
+  /* min-height: 680px; */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 31, 61, 0.08);
+}
+
+.zyora-login-brand {
+  background: #001f3d;
+  color: white;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.zyora-login-brand::before {
+  content: "";
+  width: 300px;
+  height: 300px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  position: absolute;
+  right: -120px;
+  top: -80px;
+}
+
+.zyora-login-brand::after {
+  content: "";
+  width: 450px;
+  height: 450px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  position: absolute;
+  left: -300px;
+  bottom: -180px;
+}
+
+.zyora-login-logo {
+  background-color: white;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.zyora-login-logo > img {
+  height: 100px;
+  position: relative;
+  z-index: 2;
+}
+
+.zyora-login-brand-content {
+  margin-top: auto;
+  margin-bottom: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.zyora-login-brand-content span {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #fd7304;
+  margin-bottom: 18px;
+}
+
+.zyora-login-brand-content h1 {
+  margin: 0;
+  font-size: clamp(38px, 4vw, 58px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+  font-weight: 700;
+}
+
+.zyora-login-brand-content p {
+  max-width: 420px;
+  margin-top: 25px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.zyora-login-footer {
+  position: relative;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+}
+
+.zyora-login-form-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+}
+
+.zyora-login-form-wrapper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.zyora-login-heading span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #fd7304;
+}
+
+.zyora-login-heading h2 {
+  margin: 12px 0 8px;
+  font-size: 38px;
+  letter-spacing: -1.5px;
+  color: #001f3d;
+}
+
+.zyora-login-heading > h1 {
+  margin: 5px 0px;
+}
+
+.zyora-login-heading p {
+  margin: 0;
+  color: #777;
+  font-size: 14px;
+}
+
+.zyora-login-form {
+  margin-top: 35px;
+}
+
+.zyora-input-group {
+  margin-bottom: 22px;
+}
+
+.zyora-input-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #001f3d;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Quicksand", sans-serif;
+}
+
+.zyora-input-wrapper {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 15px;
+  border: 1px solid #dedede;
+  border-radius: 12px;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.zyora-input-wrapper:focus-within {
+  border-color: #001f3d;
+  box-shadow: 0 0 0 3px rgba(0, 31, 61, 0.06);
+}
+
+.zyora-input-wrapper > svg {
+  flex-shrink: 0;
+  color: #777;
+  font-size: 18px;
+}
+
+.zyora-input-wrapper input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #001f3d;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 500;
+}
+
+.zyora-input-wrapper input::placeholder {
+  color: #aaa;
+}
+
+.zyora-password-toggle {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #777;
+  padding: 3px;
+  font-size: 18px;
+}
+
+.zyora-login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 0 25px;
+  font-size: 12px;
+}
+
+.zyora-remember {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #666;
+  cursor: pointer;
+}
+
+.zyora-remember input {
+  accent-color: #fd7304;
+  cursor: pointer;
+}
+
+.zyora-forgot {
+  border: none;
+  background: transparent;
+  color: #001f3d;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 650;
+}
+
+.zyora-forgot:hover {
+  color: #fd7304;
+}
+
+.zyora-login-button {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 12px;
+  background: #fd7304;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-family: "Quicksand", sans-serif;
+}
+
+.zyora-login-button:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.zyora-login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+/* =========================
+   SECURITY
+========================= */
+
+.zyora-login-security {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  color: #999;
+  font-size: 11px;
+}
+
+.zyora-login-security svg {
+  font-size: 13px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+  .zyora-login-page {
+    padding: 15px;
+  }
+
+  .zyora-login-container {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .zyora-login-brand {
+    min-height: 300px;
+    padding: 35px;
+  }
+
+  .zyora-login-brand-content {
+    margin-top: 70px;
+  }
+
+  .zyora-login-brand-content h1 {
+    font-size: 40px;
+  }
+
+  .zyora-login-footer {
+    margin-top: 40px;
+  }
+
+  .zyora-login-form-section {
+    padding: 40px 25px;
+  }
+}
+
+@media (max-width: 450px) {
+  .zyora-login-page {
+    padding: 0;
+  }
+
+  .zyora-login-container {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .zyora-login-brand {
+    min-height: 260px;
+    padding: 28px;
+  }
+
+  .zyora-login-brand-content {
+    margin-top: 50px;
+  }
+
+  .zyora-login-brand-content h1 {
+    font-size: 34px;
+  }
+
+  .zyora-login-form-section {
+    padding: 35px 22px;
+  }
+
+  .zyora-login-heading h2 {
+    font-size: 32px;
+  }
+}

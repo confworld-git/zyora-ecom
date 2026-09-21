@@ -9,9 +9,31 @@ import EnquiryData from "./EnquiryData";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import AddProduct from "./AddProducts";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      toast.success("Logged out successfully");
+
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Logout failed");
+    }
+  };
 
   useEffect(() => {
     const getContactData = async () => {
@@ -54,6 +76,7 @@ const Dashboard = () => {
             <MdOutlinePersonOutline />
             Admin Panel
           </li>
+          <li onClick={handleLogout}>Logout</li>
         </div>
         <div className="dashboard_right_section">
           <EnquiryData enquiryData={enquiryData} />
