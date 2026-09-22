@@ -1,8 +1,9 @@
 import "./Dashboard.css";
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const categories = [
   "Electronics",
@@ -20,6 +21,7 @@ const categories = [
 function AddProduct() {
   const [formData, setFormData] = useState({
     id: "",
+    name: "",
     category: "",
     title: "",
     brand: "",
@@ -47,7 +49,6 @@ function AddProduct() {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,6 +61,21 @@ function AddProduct() {
     setErrors((prev) => ({
       ...prev,
       [name]: "",
+    }));
+  };
+
+  const generateProductId = () => {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const randomPart = Math.random().toString(36).slice(2, 7).toUpperCase();
+
+    setFormData((prev) => ({
+      ...prev,
+      id: `PRD-${timestamp}-${randomPart}`,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      id: "",
     }));
   };
 
@@ -233,6 +249,10 @@ function AddProduct() {
       newErrors.id = "Product ID is required";
     }
 
+    if (!formData.name.trim()) {
+      newErrors.name = "Product name is required";
+    }
+
     if (!formData.category) {
       newErrors.category = "Please select a category";
     }
@@ -249,10 +269,7 @@ function AddProduct() {
       newErrors.mrp = "Enter a valid MRP";
     }
 
-    if (
-      !formData.selling_price ||
-      Number(formData.selling_price) <= 0
-    ) {
+    if (!formData.selling_price || Number(formData.selling_price) <= 0) {
       newErrors.selling_price = "Enter a valid selling price";
     }
 
@@ -261,8 +278,7 @@ function AddProduct() {
       Number(formData.mrp) > 0 &&
       Number(formData.selling_price) >= Number(formData.mrp)
     ) {
-      newErrors.selling_price =
-        "Selling price must be less than MRP";
+      newErrors.selling_price = "Selling price must be less than MRP";
     }
 
     if (formData.images.length === 0) {
@@ -295,9 +311,6 @@ function AddProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    setSuccessMessage("");
-
     if (!validateForm()) {
       window.scrollTo({
         top: 0,
@@ -313,6 +326,7 @@ function AddProduct() {
       const data = new FormData();
 
       data.append("id", formData.id.trim());
+      data.append("name", formData.name.trim());
       data.append("category", formData.category);
       data.append("title", formData.title.trim());
       data.append("brand", formData.brand.trim());
@@ -324,16 +338,14 @@ function AddProduct() {
           mrp: Number(formData.mrp),
           selling_price: Number(formData.selling_price),
           discount_percent: discount,
-        })
+        }),
       );
 
       data.append(
         "about_this_item",
         JSON.stringify(
-          formData.about_this_item.filter(
-            (item) => item.trim() !== ""
-          )
-        )
+          formData.about_this_item.filter((item) => item.trim() !== ""),
+        ),
       );
 
       data.append(
@@ -344,19 +356,15 @@ function AddProduct() {
           measurements: convertToObject(formData.measurements),
           materials_care: convertToObject(formData.materials_care),
           item_details: convertToObject(formData.item_details),
-        })
+        }),
       );
 
       data.append(
         "variants",
         JSON.stringify({
-          colours: formData.colours.filter(
-            (item) => item.trim() !== ""
-          ),
-          sizes: formData.sizes.filter(
-            (item) => item.trim() !== ""
-          ),
-        })
+          colours: formData.colours.filter((item) => item.trim() !== ""),
+          sizes: formData.sizes.filter((item) => item.trim() !== ""),
+        }),
       );
 
       data.append(
@@ -364,29 +372,24 @@ function AddProduct() {
         JSON.stringify({
           in_stock: formData.in_stock,
           quantity: Number(formData.quantity) || 0,
-        })
+        }),
       );
 
       formData.images.forEach((image) => {
         data.append("images", image);
       });
 
-      const response = await axios.post(
-        `${API_URL}/api/products`,
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/products`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
 
-      console.log("Product created:", response.data);
-
-      setSuccessMessage("Product added successfully!");
+      toast.success(response.data.message);
       setFormData({
         id: "",
+        name: "",
         category: "",
         title: "",
         brand: "",
@@ -446,12 +449,7 @@ function AddProduct() {
                 placeholder="Key"
                 value={item.key}
                 onChange={(e) =>
-                  handleKeyValueChange(
-                    section,
-                    index,
-                    "key",
-                    e.target.value
-                  )
+                  handleKeyValueChange(section, index, "key", e.target.value)
                 }
               />
 
@@ -460,21 +458,14 @@ function AddProduct() {
                 placeholder="Value"
                 value={item.value}
                 onChange={(e) =>
-                  handleKeyValueChange(
-                    section,
-                    index,
-                    "value",
-                    e.target.value
-                  )
+                  handleKeyValueChange(section, index, "value", e.target.value)
                 }
               />
 
               <button
                 type="button"
                 className="remove-btn"
-                onClick={() =>
-                  removeKeyValue(section, index)
-                }
+                onClick={() => removeKeyValue(section, index)}
               >
                 ×
               </button>
@@ -488,31 +479,19 @@ function AddProduct() {
   return (
     <div className="add-product-page">
       <div className="add-product-container">
-
         <div className="page-header">
           <div>
             <span className="page-label">PRODUCT MANAGEMENT</span>
             <h1>Add Product</h1>
-            <p>
-              Add a new product to your Zyora store.
-            </p>
+            <p>Add a new product to your Zyora store.</p>
           </div>
         </div>
 
         {errors.submit && (
-          <div className="alert error-alert">
-            {errors.submit}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="alert success-alert">
-            {successMessage}
-          </div>
+          <div className="alert error-alert">{errors.submit}</div>
         )}
 
         <form onSubmit={handleSubmit}>
-
           <section className="product-section">
             <div className="section-heading">
               <div>
@@ -522,24 +501,51 @@ function AddProduct() {
             </div>
 
             <div className="form-grid">
-
-              <div className="form-group">
+              <div className="form-group full-width">
                 <label>
                   Product ID <span>*</span>
                 </label>
 
+                <div className="price-input">
+                  <input
+                    type="text"
+                    name="id"
+                    placeholder="Enter manually or generate"
+                    value={formData.id}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="small-add-btn"
+                    onClick={generateProductId}
+                    style={{
+                      marginTop: "6px",
+                    }}
+                  >
+                    Generate <i class="bi bi-arrow-clockwise"></i>
+                  </button>
+                </div>
+
+                {errors.id && (
+                  <small className="field-error">{errors.id}</small>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>
+                  Product Name <span>*</span>
+                </label>
+
                 <input
                   type="text"
-                  name="id"
-                  placeholder="e.g. FITX-0032-PUR"
-                  value={formData.id}
+                  name="name"
+                  placeholder="Enter product name"
+                  value={formData.name}
                   onChange={handleChange}
                 />
 
-                {errors.id && (
-                  <small className="field-error">
-                    {errors.id}
-                  </small>
+                {errors.name && (
+                  <small className="field-error">{errors.name}</small>
                 )}
               </div>
 
@@ -556,23 +562,18 @@ function AddProduct() {
                   <option value="">Select category</option>
 
                   {categories.map((category) => (
-                    <option
-                      key={category}
-                      value={category}
-                    >
+                    <option key={category} value={category}>
                       {category}
                     </option>
                   ))}
                 </select>
 
                 {errors.category && (
-                  <small className="field-error">
-                    {errors.category}
-                  </small>
+                  <small className="field-error">{errors.category}</small>
                 )}
               </div>
 
-              <div className="form-group full-width">
+              <div className="form-group">
                 <label>
                   Product Title <span>*</span>
                 </label>
@@ -586,9 +587,7 @@ function AddProduct() {
                 />
 
                 {errors.title && (
-                  <small className="field-error">
-                    {errors.title}
-                  </small>
+                  <small className="field-error">{errors.title}</small>
                 )}
               </div>
 
@@ -606,12 +605,9 @@ function AddProduct() {
                 />
 
                 {errors.brand && (
-                  <small className="field-error">
-                    {errors.brand}
-                  </small>
+                  <small className="field-error">{errors.brand}</small>
                 )}
               </div>
-
             </div>
           </section>
 
@@ -624,14 +620,9 @@ function AddProduct() {
             </div>
 
             <div className="form-grid three-columns">
-
               <div className="form-group">
                 <label>Currency</label>
-                <input
-                  type="text"
-                  value="INR"
-                  disabled
-                />
+                <input type="text" value="INR" disabled />
               </div>
 
               <div className="form-group">
@@ -652,9 +643,7 @@ function AddProduct() {
                 </div>
 
                 {errors.mrp && (
-                  <small className="field-error">
-                    {errors.mrp}
-                  </small>
+                  <small className="field-error">{errors.mrp}</small>
                 )}
               </div>
 
@@ -676,12 +665,9 @@ function AddProduct() {
                 </div>
 
                 {errors.selling_price && (
-                  <small className="field-error">
-                    {errors.selling_price}
-                  </small>
+                  <small className="field-error">{errors.selling_price}</small>
                 )}
               </div>
-
             </div>
 
             <div className="discount-box">
@@ -705,9 +691,7 @@ function AddProduct() {
             <div className="section-heading">
               <div>
                 <h2>Product Images</h2>
-                <p>
-                  Upload up to 5 product images.
-                </p>
+                <p>Upload up to 5 product images.</p>
               </div>
             </div>
 
@@ -722,45 +706,24 @@ function AddProduct() {
 
               <div className="upload-icon">＋</div>
 
-              <strong>
-                Click to upload images
-              </strong>
+              <strong>Click to upload images</strong>
 
-              <span>
-                PNG, JPG or WEBP • Maximum 5 images
-              </span>
+              <span>PNG, JPG or WEBP • Maximum 5 images</span>
             </label>
 
             {errors.images && (
-              <small className="field-error">
-                {errors.images}
-              </small>
+              <small className="field-error">{errors.images}</small>
             )}
 
             {imagePreviews.length > 0 && (
               <div className="image-preview-grid">
                 {imagePreviews.map((image, index) => (
-                  <div
-                    className="image-preview"
-                    key={image.url}
-                  >
-                    <img
-                      src={image.url}
-                      alt={`Product ${index + 1}`}
-                    />
+                  <div className="image-preview" key={image.url}>
+                    <img src={image.url} alt={`Product ${index + 1}`} />
 
-                    {index === 0 && (
-                      <span className="primary-image">
-                        Main
-                      </span>
-                    )}
+                    {index === 0 && <span className="primary-image">Main</span>}
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        removeImage(index)
-                      }
-                    >
+                    <button type="button" onClick={() => removeImage(index)}>
                       ×
                     </button>
                   </div>
@@ -774,9 +737,7 @@ function AddProduct() {
             <div className="section-heading">
               <div>
                 <h2>About This Item</h2>
-                <p>
-                  Add the main selling points of the product.
-                </p>
+                <p>Add the main selling points of the product.</p>
               </div>
 
               <button
@@ -789,77 +750,46 @@ function AddProduct() {
             </div>
 
             <div className="dynamic-list">
-              {formData.about_this_item.map(
-                (feature, index) => (
-                  <div
-                    className="dynamic-row"
-                    key={index}
+              {formData.about_this_item.map((feature, index) => (
+                <div className="dynamic-row" key={index}>
+                  <span className="row-number">{index + 1}</span>
+
+                  <input
+                    type="text"
+                    placeholder="Enter product feature"
+                    value={feature}
+                    onChange={(e) => handleFeatureChange(index, e.target.value)}
+                  />
+
+                  <button
+                    type="button"
+                    className="remove-btn"
+                    onClick={() => removeFeature(index)}
                   >
-                    <span className="row-number">
-                      {index + 1}
-                    </span>
-
-                    <input
-                      type="text"
-                      placeholder="Enter product feature"
-                      value={feature}
-                      onChange={(e) =>
-                        handleFeatureChange(
-                          index,
-                          e.target.value
-                        )
-                      }
-                    />
-
-                    <button
-                      type="button"
-                      className="remove-btn"
-                      onClick={() =>
-                        removeFeature(index)
-                      }
-                    >
-                      ×
-                    </button>
-                  </div>
-                )
-              )}
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
           </section>
 
           {/* Product Information */}
-          {renderKeyValueSection(
-            "Features & Specifications",
-            "features_specs"
-          )}
+          {renderKeyValueSection("Features & Specifications", "features_specs")}
 
-          {renderKeyValueSection(
-            "Style",
-            "style"
-          )}
+          {renderKeyValueSection("Style", "style")}
 
-          {renderKeyValueSection(
-            "Measurements",
-            "measurements"
-          )}
+          {renderKeyValueSection("Measurements", "measurements")}
 
-          {renderKeyValueSection(
-            "Materials & Care",
-            "materials_care"
-          )}
+          {renderKeyValueSection("Materials & Care", "materials_care")}
 
-          {renderKeyValueSection(
-            "Item Details",
-            "item_details"
-          )}
+          {renderKeyValueSection("Item Details", "item_details")}
 
           {/* Variants */}
           <section className="product-section">
             <div className="section-heading">
               <div>
                 <h2>Variants</h2>
-                <p>
-                  Add available colours and sizes.
-                </p>
+                <p>Add available colours and sizes.</p>
               </div>
             </div>
 
@@ -878,35 +808,22 @@ function AddProduct() {
               </div>
 
               <div className="chips-input-list">
-                {formData.colours.map(
-                  (colour, index) => (
-                    <div
-                      className="chip-input"
-                      key={index}
-                    >
-                      <input
-                        type="text"
-                        placeholder="e.g. Black"
-                        value={colour}
-                        onChange={(e) =>
-                          handleColourChange(
-                            index,
-                            e.target.value
-                          )
-                        }
-                      />
+                {formData.colours.map((colour, index) => (
+                  <div className="chip-input" key={index}>
+                    <input
+                      type="text"
+                      placeholder="e.g. Black"
+                      value={colour}
+                      onChange={(e) =>
+                        handleColourChange(index, e.target.value)
+                      }
+                    />
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeColour(index)
-                        }
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )
-                )}
+                    <button type="button" onClick={() => removeColour(index)}>
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -925,35 +842,20 @@ function AddProduct() {
               </div>
 
               <div className="chips-input-list">
-                {formData.sizes.map(
-                  (size, index) => (
-                    <div
-                      className="chip-input"
-                      key={index}
-                    >
-                      <input
-                        type="text"
-                        placeholder="e.g. Large"
-                        value={size}
-                        onChange={(e) =>
-                          handleSizeChange(
-                            index,
-                            e.target.value
-                          )
-                        }
-                      />
+                {formData.sizes.map((size, index) => (
+                  <div className="chip-input" key={index}>
+                    <input
+                      type="text"
+                      placeholder="e.g. Large"
+                      value={size}
+                      onChange={(e) => handleSizeChange(index, e.target.value)}
+                    />
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeSize(index)
-                        }
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )
-                )}
+                    <button type="button" onClick={() => removeSize(index)}>
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
@@ -968,7 +870,6 @@ function AddProduct() {
             </div>
 
             <div className="stock-row">
-
               <label className="stock-toggle">
                 <input
                   type="checkbox"
@@ -983,9 +884,7 @@ function AddProduct() {
 
                 <span className="toggle-slider" />
 
-                <span>
-                  Product is in stock
-                </span>
+                <span>Product is in stock</span>
               </label>
 
               <div className="form-group quantity-field">
@@ -1002,12 +901,9 @@ function AddProduct() {
                 />
 
                 {errors.quantity && (
-                  <small className="field-error">
-                    {errors.quantity}
-                  </small>
+                  <small className="field-error">{errors.quantity}</small>
                 )}
               </div>
-
             </div>
           </section>
 
@@ -1021,11 +917,7 @@ function AddProduct() {
               Cancel
             </button>
 
-            <button
-              type="submit"
-              className="submit-btn"
-              disabled={loading}
-            >
+            <button type="submit" className="submit-btn" disabled={loading}>
               {loading ? (
                 <>
                   <span className="spinner" />
@@ -1036,7 +928,6 @@ function AddProduct() {
               )}
             </button>
           </div>
-
         </form>
       </div>
     </div>

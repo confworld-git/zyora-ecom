@@ -11,10 +11,11 @@ import { Toaster } from "react-hot-toast";
 import PublicRoute from "./ProtectedRoute/PublicRoute.jsx";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.jsx";
 import Layout from "./ProtectedRoute/Layout.jsx";
+import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
 
 const App = () => {
   return (
-     <BrowserRouter>
+    <BrowserRouter>
       <Toaster
         position="top-center"
         reverseOrder={false}
@@ -37,6 +38,7 @@ const App = () => {
           <Route path="/Cart" element={<Cart />} />
           <Route path="/Favorites" element={<Favorites />} />
           <Route path="/Zyora_Category" element={<Category />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           <Route
             path="/Dashboard"
             element={

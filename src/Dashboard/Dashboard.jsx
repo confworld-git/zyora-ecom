@@ -5,7 +5,8 @@ import { AiOutlineProduct } from "react-icons/ai";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { RiHome4Line } from "react-icons/ri";
 import EnquiryData from "./EnquiryData";
-// import Home from "./Home";
+import Admin from "./Admin";
+import Home from "./Home";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import AddProduct from "./AddProducts";
@@ -15,6 +16,7 @@ import { toast } from "react-hot-toast";
 
 const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
+  const [activeSection, setActiveSection] = useState("home");
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -50,30 +52,30 @@ const Dashboard = () => {
     getContactData();
   }, []);
 
-  // const totalEnquiries = enquiryData.length;
+  const totalEnquiries = enquiryData.length;
 
   return (
     <div className="dashboard">
       <section className="dashboard_secton">
         <div className="dashboard_left_section">
           <h1>ZYORA</h1>
-          <li>
+          <li onClick={() => setActiveSection("home")}>
             <RiHome4Line />
             Home
           </li>
-          <li>
+          <li onClick={() => setActiveSection("orders")}>
             <TiShoppingCart />
             Orders
           </li>
-          <li>
+          <li onClick={() => setActiveSection("enquiry")}>
             <LuMessageCircleQuestion />
             Enquiry
           </li>
-          <li>
+          <li onClick={() => setActiveSection("add_product")}>
             <AiOutlineProduct />
             Add Products
           </li>
-          <li>
+          <li onClick={() => setActiveSection("admin")}>
             <MdOutlinePersonOutline />
             Admin Panel
           </li>
@@ -83,9 +85,22 @@ const Dashboard = () => {
           </li>
         </div>
         <div className="dashboard_right_section">
-          <EnquiryData enquiryData={enquiryData} />
-          {/* <Home totalEnquiries={totalEnquiries} /> */}
-          <AddProduct />
+          {activeSection === "home" && <Home totalEnquiries={totalEnquiries} />}
+
+          {activeSection === "orders" && (
+            <div>
+              <h2>Orders</h2>
+              <p>Orders will appear here.</p>
+            </div>
+          )}
+
+          {activeSection === "enquiry" && (
+            <EnquiryData enquiryData={enquiryData} />
+          )}
+
+          {activeSection === "add_product" && <AddProduct />}
+
+          {activeSection === "admin" && <Admin />}
         </div>
       </section>
     </div>

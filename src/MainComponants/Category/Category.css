@@ -1,5 +1,5 @@
 .category {
-  padding: 40px;
+  padding: 30px;
   background-color: #faf7ef;
 }
 
@@ -23,16 +23,69 @@
   flex: 4;
 }
 
+.categories_items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+.product_description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product_card > small {
+  font-weight: 600;
+  color: black;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "poppins", sans-serif;
+}
+
+.price > strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.price > del {
+  color: #757575;
+  font-size: 13px;
+}
+
+.price > span {
+  font-size: 13px;
+  color: red;
+}
+
 .categories_items > div {
-  width: 200px;
+  width: 280px;
   padding: 10px;
   border-radius: 20px;
   border: 1px solid #f3ece5;
   background-color: white;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.categories_items > div:hover,
+.categories_items > div:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(70, 48, 31, 0.12);
+  /* outline: 2px solid #ffba74; */
+  outline-offset: 2px;
 }
 
 .categories_items > div > img {
-  height: 200px;
+  height: 250px;
   width: 100%;
   object-fit: cover;
   border-radius: 20px;
@@ -68,7 +121,7 @@
   padding: 10px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   font-family: "Quicksand", sans-serif;
   transition: 0.5s;
   margin-top: 5px;

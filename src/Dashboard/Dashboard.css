@@ -56,7 +56,7 @@
   align-items: center;
   gap: 10px;
   margin-top: 10px;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .dashboard_left_section > li > svg {
@@ -699,4 +699,90 @@
   .chip-input {
     width: 100%;
   }
+}
+
+.admin-settings-card {
+  width: 100%;
+  max-width: 650px;
+  margin-top: 30px;
+  padding: 30px;
+  /* background: #ffe6a1; */
+  border: 1px solid #fff8e3;
+  border-radius: 12px;
+  box-shadow: #959da533 0px 8px 24px;
+}
+
+.admin-settings-card > form {
+  display: grid;
+  grid-template-columns: 2fr 2fr;
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-settings-card > form > :last-child {
+grid-column: span 2;
+}
+
+.admin-settings-header {
+  margin-bottom: 25px;
+}
+
+.admin-settings-header h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #18181b;
+}
+
+.admin-settings-header p {
+  margin: 0;
+  color: #71717a;
+  font-size: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #27272a;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d4d4d8;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: #18181b;
+}
+
+.update-admin-btn {
+  width: 100%;
+  padding: 13px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #18181b;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.update-admin-btn:hover {
+  opacity: 0.9;
+}
+
+.update-admin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
