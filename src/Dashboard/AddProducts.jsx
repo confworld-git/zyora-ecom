@@ -446,7 +446,7 @@ function AddProduct() {
             <div className="key-value-row" key={index}>
               <input
                 type="text"
-                placeholder="Key"
+                placeholder=""
                 value={item.key}
                 onChange={(e) =>
                   handleKeyValueChange(section, index, "key", e.target.value)
@@ -455,7 +455,7 @@ function AddProduct() {
 
               <input
                 type="text"
-                placeholder="Value"
+                placeholder=""
                 value={item.value}
                 onChange={(e) =>
                   handleKeyValueChange(section, index, "value", e.target.value)

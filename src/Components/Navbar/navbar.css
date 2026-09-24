@@ -58,27 +58,17 @@
   transition: 0.3s ease;
 }
 
+.navbar > ul > li > a > svg {
+  font-size: 25px;
+}
+
 .navbar > ul > li:hover > a {
   color: #fd7304;
-  /* font-size: 17px; */
   letter-spacing: 1px;
 }
 
-/* .navbar > ul > .cart_icon {
-  cursor: pointer;
-  background-color: #020092;
-  padding: 5px;
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-} */
-
 .cart_icon {
+  position: relative;
   cursor: pointer;
   transition: 0.3s ease;
   text-decoration: none;
@@ -87,6 +77,26 @@
 
 .cart_icon > .bi {
   font-size: 20px;
+}
+
+.cart_icon.has_items {
+  color: #fd7304;
+}
+
+.cart_badge {
+  position: absolute;
+  top: -10px;
+  right: -12px;
+  width: 15px;
+  height: 15px;
+  padding: 2px;
+  border-radius: 50%;
+  background-color: #fd7304;
+  color: #fff;
+  font-size: 10px;
+  /* font-weight: 600; */
+  text-align: center;
+  font-family: "poppins", sans-serif;
 }
 
 .cart_icon:hover {

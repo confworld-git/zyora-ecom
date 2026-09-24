@@ -1,33 +1,47 @@
 import "./navbar.css";
+import { Link } from "react-router-dom";
+import { useCart } from "../../Context/CartContext.jsx";
+import { MdPerson } from "react-icons/md";
 
 const Navbar = () => {
+  const { totalItems } = useCart();
+
   return (
     <nav className="navbar">
       <h1>ZYORA</h1>
       <ul>
         <li>
-          <a href="/">Home</a>
+          <Link to="/">Home</Link>
         </li>
         <li>
-          <a href="/Zyora_Category">Category</a>
+          <Link to="/Zyora_Category">Category</Link>
         </li>
         <li>
-          <a href="/About_Us">About Us</a>
+          <Link to="/About_Us">About Us</Link>
         </li>
         <li>
-          <a href="/Contact_Us">Contact Us</a>
+          <Link to="/Contact_Us">Contact Us</Link>
         </li>
         <li>
-          <a href="/Login">Login</a>
+          <Link to="/Login">
+            <MdPerson />
+          </Link>
         </li>
-        <a className="cart_icon" href="/Cart">
-          <i class="bi bi-bag-check-fill"></i>
-          {/* <i class="bi bi-bag-check"></i> */}
-        </a>
-        <a className="cart_icon" href="/Favorites">
-          <i class="bi bi-heart-fill"></i>
+        <Link
+          className={`cart_icon ${totalItems > 0 ? "has_items" : ""}`}
+          to="/Cart"
+        >
+          {totalItems > 0 ? (
+            <i className="bi bi-bag-check-fill"></i>
+          ) : (
+            <i className="bi bi-bag-check"></i>
+          )}
+          {totalItems > 0 && <span className="cart_badge">{totalItems}</span>}
+        </Link>
+        <Link className="cart_icon" to="/Favorites">
+          <i className="bi bi-heart-fill"></i>
           {/* <i class="bi bi-heart"></i> */}
-        </a>
+        </Link>
       </ul>
     </nav>
   );

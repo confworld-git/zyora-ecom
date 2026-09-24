@@ -2,8 +2,11 @@ import "./ProductDetail.css";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { useCart } from "../../Context/CartContext.jsx";
 
 const ProductDetail = () => {
+  const { addToCart } = useCart();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,7 +21,9 @@ const ProductDetail = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
         );
-        const matchingProduct = response.data.find((item) => item.id === id);
+        const matchingProduct = response.data.find(
+          (item) => String(item.id ?? item._id) === String(id),
+        );
 
         if (!matchingProduct) {
           setError("Product not found.");
@@ -52,6 +57,8 @@ const ProductDetail = () => {
   }
 
   const productName = product.name || product.title;
+  const ratingAverage = product.rating?.average ?? 0;
+  const displayedRating = Math.round(ratingAverage * 2) / 2;
   const information = product.product_information || {};
   const details = [
     ["Features & Specifications", information.features_specs],
@@ -60,6 +67,32 @@ const ProductDetail = () => {
     ["Materials & Care", information.materials_care],
     ["Item Details", information.item_details],
   ];
+
+  const colorRequired = product.variants?.colours?.length > 0;
+  const sizeRequired = product.variants?.sizes?.length > 0;
+
+  const validateSelection = () => {
+    if (colorRequired && !selectedColor) {
+      toast.error("Please select a color");
+      return false;
+    }
+    if (sizeRequired && !selectedSize) {
+      toast.error("Please select a size");
+      return false;
+    }
+    return true;
+  };
+
+  const handleAddToCart = () => {
+    if (!validateSelection()) return;
+    addToCart(product, selectedColor, selectedSize);
+    toast.success("Added to cart");
+  };
+
+  const handleBuyNow = () => {
+    if (!validateSelection()) return;
+    // TODO: add your buy-now navigation/logic here
+  };
 
   return (
     <main className="product-detail-page">
@@ -84,7 +117,7 @@ const ProductDetail = () => {
         </div>
 
         <div className="preview_image_big">
-            <img src={selectedImage} alt={productName} />
+          <img src={selectedImage} alt={productName} />
         </div>
 
         <div className="product-detail-summary">
@@ -99,11 +132,6 @@ const ProductDetail = () => {
             <span>{product.price?.discount_percent}% OFF</span>
           </div>
 
-          <p className={product.stock?.in_stock ? "in-stock" : "out-stock"}>
-            {product.stock?.in_stock
-              ? `In Stock (${product.stock.quantity ?? 0} available)`
-              : "Out of Stock"}
-          </p>
           <div className="color-selection">
             <h3>Color</h3>
             <div className="color-options">
@@ -142,6 +170,14 @@ const ProductDetail = () => {
               )}
             </div>
           </div>
+          <div className="product_btns">
+            <button type="button" onClick={handleBuyNow}>
+              Buy now <i className="bi bi-wallet2"></i>
+            </button>
+            <button type="button" onClick={handleAddToCart}>
+              Add to cart <i className="bi bi-bag-check"></i>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -158,22 +194,62 @@ const ProductDetail = () => {
         )}
       </section>
 
-      {/* <section className="product-detail-section detail-grid">
+      <section className="product-detail-section detail-grid">
         <div>
           <h2>Variants</h2>
+          <div className="variant-colours">
+            <span>Colours:</span>
+            {product.variants?.colours?.length > 0 ? (
+              product.variants.colours.map((color) => (
+                <span className="variant-colour" key={color}>
+                  <span
+                    className="variant-colour-swatch"
+                    style={{ backgroundColor: color }}
+                    title={color}
+                    aria-label={color}
+                  />
+                  {color}
+                </span>
+              ))
+            ) : (
+              <span>Not specified</span>
+            )}
+          </div>
           <p>
-            Colours: {product.variants?.colours?.join(", ") || "Not specified"}
+            Sizes:
+            <span>
+              {product.variants?.sizes?.join(", ") || "Not specified"}
+            </span>
           </p>
-          <p>Sizes: {product.variants?.sizes?.join(", ") || "Not specified"}</p>
         </div>
         <div>
           <h2>Rating</h2>
-          <p>
-            {product.rating?.average ?? 0} / 5 ({product.rating?.count ?? 0}{" "}
-            reviews)
-          </p>
+          <div
+            className="rating-display"
+            aria-label={`${ratingAverage} out of 5 stars`}
+          >
+            <span className="rating-stars" aria-hidden="true">
+              {Array.from({ length: 5 }, (_, index) => (
+                <span
+                  className={
+                    displayedRating >= index + 1
+                      ? "full"
+                      : displayedRating >= index + 0.5
+                        ? "half"
+                        : "empty"
+                  }
+                  key={index}
+                >
+                  ★
+                </span>
+              ))}
+            </span>
+            <span>
+              {ratingAverage} / 5 ({product.rating?.count ?? 0} reviews)
+            </span>
+          </div>
         </div>
-      </section> */}
+      </section>
 
       {details.some(
         ([, values]) => values && Object.keys(values).length > 0,

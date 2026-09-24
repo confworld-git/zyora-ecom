@@ -12,6 +12,7 @@ import PublicRoute from "./ProtectedRoute/PublicRoute.jsx";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.jsx";
 import Layout from "./ProtectedRoute/Layout.jsx";
 import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
+import "./index.css"
 
 const App = () => {
   return (

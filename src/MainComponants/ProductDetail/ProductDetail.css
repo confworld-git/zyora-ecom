@@ -40,7 +40,7 @@
 }
 
 .product-detail-hero > :nth-child(2) {
-    width: 80%;
+  width: 80%;
 }
 
 .product-detail-hero > :nth-child(2) > img {
@@ -71,16 +71,106 @@
 .product-category,
 /* .product-title, */
 .product-id {
-  color: #525252;
-  font-weight: 500;
+  color: #414141;
+  font-weight: 550;
   font-size: 15px;
 }
 
-.product-title {
-  font-family: "Playfair Display SC", serif;
-  margin-top: 5px;
+.product_btns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.product_btns > button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 52px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-radius: 500px;
+  outline: none;
+  background: #171717;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(23, 23, 23, 0.14);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease;
+}
+
+.product_btns > button:first-child {
+  background: linear-gradient(135deg, #ff8a1f, #ed5c00);
+  box-shadow: 0 10px 20px rgba(237, 92, 0, 0.22);
+}
+
+.product_btns > button::before {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: -75%;
+  width: 45%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.24);
+  content: "";
+  transform: skewX(-20deg);
+  transition: left 420ms ease;
+}
+
+.product_btns > button > i {
   font-size: 18px;
-  font-weight: 550;
+  transition: transform 220ms ease;
+}
+
+.product_btns > button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 24px rgba(23, 23, 23, 0.2);
+}
+
+.product_btns > button:hover::before {
+  left: 130%;
+}
+
+.product_btns > button:hover > i {
+  transform: translateX(3px) scale(1.08);
+}
+
+.product_btns > button:focus-visible {
+  box-shadow:
+    0 0 0 3px #faf7ef,
+    0 0 0 6px #f16d01;
+}
+
+.product_btns > button:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product_btns > button,
+  .product_btns > button::before,
+  .product_btns > button > i {
+    transition: none;
+  }
+}
+
+.product-title {
+  font-family: "Poppins", sans-serif;
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 450;
   color: #3a3a3a;
 }
 
@@ -98,7 +188,7 @@
   align-items: baseline;
   flex-wrap: wrap;
   gap: 12px;
-  margin: 24px 0;
+  margin: 14px 0;
 }
 
 .detail-price strong {
@@ -115,12 +205,30 @@
 }
 
 .in-stock {
-  color: #287a45;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #a9dca9;
+  border-radius: 999px;
+  background: #e9f8e9;
+  color: #176b25;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .out-stock {
-  color: #c73e32;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #efb4ad;
+  border-radius: 999px;
+  background: #fff0ee;
+  color: #bd3d32;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -214,6 +322,76 @@
   line-height: 1.7;
 }
 
+.product-detail-section p {
+  margin: 0;
+}
+
+.detail-grid > div > p {
+  font-weight: 550;
+  font-family: "Playfair Display SC", serif;
+}
+
+.detail-grid > div > p > span {
+  font-weight: 500;
+  margin-left: 10px;
+  font-family: "Quicksand", sans-serif;
+}
+
+.variant-colours {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-weight: 550;
+}
+
+.variant-colour {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 500;
+}
+
+.variant-colour-swatch {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+}
+
+.rating-display {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-weight: 550;
+  font-family: "Quicksand", sans-serif;
+}
+
+.rating-stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.rating-stars .full {
+  color: #f16d01;
+}
+
+.rating-stars .empty {
+  color: #cdbda9;
+}
+
+.rating-stars .half {
+  background: linear-gradient(90deg, #f16d01 50%, #cdbda9 50%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
 .detail-grid,
 .information-grid {
   display: grid;
@@ -241,8 +419,8 @@
   text-align: end;
 }
 
-.information-grid p strong{
-    text-align: start;
+.information-grid p strong {
+  text-align: start;
 }
 
 .product-detail-state {

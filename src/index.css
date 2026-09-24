@@ -1,16 +1,31 @@
 body h1 {
   font-family: "Playfair Display SC", serif;
-  /* font-family: "Poppins", sans-serif; */
 }
 
 body {
   padding: 0;
   margin: 0;
-  /* font-family: "Quicksand", sans-serif; */
   font-family: "Playfair Display SC", sans-serif;
   background-color: #ffffff;
 }
 
-body p{
+body p {
   font-family: "Quicksand", sans-serif;
+}
+
+#page_path > p {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 0;
+  color: #616161;
+  font-family: "Playfair Display SC", serif;
+}
+
+#page_path > p > svg {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
