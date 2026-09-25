@@ -269,7 +269,9 @@ const Category = () => {
   return (
     <div className="category">
       <div id="page_path">
-        <p>Home <MdKeyboardArrowRight/> Categories</p>
+        <p>
+          Home <MdKeyboardArrowRight /> Categories
+        </p>
       </div>
       <h1>Categories</h1>
       <p>
@@ -529,22 +531,20 @@ const Category = () => {
                     src={product.images?.[0]}
                     alt={product.title || "Product"}
                   />
-                  <small>{product.brand}</small>
-                  <p className="product_description">{product.title}</p>
-                  <div className="price">
-                    <strong>₹{product.price?.selling_price}</strong>
-                    <del>₹{product.price?.mrp}</del>
-                    <span>({product.price?.discount_percent}% OFF)</span>
-                  </div>
-                  <p>
+                  <p className="rating_pre">
                     ⭐ {product.rating?.average ?? 0} (
                     {product.rating?.count ?? 0})
                   </p>
-                  {product.stock?.in_stock ? (
-                    <p>In Stock</p>
-                  ) : (
-                    <p>Out of Stock</p>
-                  )}
+                  <small>{product.brand}</small>
+                  <p className="product_description">{product.title}</p>
+                  <div className="price">
+                    <strong>Rs.{product.price?.selling_price}</strong>
+                    <del>Rs.{product.price?.mrp}</del>
+                    <span>({product.price?.discount_percent}% OFF)</span>
+                  </div>
+                  <span>
+                    {/* use frame1, frame2 and heart_anime for this before clicking frame1 and animaiton (heart_anime) and then frame2 image should be in add to fav style*/}
+                    add to fav</span>
                 </div>
               );
             })}

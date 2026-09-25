@@ -1,23 +1,25 @@
 import "./navbar.css";
 import { Link } from "react-router-dom";
 import { useCart } from "../../Context/CartContext.jsx";
+import { useWishlist } from "../../Context/WishlistContext.jsx";
 import { MdPerson } from "react-icons/md";
 
 const Navbar = () => {
   const { totalItems } = useCart();
+  const { wishlistItems } = useWishlist();
+  const totalFavorites = wishlistItems.length;
 
   return (
     <nav className="navbar">
-      <h1>ZYORA</h1>
+      <h1>
+        <Link to="/">ZYORA</Link>
+      </h1>
       <ul>
         <li>
-          <Link to="/">Home</Link>
+          <Link to="/About_Us">About Us</Link>
         </li>
         <li>
           <Link to="/Zyora_Category">Category</Link>
-        </li>
-        <li>
-          <Link to="/About_Us">About Us</Link>
         </li>
         <li>
           <Link to="/Contact_Us">Contact Us</Link>
@@ -38,9 +40,19 @@ const Navbar = () => {
           )}
           {totalItems > 0 && <span className="cart_badge">{totalItems}</span>}
         </Link>
-        <Link className="cart_icon" to="/Favorites">
-          <i className="bi bi-heart-fill"></i>
-          {/* <i class="bi bi-heart"></i> */}
+        <Link
+          className={`cart_icon ${totalFavorites > 0 ? "has_items" : ""}`}
+          to="/Favorites"
+        >
+          {totalFavorites > 0 ? (
+            <i className="bi bi-heart-fill"></i>
+          ) : (
+            <i className="bi bi-heart"></i>
+          )}
+
+          {totalFavorites > 0 && (
+            <span className="cart_badge">{totalFavorites}</span>
+          )}
         </Link>
       </ul>
     </nav>

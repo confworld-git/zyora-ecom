@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { useCart } from "../../Context/CartContext.jsx";
 import Confetti from "../../Confetti/Confetti.jsx";
+import nocart from "../../assets/Videos/nocart.gif";
+import Order from "../Order/Order.jsx";
+import { MdKeyboardArrowRight } from "react-icons/md";
 
 const Cart = () => {
   const {
@@ -11,18 +14,75 @@ const Cart = () => {
     decreaseQuantity,
     removeFromCart,
     updateCartItemOption,
-    subtotal,
   } = useCart();
 
+  const [selectedCartIds, setSelectedCartIds] = useState(
+    () => new Set(cartItems.map((item) => item.cartId)),
+  );
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponMessage, setCouponMessage] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [showPlatformFee, setShowPlatformFee] = useState(false);
+  const getStoredAddresses = () => {
+    try {
+      const storedAddresses = JSON.parse(
+        localStorage.getItem("addresses") || "null",
+      );
+      if (Array.isArray(storedAddresses) && storedAddresses.length > 0) {
+        return storedAddresses;
+      }
+    } catch (error) {
+      console.error("Unable to parse saved addresses", error);
+    }
+
+    try {
+      const defaultAddress = JSON.parse(
+        localStorage.getItem("defaultAddress") || "null",
+      );
+      return defaultAddress ? [defaultAddress] : [];
+    } catch (error) {
+      console.error("Unable to parse default address", error);
+      return [];
+    }
+  };
+
+  const [addresses, setAddresses] = useState(() => getStoredAddresses());
+  const [hasDefaultAddress, setHasDefaultAddress] = useState(() =>
+    Boolean(JSON.parse(localStorage.getItem("defaultAddress") || "null")),
+  );
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
+  const [showAddressForm, setShowAddressForm] = useState(false);
 
   const FREE_SHIPPING_LIMIT = 1999;
   const SHIPPING_CHARGE = 250;
   const PLATFORM_FEE = 23;
+
+  useEffect(() => {
+    setSelectedCartIds((currentIds) => {
+      const cartItemIds = new Set(cartItems.map((item) => item.cartId));
+      const nextIds = new Set(
+        [...currentIds].filter((cartId) => cartItemIds.has(cartId)),
+      );
+
+      cartItems.forEach((item) => {
+        if (!currentIds.has(item.cartId)) {
+          nextIds.add(item.cartId);
+        }
+      });
+
+      return nextIds;
+    });
+  }, [cartItems]);
+
+  const selectedItems = cartItems.filter((item) =>
+    selectedCartIds.has(item.cartId),
+  );
+  const subtotal = selectedItems.reduce(
+    (total, item) =>
+      total + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+    0,
+  );
 
   const shipping =
     subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_LIMIT ? 0 : SHIPPING_CHARGE;
@@ -60,13 +120,13 @@ const Cart = () => {
     return 0;
   };
 
-  const totalMRP = cartItems.reduce((total, item) => {
+  const totalMRP = selectedItems.reduce((total, item) => {
     const mrp = Number(item.mrp) || 0;
     const quantity = Number(item.quantity) || 0;
     return total + mrp * quantity;
   }, 0);
 
-  const productDiscount = cartItems.reduce((total, item) => {
+  const productDiscount = selectedItems.reduce((total, item) => {
     const mrp = Number(item.mrp) || 0;
     const sellingPrice = Number(item.price) || 0;
     const quantity = Number(item.quantity) || 0;
@@ -75,15 +135,92 @@ const Cart = () => {
   }, 0);
 
   const couponDiscount = calculateDiscount();
-  const totalItemsCount = cartItems.reduce(
+  const totalItemsCount = selectedItems.reduce(
     (total, item) => total + (Number(item.quantity) || 0),
     0,
   );
 
   const total = Math.max(
     0,
-    subtotal + shipping - couponDiscount + PLATFORM_FEE,
+    subtotal +
+      shipping -
+      couponDiscount +
+      (selectedItems.length > 0 ? PLATFORM_FEE : 0),
   );
+
+  const toggleCartItem = (cartId) => {
+    setSelectedCartIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+      if (nextIds.has(cartId)) {
+        nextIds.delete(cartId);
+      } else {
+        nextIds.add(cartId);
+      }
+      return nextIds;
+    });
+  };
+
+  const handleAddressSaved = (address) => {
+    const normalizedAddress = {
+      ...address,
+      isDefault: Boolean(address.isDefault),
+    };
+
+    setAddresses((currentAddresses) => {
+      let nextAddresses = [...currentAddresses];
+
+      if (normalizedAddress.isDefault) {
+        nextAddresses = nextAddresses.map((currentAddress) => ({
+          ...currentAddress,
+          isDefault: false,
+        }));
+      }
+
+      nextAddresses = [...nextAddresses, normalizedAddress];
+      const defaultAddress =
+        nextAddresses.find((item) => item.isDefault) || null;
+
+      if (defaultAddress) {
+        localStorage.setItem("defaultAddress", JSON.stringify(defaultAddress));
+      } else {
+        localStorage.removeItem("defaultAddress");
+      }
+
+      localStorage.setItem("addresses", JSON.stringify(nextAddresses));
+      return nextAddresses;
+    });
+
+    setSelectedAddressIndex(addresses.length);
+    setHasDefaultAddress(Boolean(normalizedAddress.isDefault));
+    setShowAddressForm(false);
+  };
+
+  const handleDeleteAddress = (addressIndex) => {
+    const nextAddresses = addresses.filter(
+      (_, index) => index !== addressIndex,
+    );
+    const deletedAddress = addresses[addressIndex];
+    const remainingDefault = nextAddresses.find((address) => address.isDefault);
+
+    setAddresses(nextAddresses);
+    setSelectedAddressIndex(
+      Math.max(0, Math.min(addressIndex, nextAddresses.length - 1)),
+    );
+    setHasDefaultAddress(Boolean(remainingDefault));
+    setShowAddressForm(false);
+
+    if (remainingDefault) {
+      localStorage.setItem("defaultAddress", JSON.stringify(remainingDefault));
+    } else {
+      localStorage.removeItem("defaultAddress");
+    }
+
+    localStorage.setItem("addresses", JSON.stringify(nextAddresses));
+
+    if (deletedAddress?.isDefault && !remainingDefault) {
+      console.log("Default address removed");
+    }
+  };
 
   const handleApplyCoupon = () => {
     const code = couponCode.trim().toUpperCase();
@@ -134,22 +271,41 @@ const Cart = () => {
 
   return (
     <div className="cart">
-      <h1 className="cart_title">
-        Your <span>Cart</span>
-      </h1>
-      <p>You’ve got taste, and honestly, we’re impressed.</p>
+      <div id="page_path">
+        <p>
+          Home <MdKeyboardArrowRight /> Cart
+        </p>
+      </div>
+      {cartItems.length > 0 && (
+        <>
+          <h1 className="cart_title">
+            Your <span>Cart</span>
+          </h1>
+          <p>You’ve got taste, and honestly, we’re impressed.</p>
+        </>
+      )}
       {cartItems.length === 0 ? (
         <div className="empty-cart">
+          <img src={nocart} alt="" />
           <h2>Your cart is empty</h2>
-          <p>Add some products to your cart and they will appear here.</p>
+          <p>
+            Looks like you haven’t added anything yet. Explore our best picks
+            and fill your cart with something you’ll love.
+          </p>
         </div>
       ) : (
         <section className="cart_section">
           <div className="cart_left_section">
             {cartItems.map((item) => (
               <div className="cart_item" key={item.cartId}>
+                <input
+                  className="cart_item_checkbox"
+                  type="checkbox"
+                  checked={selectedCartIds.has(item.cartId)}
+                  onChange={() => toggleCartItem(item.cartId)}
+                  aria-label={`Include ${item.name} in price details`}
+                />
                 <img src={item.image} alt={item.name} />
-
                 <div>
                   <div className="cart_item_details">
                     <span>{item.brand}</span>
@@ -272,6 +428,12 @@ const Cart = () => {
                 </div>
               </div>
             ))}
+            {showAddressForm && (
+              <Order
+                onAddressSaved={handleAddressSaved}
+                onCancel={() => setShowAddressForm(false)}
+              />
+            )}
           </div>
 
           <aside className="cart_summary">
@@ -409,7 +571,7 @@ const Cart = () => {
             <div className="summary_row">
               <span>Shipping</span>
               <strong>
-                {shipping === 0 ? (
+                {shipping === 0 && subtotal > 0 ? (
                   <span className="free_shipping">FREE</span>
                 ) : (
                   <>
@@ -447,7 +609,74 @@ const Cart = () => {
               <a href="/privacy">Privacy Policy</a>
             </p>
 
-            <button className="checkout_btn" type="button">
+            {(addresses.length > 0 || !hasDefaultAddress) &&
+              !showAddressForm && (
+                <div className="cart_address_section">
+                  <div className="cart_address_heading">
+                    <h3>Select Address</h3>
+                    <button
+                      type="button"
+                      className="add_address_btn"
+                      onClick={() => setShowAddressForm(true)}
+                    >
+                      {hasDefaultAddress ? "Add new address" : "Add address"}
+                    </button>
+                  </div>
+                  {addresses.length > 0 && (
+                    <>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          width: "100%",
+                        }}
+                      >
+                        <select
+                          className="cart_address_select"
+                          value={selectedAddressIndex}
+                          onChange={(event) =>
+                            setSelectedAddressIndex(Number(event.target.value))
+                          }
+                          aria-label="Select delivery address"
+                          style={{ flex: 1 }}
+                        >
+                          {addresses.map((address, index) => (
+                            <option
+                              key={`${address.mobile}-${index}`}
+                              value={index}
+                            >
+                              {address.name} - {address.houseNumber},{" "}
+                              {address.city} - {address.pinCode}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          className="remove_address_btn"
+                          onClick={() =>
+                            handleDeleteAddress(selectedAddressIndex)
+                          }
+                          aria-label="Delete selected address"
+                          title="Delete selected address"
+                        >
+                          <i className="bi bi-x-circle-fill"></i>
+                        </button>
+                      </div>
+                      <p className="cart_selected_address">
+                        {addresses[selectedAddressIndex].address},{" "}
+                        {addresses[selectedAddressIndex].locality},{" "}
+                        {addresses[selectedAddressIndex].state}
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+            <button
+              className="checkout_btn"
+              type="button"
+              disabled={selectedItems.length === 0}
+            >
               PLACE ORDER
             </button>
             <Confetti active={celebrate} burstKey={burstKey} />

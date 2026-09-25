@@ -4,9 +4,11 @@ import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useCart } from "../../Context/CartContext.jsx";
+import { useWishlist } from "../../Context/WishlistContext";
 
 const ProductDetail = () => {
   const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -85,13 +87,26 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (!validateSelection()) return;
-    addToCart(product, selectedColor, selectedSize);
+
+    const selectedProduct = {
+      ...product,
+      images: selectedImage ? [selectedImage] : [],
+    };
+
+    addToCart(selectedProduct, selectedColor, selectedSize);
     toast.success("Added to cart");
   };
 
-  const handleBuyNow = () => {
-    if (!validateSelection()) return;
-    // TODO: add your buy-now navigation/logic here
+  const handleAddFav = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const selectedProduct = {
+      ...product,
+      images: selectedImage ? [selectedImage] : [],
+    };
+
+    toggleWishlist(selectedProduct);
   };
 
   return (
@@ -171,8 +186,17 @@ const ProductDetail = () => {
             </div>
           </div>
           <div className="product_btns">
-            <button type="button" onClick={handleBuyNow}>
-              Buy now <i className="bi bi-wallet2"></i>
+            <button type="button" onClick={handleAddFav}>
+              {isInWishlist(product?.id ?? product?._id)
+                ? "Changed my mind"
+                : "This one's mine"}
+              <i
+                className={
+                  isInWishlist(product?.id ?? product?._id)
+                    ? "bi bi-heart-fill"
+                    : "bi bi-heart"
+                }
+              ></i>
             </button>
             <button type="button" onClick={handleAddToCart}>
               Add to cart <i className="bi bi-bag-check"></i>

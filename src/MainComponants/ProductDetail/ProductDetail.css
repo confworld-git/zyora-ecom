@@ -261,7 +261,7 @@
 
 .color-options button:hover,
 .color-options button.selected {
-  outline-color: #5d3f27;
+  outline-color: #000000;
 }
 
 .no-colors {

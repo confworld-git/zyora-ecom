@@ -4,8 +4,9 @@ import { useForm, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import axios from "axios";
-import contactus from "../../assets/Images/contactus.png";
 import toast from "react-hot-toast";
+import { MdKeyboardArrowRight } from "react-icons/md";
+import peak from "../../assets/Images/peak.gif"
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -42,7 +43,11 @@ const Contact = () => {
 
   return (
     <div className="contact_main">
-      <img src={contactus} alt="" />
+      <div id="page_path">
+        <p>
+          Home <MdKeyboardArrowRight /> Contact Us
+        </p>
+      </div>
       <div className="Contact">
         <div className="contact_content">
           <h1>
@@ -76,6 +81,7 @@ const Contact = () => {
           </li>
         </div>
         <div className="contact_form">
+          <img src={peak} alt="" />
           <p>Send a Message</p>
           <h1>Tell us about it.</h1>
           <form onSubmit={handleSubmit(onSubmit)}>

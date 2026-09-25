@@ -7,13 +7,18 @@
   backdrop-filter: blur(50px);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .navbar > h1 {
   margin: 0;
   padding: 0;
   font-size: 35px;
+}
+
+.navbar > h1 > a {
+  text-decoration: none;
+  color: black;
 }
 
 .navbar > img {
@@ -77,6 +82,8 @@
 
 .cart_icon > .bi {
   font-size: 20px;
+  display: inline-block;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .cart_icon.has_items {
@@ -85,21 +92,20 @@
 
 .cart_badge {
   position: absolute;
-  top: -10px;
-  right: -12px;
+  top: -12px;
+  right: -14px;
   width: 15px;
   height: 15px;
   padding: 2px;
   border-radius: 50%;
-  background-color: #fd7304;
+  background-color: #fd0404;
   color: #fff;
   font-size: 10px;
-  /* font-weight: 600; */
   text-align: center;
   font-family: "poppins", sans-serif;
 }
 
-.cart_icon:hover {
+.cart_icon:hover > .bi {
   color: #fd7304;
   transform: scale(1.2);
 }

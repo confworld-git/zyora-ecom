@@ -1,7 +1,6 @@
 .Contact {
   display: flex;
   justify-content: space-between;
-  padding: 60px;
   gap: 40px;
   position: relative;
 }
@@ -9,6 +8,7 @@
 .contact_main {
   position: relative;
   background-color: #faf7ef;
+    padding: 60px;
 }
 
 .contact_main > img {
@@ -33,6 +33,14 @@
   box-shadow: #efe7dd 0px 7px 29px 0px;
   background-color: white;
   border: 1px solid #f3ece5;
+  position: relative;
+}
+
+.contact_form>img{
+  position: absolute;
+  top: 25%;
+  left: -125px;
+  height: 250px;
 }
 
 .contact_form > p {

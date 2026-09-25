@@ -1,0 +1,147 @@
+.order_customer_detail {
+  background: #fff;
+  border: 1px solid #f3ece5;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(26, 26, 26, 0.04);
+  margin-bottom: 16px;
+}
+
+.order_customer_detail > h1 {
+  margin: 0 0 15px 0;
+}
+
+.order_address_form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.order_address_form > .order_field_group:last-of-type,
+.order_address_form > div:last-child {
+  grid-column: 1 / -1;
+}
+
+.order_address_form input {
+  font-family: "poppins", sans-serif;
+  padding: 10px;
+  border: 1px solid #dfdfdf;
+  border-radius: 6px;
+}
+
+.order_address_form > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.order_address_form > div > span {
+  font-family: "poppins", sans-serif;
+  font-size: 13px;
+  color: #ff5252;
+}
+
+.order_address_form > div > div {
+  font-family: "poppins", sans-serif;
+}
+
+.order_address_form > div:last-child {
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.order_section_title.small {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.order_address_type {
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 24px;
+}
+
+.radio_option {
+  display: inline-flex;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  color: #454545;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.radio_option input,
+.order_default_checkbox input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #fd3f00;
+  cursor: pointer;
+}
+
+.radio_circle {
+  display: none;
+}
+
+.order_default_checkbox {
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  color: #626262;
+  font-size: 13px;
+}
+
+.order_form_actions {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.order_form_actions button {
+  min-width: 100px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: "poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.order_cancel_btn {
+  background: #000;
+  border-color: #d9d1ca !important;
+  color: white;
+}
+
+.order_cancel_btn:hover {
+  transform: scale(1.05);
+}
+
+.order_save_btn {
+  background: #ff4000;
+  color: #fff;
+}
+
+.order_save_btn:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 520px) {
+  .order_form_actions {
+    justify-content: stretch;
+  }
+
+  .order_form_actions button {
+    flex: 1;
+  }
+}

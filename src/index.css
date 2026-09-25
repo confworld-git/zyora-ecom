@@ -21,6 +21,8 @@ body p {
   margin-top: 0;
   color: #616161;
   font-family: "Playfair Display SC", serif;
+  position: relative;
+  z-index: 200;
 }
 
 #page_path > p > svg {
@@ -29,3 +31,5 @@ body p {
   align-items: center;
   justify-content: center;
 }
+
+/* ff4000 */

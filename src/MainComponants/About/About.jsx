@@ -5,10 +5,16 @@ import { FaHandsHelping } from "react-icons/fa";
 import { FaTruck } from "react-icons/fa6";
 import arc from "../../assets/Images/arc.png";
 // import arc4 from "../../assets/Videos/arc.mp4";
+import { MdKeyboardArrowRight } from "react-icons/md";
 
 const About = () => {
   return (
     <div className="About_us">
+      <div id="page_path">
+        <p>
+          Home <MdKeyboardArrowRight /> About Us
+        </p>
+      </div>
       <div className="about_title">
         <img src={arc} alt="" />
         {/* <video src={arc4} autoPlay muted loop playsInline/> */}
