@@ -6,7 +6,7 @@ import "react-phone-number-input/style.css";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { MdKeyboardArrowRight } from "react-icons/md";
-import peak from "../../assets/Images/peak.gif"
+import peak from "../../assets/Images/peak1.png"
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 

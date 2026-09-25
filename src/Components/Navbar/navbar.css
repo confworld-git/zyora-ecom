@@ -92,15 +92,18 @@
 
 .cart_badge {
   position: absolute;
-  top: -12px;
-  right: -14px;
+  top: -10px;
+  right: -12px;
   width: 15px;
   height: 15px;
-  padding: 2px;
+  /* padding: 2px; */
   border-radius: 50%;
   background-color: #fd0404;
   color: #fff;
-  font-size: 10px;
+  font-size: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   font-family: "poppins", sans-serif;
 }

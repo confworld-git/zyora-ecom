@@ -1,13 +1,17 @@
 import "./welcome.css";
-import globe from "../../assets/Videos/globe.mp4";
-// import world from "../../assets/Videos/world.mp4";
 
 const Welcome = () => {
   return (
     <section className="Welcome_container">
-      <div className="Video_container">
-        <video src={globe} autoPlay muted loop playsInline />
-      </div>
+      {/* <div className="Video_container">
+        <video
+          src="https://res.cloudinary.com/zyora/video/upload/v1790328170/globe2_lgz10s.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+      </div> */}
       <div className="Welcome_content">
         <div>
           <h1>
