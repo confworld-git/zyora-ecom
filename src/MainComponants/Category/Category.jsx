@@ -1,7 +1,7 @@
 import "./Category.css";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 
 const MIN_PRODUCT_PRICE = 749;
@@ -16,12 +16,14 @@ const clothingSizeLabels = {
 };
 
 const Category = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCategory = searchParams.get("category");
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
 
   const [filters, setFilters] = useState({
-    categories: [],
+    categories: selectedCategory ? [selectedCategory] : [],
     priceMin: MIN_PRODUCT_PRICE,
     priceMax: null,
     colors: [],
@@ -217,6 +219,7 @@ const Category = () => {
   const clearFilters = () => {
     setSearchTerm("");
     setSizeSliderSize("");
+    setSearchParams({}, { replace: true });
 
     setFilters({
       categories: [],
@@ -544,7 +547,8 @@ const Category = () => {
                   </div>
                   <span>
                     {/* use frame1, frame2 and heart_anime for this before clicking frame1 and animaiton (heart_anime) and then frame2 image should be in add to fav style*/}
-                    add to fav</span>
+                    add to fav
+                  </span>
                 </div>
               );
             })}

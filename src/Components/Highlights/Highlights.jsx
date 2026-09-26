@@ -14,7 +14,7 @@ const Highlights = () => {
     <div className="highlights">
       <div>
         <h1>Category <span>Highlights</span></h1>
-        <p>
+        <p className="explore_category_link">
           View products
           <i class="bi bi-arrow-right"></i>
         </p>

@@ -43,6 +43,7 @@ function AddProduct() {
     sizes: [""],
 
     in_stock: true,
+    is_best_seller: false,
     quantity: "",
   });
 
@@ -374,6 +375,7 @@ function AddProduct() {
           quantity: Number(formData.quantity) || 0,
         }),
       );
+      data.append("is_best_seller", String(formData.is_best_seller));
 
       formData.images.forEach((image) => {
         data.append("images", image);
@@ -405,6 +407,7 @@ function AddProduct() {
         colours: [""],
         sizes: [""],
         in_stock: true,
+        is_best_seller: false,
         quantity: "",
       });
 
@@ -885,6 +888,23 @@ function AddProduct() {
                 <span className="toggle-slider" />
 
                 <span>Product is in stock</span>
+              </label>
+
+              <label className="stock-toggle">
+                <input
+                  type="checkbox"
+                  checked={formData.is_best_seller}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      is_best_seller: e.target.checked,
+                    }))
+                  }
+                />
+
+                <span className="toggle-slider" />
+
+                <span>Feature as a best seller</span>
               </label>
 
               <div className="form-group quantity-field">

@@ -488,8 +488,8 @@
 
 .price > span {
   font-size: 13px;
-  color: rgb(255, 0, 0);
-  font-weight: 500;
+  color: #16a34a;
+  font-weight: 600;
 }
 
 .categories_items > div {

@@ -1,233 +1,200 @@
 import "./Featured.css";
-import furnicher1 from "../../assets/Images/furnicher1.jfif";
-import furnicher2 from "../../assets/Images/furnicher2.jfif";
-import note1 from "../../assets/Images/note1.jfif";
-import kitchen1 from "../../assets/Images/kitchen1.jfif";
-import toy4 from "../../assets/Images/toy4.jfif";
-import bag2 from "../../assets/Images/bag2.jfif";
-// import toy5 from "../../assets/Images/toy5.png";
-import note2 from "../../assets/Images/note2.jfif";
-import note3 from "../../assets/Images/note3.jfif";
-import note4 from "../../assets/Images/note4.jfif";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
-import bag5 from "../../assets/Images/bag5.jfif";
-import dress2 from "../../assets/Images/dress2.jfif";
-import dress3 from "../../assets/Images/dress3.jfif";
-import toy2 from "../../assets/Images/toy2.png";
-import bag3 from "../../assets/Images/bag3.jfif";
-import kitchen2 from "../../assets/Images/kitchen2.jfif";
-import toy3 from "../../assets/Images/toy3.jfif";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-import dress1 from "../../assets/Images/dress1.jfif";
-import bag4 from "../../assets/Images/bag4.jfif";
-import toy1 from "../../assets/Images/toy1.jfif";
-import dress4 from "../../assets/Images/dress4.jfif";
+const FILTERS = [
+  {
+    id: "all",
+    title: "All Products",
+    description: "Browse the full collection.",
+  },
+  {
+    id: "new",
+    title: "New Arrivals",
+    description: "Fresh finds, just landed.",
+  },
+  {
+    id: "bestseller",
+    title: "Best Sellers",
+    description: "Loved by our customers.",
+  },
+  {
+    id: "under499",
+    title: "Under ₹499",
+    description: "Great picks that won't break the bank.",
+  },
+];
 
 const Featured = () => {
-  const products = [
-    {
-      image: bag2,
-      name: "Green Fashion Bag",
-      price: 1499,
-      description: "Trendy handbag designed for everyday fashion.",
-      category: "Fashion",
-    },
-    {
-      image: bag5,
-      name: "Elegant White Handbag",
-      price: 1599,
-      description: "Minimal and sophisticated handbag for every occasion.",
-      category: "Fashion",
-    },
-    {
-      image: bag3,
-      name: "Navy Blue Handbag",
-      price: 1399,
-      description: "Classic blue handbag with a premium appearance.",
-      category: "Fashion",
-    },
-    {
-      image: bag4,
-      name: "Luxury Black Handbag",
-      price: 1799,
-      description: "Premium black handbag with a stylish design.",
-      category: "Fashion",
-    },
-    {
-      image: dress1,
-      name: "Floral Casual Dress",
-      price: 899,
-      description: "Comfortable floral dress for casual outings.",
-      category: "Fashion",
-    },
-    {
-      image: dress2,
-      name: "Yellow Summer Dress",
-      price: 999,
-      description: "Light and comfortable dress for sunny days.",
-      category: "Fashion",
-    },
-    {
-      image: dress3,
-      name: "Elegant White Dress",
-      price: 1199,
-      description: "Simple and elegant dress with a timeless look.",
-      category: "Fashion",
-    },
-    {
-      image: dress4,
-      name: "Black & White Dress",
-      price: 1099,
-      description: "Modern black and white dress with an elegant style.",
-      category: "Fashion",
-    },
+  const [products, setProducts] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    {
-      image: note1,
-      name: "Pastel Stationery Set",
-      price: 349,
-      description: "Beautiful stationery essentials for work and study.",
-      category: "Stationery",
-    },
-    {
-      image: note2,
-      name: "Floral Notebook Set",
-      price: 299,
-      description: "Cute notebooks with stylish floral designs.",
-      category: "Stationery",
-    },
-    {
-      image: note3,
-      name: "Creative Planner Set",
-      price: 449,
-      description: "Organize your day with this colorful planner set.",
-      category: "Stationery",
-    },
-    {
-      image: note4,
-      name: "Mint Desk Organizer",
-      price: 399,
-      description: "Keep your workspace neat and organized.",
-      category: "Stationery",
-    },
+  useEffect(() => {
+    const controller = new AbortController();
 
-    {
-      image: kitchen1,
-      name: "Modern Kitchen Set",
-      price: 899,
-      description: "Stylish and practical essentials for your kitchen.",
-      category: "Home & Kitchen",
-    },
-    {
-      image: kitchen2,
-      name: "Kitchen Essentials",
-      price: 749,
-      description: "Useful kitchen essentials for your everyday needs.",
-      category: "Home & Kitchen",
-    },
-        {
-      image: furnicher1,
-      name: "Modern Bedside Table",
-      price: 2499,
-      description:
-        "Stylish bedside table with open shelves and spacious drawers.",
-      category: "Home & Kitchen",
-    },
-    {
-      image: furnicher2,
-      name: "Minimal Wooden Nightstand",
-      price: 2299,
-      description:
-        "Modern wooden nightstand designed to keep your bedroom organized.",
-      category: "Home & Kitchen",
-    },
+    const getProducts = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}/api/products/get_products`,
+          { signal: controller.signal },
+        );
+        setProducts(Array.isArray(response.data) ? response.data : []);
+      } catch (requestError) {
+        if (axios.isCancel(requestError)) return;
+        console.error("Error fetching featured products:", requestError);
+        setError("Unable to load products right now.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    {
-      image: toy4,
-      name: "Cuddly Teddy Bear",
-      price: 699,
-      description: "Soft and adorable teddy bear, perfect for gifting.",
-      category: "Toys",
-    },
-    // {
-    //   image: toy5,
-    //   name: "Classic Red Teddy",
-    //   price: 799,
-    //   description: "Super-soft teddy bear made for warm cuddles.",
-    //   category: "Toys",
-    // },
-    {
-      image: toy2,
-      name: "Soft Cream Teddy",
-      price: 649,
-      description: "Adorable soft toy that's perfect for kids and gifting.",
-      category: "Toys",
-    },
-    {
-      image: toy3,
-      name: "Cute Panda Plush",
-      price: 599,
-      description: "Soft panda plush toy made for endless cuddles.",
-      category: "Toys",
-    },
-    {
-      image: toy1,
-      name: "White Teddy Bear",
-      price: 699,
-      description: "Classic white teddy bear with an ultra-soft finish.",
-      category: "Toys",
-    },
-  ];
+    getProducts();
 
-  const categories = ["Fashion", "Stationery", "Home & Kitchen", "Toys"];
+    // Prevents "state update on an unmounted component" if this
+    // component unmounts before the request resolves.
+    return () => controller.abort();
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    switch (activeFilter) {
+      case "new":
+        return [...products]
+          .sort(
+            (first, second) =>
+              new Date(second.createdAt || 0) - new Date(first.createdAt || 0),
+          )
+          .slice(0, 8);
+      case "bestseller":
+        return products.filter((product) => product.is_best_seller);
+      case "under499":
+        return products.filter(
+          (product) => Number(product.price?.selling_price) <= 499,
+        );
+      default:
+        return products;
+    }
+  }, [activeFilter, products]);
+
+  // Derive categories from the *filtered* list so we never render an
+  // empty category section (no more silent `return null` cases below).
+  const categories = useMemo(
+    () => [
+      ...new Set(
+        filteredProducts.map((product) => product.category).filter(Boolean),
+      ),
+    ],
+    [filteredProducts],
+  );
+
   return (
     <div className="Featured_Collection">
       <h1>
         Featured <span>Collections</span> Banner
       </h1>
       <p>Handpicked selections tailored to your lifestyle</p>
-      <section>
-        <div>
-          <h1>New Arrivals</h1>
-          <p>Fresh finds, just landed.</p>
-        </div>
-        <div>
-          <h1>Best Sellers</h1>
-          <p>Loved by thousands of happy customers. </p>
-        </div>
-        <div>
-          <h1>Under ₹499</h1>
-          <p>Great picks that won't break the bank.</p>
-        </div>
-      </section>
-      {categories.map((category) => {
-        const categoryProducts = products.filter(
-          (product) => product.category === category,
-        );
 
-        return (
-          <div className="category_section" key={category}>
-            <div className="category_heading">
-              <h1>{category}</h1>
-              <p>
-                View products <i className="bi bi-arrow-right"></i>
-              </p>
+      <section aria-label="Featured product filters">
+        {FILTERS.map((filter) => (
+          <button
+            className={activeFilter === filter.id ? "active" : ""}
+            key={filter.id}
+            type="button"
+            aria-pressed={activeFilter === filter.id}
+            onClick={() => setActiveFilter(filter.id)}
+          >
+            <h3>{filter.title}</h3>
+            <p>{filter.description}</p>
+          </button>
+        ))}
+      </section>
+
+      {loading ? (
+        <p className="featured_status" role="status">
+          Loading products...
+        </p>
+      ) : error ? (
+        <p className="featured_status" role="alert">
+          {error}
+        </p>
+      ) : filteredProducts.length === 0 ? (
+        <p className="featured_status">
+          No products match this collection yet.
+        </p>
+      ) : (
+        categories.map((category) => {
+          const categoryProducts = filteredProducts.filter(
+            (product) => product.category === category,
+          );
+
+          return (
+            <div className="category_section" key={category}>
+              <div className="category_heading">
+                <h2>{category}</h2>
+                {/* <span>
+                  {categoryProducts.length}
+                  {categoryProducts.length === 1 ? "product" : "products"}
+                </span> */}
+                <Link
+                  className="explore_category_link"
+                  to={`/Zyora_Category?category=${encodeURIComponent(category)}`}
+                >
+                  Explore more <i class="bi bi-arrow-right"></i>
+                </Link>
+              </div>
+              <div className="collections_imgs">
+                {categoryProducts.map((product, index) => {
+                  const productKey = product.id || product._id || index;
+                  return (
+                    <Link
+                      className="product_card"
+                      key={productKey}
+                      to={`/product/${product.id || product._id}`}
+                    >
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name || product.title}
+                        />
+                      ) : (
+                        <div className="featured_no_image">
+                          No image available
+                        </div>
+                      )}
+                      <div className="product_info">
+                        <p className="featured_brand">{product.brand}</p>
+                        <h2>{product.name || product.title}</h2>
+                        <div className="product_price_row">
+                          <p id="product_price">
+                            ₹{product.price?.selling_price}
+                          </p>
+                          {product.price?.mrp && (
+                            <p className="product_mrp">₹{product.price.mrp}</p>
+                          )}
+                          {product.price?.discount_percent ? (
+                            <p className="product_discount">
+                              {product.price.discount_percent}% off
+                            </p>
+                          ) : null}
+                        </div>
+                        <p className="product_description_clamp">
+                          {product.about_this_item?.[0] || product.title}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-            <div className="collections_imgs">
-              {categoryProducts.map((product, index) => (
-                <div className="product_card" key={index}>
-                  <img src={product.image} alt={product.name} />
-                  <div className="product_info">
-                    <h2>{product.name}</h2>
-                    <p id="product_price">₹{product.price}</p>
-                    <p className="product_description">{product.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })
+      )}
     </div>
   );
 };
