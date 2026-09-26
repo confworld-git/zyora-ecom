@@ -3,7 +3,7 @@ import "./welcome.css";
 const Welcome = () => {
   return (
     <section className="Welcome_container">
-      {/* <div className="Video_container">
+      <div className="Video_container">
         <video
           src="https://res.cloudinary.com/zyora/video/upload/v1790328170/globe2_lgz10s.mp4"
           autoPlay
@@ -11,7 +11,7 @@ const Welcome = () => {
           loop
           playsInline
         />
-      </div> */}
+      </div>
       <div className="Welcome_content">
         <div>
           <h1>

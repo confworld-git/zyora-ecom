@@ -1,6 +1,7 @@
 .Welcome_container {
   position: relative;
-  /* min-height: 100vh; */
+  min-height: 100vh;
+  margin-top: 50px;
 }
 
 .Video_container {
@@ -21,7 +22,7 @@
 
 .Welcome_content {
   position: relative;
-  margin-top: 20px;
+  /* margin-top: 20px; */
   min-height: 100vh;
   z-index: 1;
   display: flex;
@@ -35,6 +36,7 @@
   /* color: white; */
   margin-bottom: 20px;
   box-sizing: border-box;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
 .Welcome_content > :nth-child(1) {
