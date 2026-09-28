@@ -246,6 +246,8 @@ export const CartProvider = ({ children }) => {
   );
 };
 
+// Context modules export both their provider and hook.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
   const context = useContext(CartContext);
 

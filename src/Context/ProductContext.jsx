@@ -40,6 +40,8 @@ export const ProductProvider = ({ children }) => {
   );
 };
 
+// Context modules export both their provider and hook.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useProducts = () => {
   const context = useContext(ProductContext);
 

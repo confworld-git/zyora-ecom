@@ -4,8 +4,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { useProducts } from "../../Context/ProductContext.jsx";
 
-const MIN_PRODUCT_PRICE = 749;
-
 const clothingSizeLabels = {
   S: "S - Small",
   M: "M - Medium",
@@ -19,12 +17,21 @@ const Category = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category");
   const { products } = useProducts();
+  const MIN_PRODUCT_PRICE = useMemo(() => {
+    const sellingPrices = products
+      .map((product) => product.price?.selling_price)
+      .filter((price) => price !== undefined && price !== null && price !== "")
+      .map(Number)
+      .filter(Number.isFinite);
+
+    return sellingPrices.length ? Math.min(...sellingPrices) : 0;
+  }, [products]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
 
   const [filters, setFilters] = useState({
     categories: selectedCategory ? [selectedCategory] : [],
-    priceMin: MIN_PRODUCT_PRICE,
+    priceMin: null,
     priceMax: null,
     colors: [],
     sizes: [],
@@ -32,6 +39,7 @@ const Category = () => {
     rating: false,
     sort: "relevance",
   });
+  const priceMin = filters.priceMin ?? MIN_PRODUCT_PRICE;
 
   const navigate = useNavigate();
 
@@ -49,7 +57,7 @@ const Category = () => {
     );
 
     return Math.max(MIN_PRODUCT_PRICE, Math.ceil(highestPrice / 500) * 500);
-  }, [products]);
+  }, [products, MIN_PRODUCT_PRICE]);
 
   const availableProducts = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
@@ -163,9 +171,8 @@ const Category = () => {
       const matchesRating =
         !filters.rating || (Number(product.rating?.average) || 0) >= 4;
       const matchesProductPrice =
-        price >= filters.priceMin &&
+        price >= (filters.priceMin ?? MIN_PRODUCT_PRICE) &&
         price <= (filters.priceMax ?? maxProductPrice);
-
       return (
         matchesSearch &&
         matchesCategory &&
@@ -200,6 +207,7 @@ const Category = () => {
     products,
     searchTerm,
     filters,
+    MIN_PRODUCT_PRICE,
   ]);
   const clearFilters = () => {
     setSearchTerm("");
@@ -244,6 +252,7 @@ const Category = () => {
     sizeSliderValue > 0 && sizeSliderMax > 0
       ? (sizeSliderValue / sizeSliderMax) * 100
       : 0;
+
   const openProduct = (product) => {
     const productId = product.id || product._id;
 
@@ -258,12 +267,9 @@ const Category = () => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    navigate(`/product/${slug}`, {
-      state: {
-        productId: productId,
-      },
-    });
+    navigate(`/Zyora_Category/product/${productId}/${slug}`);
   };
+
   return (
     <div className="category">
       <div id="page_path">
@@ -318,7 +324,7 @@ const Category = () => {
               <legend>Price</legend>
 
               <div className="price_range_values">
-                <span>₹{filters.priceMin.toLocaleString("en-IN")}</span>
+                <span>₹{priceMin.toLocaleString("en-IN")}</span>
                 <span>
                   ₹
                   {(filters.priceMax ?? maxProductPrice).toLocaleString(
@@ -330,7 +336,7 @@ const Category = () => {
               <div
                 className="price_slider"
                 style={{
-                  "--range-start": `${((filters.priceMin - MIN_PRODUCT_PRICE) / priceRangeSpan) * 100}%`,
+                  "--range-start": `${((priceMin - MIN_PRODUCT_PRICE) / priceRangeSpan) * 100}%`,
                   "--range-end": `${(((filters.priceMax ?? maxProductPrice) - MIN_PRODUCT_PRICE) / priceRangeSpan) * 100}%`,
                 }}
               >
@@ -342,7 +348,7 @@ const Category = () => {
                   min={MIN_PRODUCT_PRICE}
                   max={maxProductPrice}
                   step="50"
-                  value={filters.priceMin}
+                  value={priceMin}
                   onChange={(event) => {
                     const value = Number(event.target.value);
 
@@ -368,7 +374,10 @@ const Category = () => {
 
                     setFilters((current) => ({
                       ...current,
-                      priceMax: Math.max(value, current.priceMin),
+                      priceMax: Math.max(
+                        value,
+                        current.priceMin ?? MIN_PRODUCT_PRICE,
+                      ),
                     }));
                   }}
                 />

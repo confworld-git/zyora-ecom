@@ -1,6 +1,6 @@
 import "./ProductDetail.css";
 import { useState } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useCart } from "../../Context/CartContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext";
@@ -12,9 +12,8 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { loading, error: productsError, getProductById } = useProducts();
-  const { slug } = useParams();
-  const location = useLocation();
-  const id = location.state?.productId;
+  const { productId, slug } = useParams();
+  const id = productId;
   const product = getProductById(id);
   const [selectionsByProduct, setSelectionsByProduct] = useState({});
   const selection = selectionsByProduct[id] || {};
@@ -91,7 +90,8 @@ const ProductDetail = () => {
       </Link> */}
       <div id="page_path">
         <p>
-          Home <MdKeyboardArrowRight /> Categories <MdKeyboardArrowRight /> {slug}
+          Home <MdKeyboardArrowRight /> Categories <MdKeyboardArrowRight />{" "}
+          {slug}
         </p>
       </div>
       <section className="product-detail-hero">

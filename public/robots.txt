@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Sitemap: https://zyora-ecom.vercel.app/sitemap.xml
 Disallow: /Dashboard
 Disallow: /Login
 Disallow: /Cart

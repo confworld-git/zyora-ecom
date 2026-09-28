@@ -142,6 +142,8 @@ export const WishlistProvider = ({ children }) => {
   );
 };
 
+// Context modules export both their provider and hook.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useWishlist = () => {
   const context = useContext(WishlistContext);
 
