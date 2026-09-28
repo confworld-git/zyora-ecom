@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /Dashboard
+Disallow: /Login
+Disallow: /Cart
+Disallow: /Favorites
