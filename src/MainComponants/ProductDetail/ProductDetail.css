@@ -16,6 +16,7 @@
   display: flex;
   gap: 22px;
   align-items: start;
+  margin-top: 40px;
 }
 
 .product-detail-gallery {

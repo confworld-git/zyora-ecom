@@ -1,8 +1,8 @@
 import "./Category.css";
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import { useProducts } from "../../Context/ProductContext.jsx";
 
 const MIN_PRODUCT_PRICE = 749;
 
@@ -18,7 +18,7 @@ const clothingSizeLabels = {
 const Category = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category");
-  const [products, setProducts] = useState([]);
+  const { products } = useProducts();
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
 
@@ -34,21 +34,6 @@ const Category = () => {
   });
 
   const navigate = useNavigate();
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
-        );
-
-        setProducts(response.data || []);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
-    getProducts();
-  }, []);
 
   const categoryOptions = useMemo(() => {
     return [
@@ -267,7 +252,17 @@ const Category = () => {
       return;
     }
 
-    navigate(`/product/${productId}`);
+    const slug = (product.name || product.title)
+      ?.toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    navigate(`/product/${slug}`, {
+      state: {
+        productId: productId,
+      },
+    });
   };
   return (
     <div className="category">

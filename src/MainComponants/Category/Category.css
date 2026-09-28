@@ -482,14 +482,16 @@
 }
 
 .price > del {
-  color: #757575;
+  /* color: #757575; */
+  color: rgba(255, 0, 0, 0.719);
   font-size: 13px;
+  font-weight: 500;
 }
 
 .price > span {
   font-size: 13px;
   color: #16a34a;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .categories_items > div {

@@ -39,7 +39,7 @@ const App = () => {
           <Route path="/Cart" element={<Cart />} />
           <Route path="/Favorites" element={<Favorites />} />
           <Route path="/Zyora_Category" element={<Category />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/product/:slug" element={<ProductDetail />} />
           <Route
             path="/Dashboard"
             element={
