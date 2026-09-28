@@ -54,6 +54,31 @@ function AddProduct() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    if (name === "category") {
+      const time = new Date();
+      const timePart = [time.getHours(), time.getMinutes(), time.getSeconds()]
+        .map((part) => String(part).padStart(2, "0"))
+        .join("");
+      const categoryPart = value
+        .trim()
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .toUpperCase();
+
+      setFormData((prev) => ({
+        ...prev,
+        category: value,
+        id: value ? `ZYR-PRD-${categoryPart}-${timePart}` : "",
+      }));
+
+      setErrors((prev) => ({
+        ...prev,
+        category: "",
+        id: "",
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -66,12 +91,21 @@ function AddProduct() {
   };
 
   const generateProductId = () => {
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const randomPart = Math.random().toString(36).slice(2, 7).toUpperCase();
+    if (!formData.category) return;
+
+    const time = new Date();
+    const timePart = [time.getHours(), time.getMinutes(), time.getSeconds()]
+      .map((part) => String(part).padStart(2, "0"))
+      .join("");
+    const categoryPart = formData.category
+      .trim()
+      .replace(/[^a-zA-Z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .toUpperCase();
 
     setFormData((prev) => ({
       ...prev,
-      id: `PRD-${timestamp}-${randomPart}`,
+      id: `ZYR-PRD-${categoryPart}-${timePart}`,
     }));
 
     setErrors((prev) => ({
@@ -504,36 +538,6 @@ function AddProduct() {
             </div>
 
             <div className="form-grid">
-              <div className="form-group full-width">
-                <label>
-                  Product ID <span>*</span>
-                </label>
-
-                <div className="price-input">
-                  <input
-                    type="text"
-                    name="id"
-                    placeholder="Enter manually or generate"
-                    value={formData.id}
-                    onChange={handleChange}
-                  />
-                  <button
-                    type="button"
-                    className="small-add-btn"
-                    onClick={generateProductId}
-                    style={{
-                      marginTop: "6px",
-                    }}
-                  >
-                    Generate <i class="bi bi-arrow-clockwise"></i>
-                  </button>
-                </div>
-
-                {errors.id && (
-                  <small className="field-error">{errors.id}</small>
-                )}
-              </div>
-
               <div className="form-group">
                 <label>
                   Product Name <span>*</span>
@@ -609,6 +613,36 @@ function AddProduct() {
 
                 {errors.brand && (
                   <small className="field-error">{errors.brand}</small>
+                )}
+              </div>
+              <div className="form-group">
+                <label>
+                  Product ID <span>*</span>
+                </label>
+
+                <div className="price-input">
+                  <input
+                    type="text"
+                    name="id"
+                    placeholder="Enter manually or generate"
+                    value={formData.id}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="small-add-btn"
+                    onClick={generateProductId}
+                    disabled={!formData.category}
+                    style={{
+                      marginTop: "6px",
+                    }}
+                  >
+                    Generate <i class="bi bi-arrow-clockwise"></i>
+                  </button>
+                </div>
+
+                {errors.id && (
+                  <small className="field-error">{errors.id}</small>
                 )}
               </div>
             </div>

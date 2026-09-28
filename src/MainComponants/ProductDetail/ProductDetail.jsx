@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useCart } from "../../Context/CartContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext";
 import { useProducts } from "../../Context/ProductContext.jsx";
+import ProductZoom from "./ProductZoom.jsx";
 
 const ProductDetail = () => {
   const { addToCart } = useCart();
@@ -80,7 +81,6 @@ const ProductDetail = () => {
     event.stopPropagation();
     toggleWishlist(id, selectedImage);
   };
-
   return (
     <main className="product-detail-page">
       <Link className="back-link" to="/Zyora_Category">
@@ -103,10 +103,11 @@ const ProductDetail = () => {
           )}
         </div>
 
-        <div className="preview_image_big">
-          <img src={selectedImage} alt={productName} />
+        <div>
+          {/* <img src={selectedImage} alt={productName} /> */}
+          <ProductZoom image={selectedImage} />
         </div>
-
+{/* className="preview_image_big" */}
         <div className="product-detail-summary">
           <small>{product.brand}</small>
           <p className="product-category">{product.category}</p>

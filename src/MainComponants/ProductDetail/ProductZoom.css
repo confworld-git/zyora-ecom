@@ -1,0 +1,57 @@
+.product-image {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+.product-image > img {
+  width: 100%;
+  height: 450px;
+  border-radius: 16px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.zoom-lens {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.2);
+  /* border: 1px solid #aaa; */
+  pointer-events: none;
+}
+
+.zoom-panel {
+  position: absolute;
+  bottom: 50px;
+  right: 50px;
+  z-index: 10;
+  width: 450px;
+  height: 450px;
+  overflow: hidden;
+  background: white;
+  border-radius: 20px;
+}
+
+.zoom-panel img {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  max-width: none;
+  object-fit: contain;
+}
