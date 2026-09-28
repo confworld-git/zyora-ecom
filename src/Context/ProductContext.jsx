@@ -3,17 +3,23 @@ import axios from "axios";
 
 const ProductContext = createContext(null);
 
-export const ProductProvider = ({ children }) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+export const ProductProvider = ({ children, initialProducts = null }) => {
+  const [products, setProducts] = useState(initialProducts || []);
+  const [loading, setLoading] = useState(!initialProducts);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // During SSG, products are already provided.
+    if (initialProducts) {
+      return;
+    }
+
     const getProducts = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
         );
+
         setProducts(Array.isArray(response.data) ? response.data : []);
       } catch (requestError) {
         console.error("Error fetching products:", requestError);
@@ -24,7 +30,7 @@ export const ProductProvider = ({ children }) => {
     };
 
     getProducts();
-  }, []);
+  }, [initialProducts]);
 
   const getProductById = (productId) =>
     products.find(

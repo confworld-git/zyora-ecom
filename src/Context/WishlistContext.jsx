@@ -8,6 +8,11 @@ const WISHLIST_STORAGE_KEY = "zyora_wishlist";
 export const WishlistProvider = ({ children }) => {
   const { getProductById } = useProducts();
   const [wishlistItems, setWishlistItems] = useState(() => {
+    // SSG / SSR: localStorage doesn't exist on the server
+    if (typeof window === "undefined") {
+      return [];
+    }
+
     try {
       const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
       return saved ? JSON.parse(saved) : [];

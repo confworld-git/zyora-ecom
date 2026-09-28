@@ -5,15 +5,18 @@ import App from "./App.jsx";
 import { CartProvider } from "./Context/CartContext.jsx";
 import { ProductProvider } from "./Context/ProductContext.jsx";
 import { WishlistProvider } from "./Context/WishlistContext";
+import { HelmetProvider } from "react-helmet-async";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ProductProvider>
-      <WishlistProvider>
-        <CartProvider>
-          <App />
-        </CartProvider>
-      </WishlistProvider>
-    </ProductProvider>
+    <HelmetProvider>
+      <ProductProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </WishlistProvider>
+      </ProductProvider>
+    </HelmetProvider>
   </StrictMode>,
 );

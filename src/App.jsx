@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Homepage from "./Components/Homepage";
 import About from "./MainComponants/About/About";
 import Contat from "./MainComponants/Contact/Contat.jsx";
@@ -7,16 +8,20 @@ import Favorites from "./MainComponants/Favorites/Favorites";
 import Category from "./MainComponants/Category/Category.jsx";
 import Dashboard from "./Dashboard/Dashboard.jsx";
 import Login from "./Login/Login.jsx";
+
 import { Toaster } from "react-hot-toast";
+
 import PublicRoute from "./ProtectedRoute/PublicRoute.jsx";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.jsx";
 import Layout from "./ProtectedRoute/Layout.jsx";
-import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
-import "./index.css"
 
-const App = () => {
+import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
+
+import "./index.css";
+
+export const AppRoutes = () => {
   return (
-    <BrowserRouter>
+    <>
       <Toaster
         position="top-center"
         reverseOrder={false}
@@ -39,7 +44,10 @@ const App = () => {
           <Route path="/Cart" element={<Cart />} />
           <Route path="/Favorites" element={<Favorites />} />
           <Route path="/Zyora_Category" element={<Category />} />
-          <Route path="/Zyora_Category/product/:productId/:slug" element={<ProductDetail />} />
+          <Route
+            path="/Zyora_Category/product/:productId/:slug"
+            element={<ProductDetail />}
+          />
           <Route
             path="/Dashboard"
             element={
@@ -58,6 +66,14 @@ const App = () => {
           />
         </Route>
       </Routes>
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
     </BrowserRouter>
   );
 };

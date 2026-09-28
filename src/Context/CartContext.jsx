@@ -8,6 +8,10 @@ const CART_STORAGE_KEY = "zyora_cart";
 export const CartProvider = ({ children }) => {
   const { getProductById } = useProducts();
   const [cartItems, setCartItems] = useState(() => {
+    if (typeof window === "undefined") {
+      return [];
+    }
+
     try {
       const saved = localStorage.getItem(CART_STORAGE_KEY);
       return saved ? JSON.parse(saved) : [];

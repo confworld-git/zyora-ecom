@@ -1,38 +1,25 @@
-import { useEffect, useState } from "react";
 import "../index.css";
-// import Intro from "./Intro/Intro";
 import Home from "./Home/Home";
 import Welcome from "./Welcome/Welcome";
 import Highlights from "./Highlights/Highlights";
 import Featured from "./Featured/Featured";
 import Why from "./Why/Why";
+import SEO from "../SEO.jsx";
 
 const Homepage = () => {
-  const [showIntro, setShowIntro] = useState(() => {
-    return localStorage.getItem("introShown") !== "true";
-  });
-
-  useEffect(() => {
-    if (!showIntro) return;
-
-    const timer = setTimeout(() => {
-      localStorage.setItem("introShown", "true");
-
-      setShowIntro(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [showIntro]);
-
   return (
-    <div>
-      {/* {showIntro && <Intro />} */}
+    <>
+      <SEO
+        title="ZYORA | Quality & Affordable Products for Everyday Life"
+        description="Shop at ZYORA for quality, functional and affordable products for your home, lifestyle and everyday needs. Explore soft toys, home & kitchen essentials, stationery, handbags and more, with reliable delivery, secure payments and easy 7-day returns."
+        canonical="https://yourdomain.com/"
+      />
       <Home />
       <Welcome />
       <Highlights />
       <Featured />
       <Why />
-    </div>
+    </>
   );
 };
 
