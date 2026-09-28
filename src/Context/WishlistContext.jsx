@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useProducts } from "./ProductContext.jsx";
 
 const WishlistContext = createContext(null);
 
 const WISHLIST_STORAGE_KEY = "zyora_wishlist";
 
 export const WishlistProvider = ({ children }) => {
+  const { getProductById } = useProducts();
   const [wishlistItems, setWishlistItems] = useState(() => {
     try {
       const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
@@ -17,19 +19,20 @@ export const WishlistProvider = ({ children }) => {
 
   useEffect(() => {
     try {
-      localStorage.setItem(
-        WISHLIST_STORAGE_KEY,
-        JSON.stringify(wishlistItems),
-      );
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistItems));
     } catch (err) {
       console.error("Failed to save wishlist:", err);
     }
   }, [wishlistItems]);
 
-  const addToWishlist = (product) => {
+  const addToWishlist = (productOrId, selectedImage) => {
+    const product =
+      typeof productOrId === "object" && productOrId !== null
+        ? productOrId
+        : getProductById(productOrId);
     const productId = product?.id ?? product?._id;
 
-    if (!productId) return;
+    if (!product || !productId) return false;
 
     const wishlistItem = {
       id: productId,
@@ -38,7 +41,7 @@ export const WishlistProvider = ({ children }) => {
       title: product.title,
       brand: product.brand,
 
-      image: product.images?.[0] || product.image || "",
+      image: selectedImage || product.images?.[0] || product.image || "",
 
       colors: product.variants?.colours || [],
       sizes: product.variants?.sizes || [],
@@ -53,9 +56,7 @@ export const WishlistProvider = ({ children }) => {
       // MRP
       mrp:
         Number(
-          typeof product.price === "object"
-            ? product.price?.mrp
-            : product.mrp,
+          typeof product.price === "object" ? product.price?.mrp : product.mrp,
         ) || 0,
 
       // Discount
@@ -79,6 +80,8 @@ export const WishlistProvider = ({ children }) => {
 
       return [...currentItems, wishlistItem];
     });
+
+    return true;
   };
 
   // Remove product from wishlist
@@ -90,14 +93,15 @@ export const WishlistProvider = ({ children }) => {
 
   // Check if product is already in wishlist
   const isInWishlist = (productId) => {
-    return wishlistItems.some(
-      (item) => String(item.id) === String(productId),
-    );
+    return wishlistItems.some((item) => String(item.id) === String(productId));
   };
 
   // Toggle wishlist
-  const toggleWishlist = (product) => {
-    const productId = product?.id ?? product?._id;
+  const toggleWishlist = (productOrId, selectedImage) => {
+    const productId =
+      typeof productOrId === "object" && productOrId !== null
+        ? (productOrId.id ?? productOrId._id)
+        : productOrId;
 
     if (!productId) return;
 
@@ -108,7 +112,7 @@ export const WishlistProvider = ({ children }) => {
     if (exists) {
       removeFromWishlist(productId);
     } else {
-      addToWishlist(product);
+      addToWishlist(productOrId, selectedImage);
     }
   };
 
@@ -142,9 +146,7 @@ export const useWishlist = () => {
   const context = useContext(WishlistContext);
 
   if (!context) {
-    throw new Error(
-      "useWishlist must be used within a WishlistProvider",
-    );
+    throw new Error("useWishlist must be used within a WishlistProvider");
   }
 
   return context;

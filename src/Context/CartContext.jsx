@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useProducts } from "./ProductContext.jsx";
 
 const CartContext = createContext(null);
 
 const CART_STORAGE_KEY = "zyora_cart";
 
 export const CartProvider = ({ children }) => {
+  const { getProductById } = useProducts();
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem(CART_STORAGE_KEY);
@@ -18,20 +20,26 @@ export const CartProvider = ({ children }) => {
   // Save cart to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(
-        CART_STORAGE_KEY,
-        JSON.stringify(cartItems)
-      );
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
     } catch (err) {
       console.error("Failed to save cart:", err);
     }
   }, [cartItems]);
 
   // ADD TO CART
-  const addToCart = (product, selectedColor, selectedSize) => {
+  const addToCart = (
+    productOrId,
+    selectedColor,
+    selectedSize,
+    selectedImage,
+  ) => {
+    const product =
+      typeof productOrId === "object" && productOrId !== null
+        ? productOrId
+        : getProductById(productOrId);
     const productId = product?.id ?? product?._id;
 
-    if (!productId) return;
+    if (!product || !productId) return false;
 
     /*
       Product page data:
@@ -43,35 +51,27 @@ export const CartProvider = ({ children }) => {
       product.sizes
     */
 
-    const colors =
-      product?.variants?.colours ??
-      product?.colors ??
-      [];
+    const colors = product?.variants?.colours ?? product?.colors ?? [];
 
-    const sizes =
-      product?.variants?.sizes ??
-      product?.sizes ??
-      [];
+    const sizes = product?.variants?.sizes ?? product?.sizes ?? [];
 
     const price =
       Number(
         typeof product.price === "object"
           ? product.price?.selling_price
-          : product.price
+          : product.price,
       ) || 0;
 
     const mrp =
       Number(
-        typeof product.price === "object"
-          ? product.price?.mrp
-          : product.mrp
+        typeof product.price === "object" ? product.price?.mrp : product.mrp,
       ) || 0;
 
     const discountPercent =
       Number(
         typeof product.price === "object"
           ? product.price?.discount_percent
-          : product.discountPercent ?? product.discount_percent
+          : (product.discountPercent ?? product.discount_percent),
       ) || 0;
 
     const color = selectedColor || "Not specified";
@@ -88,10 +88,7 @@ export const CartProvider = ({ children }) => {
       title: product.title,
       brand: product.brand,
 
-      image:
-        product.images?.[0] ||
-        product.image ||
-        "",
+      image: selectedImage || product.images?.[0] || product.image || "",
 
       colors,
       sizes,
@@ -107,9 +104,7 @@ export const CartProvider = ({ children }) => {
     };
 
     setCartItems((currentItems) => {
-      const existingItem = currentItems.find(
-        (item) => item.cartId === cartId
-      );
+      const existingItem = currentItems.find((item) => item.cartId === cartId);
 
       // Same product + same variant
       if (existingItem) {
@@ -117,15 +112,18 @@ export const CartProvider = ({ children }) => {
           item.cartId === cartId
             ? {
                 ...item,
+                image: selectedImage || item.image,
                 quantity: item.quantity + 1,
               }
-            : item
+            : item,
         );
       }
 
       // New product / new variant
       return [...currentItems, cartItem];
     });
+
+    return true;
   };
 
   // INCREASE QUANTITY
@@ -137,8 +135,8 @@ export const CartProvider = ({ children }) => {
               ...item,
               quantity: item.quantity + 1,
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -152,63 +150,50 @@ export const CartProvider = ({ children }) => {
                 ...item,
                 quantity: item.quantity - 1,
               }
-            : item
+            : item,
         )
-        .filter((item) => item.quantity > 0)
+        .filter((item) => item.quantity > 0),
     );
   };
 
   // REMOVE ITEM
   const removeFromCart = (cartId) => {
-    setCartItems((items) =>
-      items.filter((item) => item.cartId !== cartId)
-    );
+    setCartItems((items) => items.filter((item) => item.cartId !== cartId));
   };
 
   // UPDATE SIZE / COLOR
   const updateCartItemOption = (cartId, option, value) => {
     setCartItems((items) => {
-      const item = items.find(
-        (currentItem) => currentItem.cartId === cartId
-      );
+      const item = items.find((currentItem) => currentItem.cartId === cartId);
 
       if (!item || item[option] === value) {
         return items;
       }
 
       const newColor =
-        option === "color"
-          ? value
-          : item.color || "Not specified";
+        option === "color" ? value : item.color || "Not specified";
 
-      const newSize =
-        option === "size"
-          ? value
-          : item.size || "Not specified";
+      const newSize = option === "size" ? value : item.size || "Not specified";
 
       const newCartId = `${String(item.id)}-${newColor}-${newSize}`;
 
       const duplicate = items.find(
         (currentItem) =>
-          currentItem.cartId === newCartId &&
-          currentItem.cartId !== cartId
+          currentItem.cartId === newCartId && currentItem.cartId !== cartId,
       );
 
       // If the selected variant already exists,
       // merge the quantities.
       if (duplicate) {
         return items
-          .filter(
-            (currentItem) => currentItem.cartId !== cartId
-          )
+          .filter((currentItem) => currentItem.cartId !== cartId)
           .map((currentItem) =>
             currentItem.cartId === newCartId
               ? {
                   ...currentItem,
-                  quantity:
-                    currentItem.quantity + item.quantity,
+                  quantity: currentItem.quantity + item.quantity,
                 }
-              : currentItem
+              : currentItem,
           );
       }
 
@@ -219,7 +204,7 @@ export const CartProvider = ({ children }) => {
               [option]: value,
               cartId: newCartId,
             }
-          : currentItem
+          : currentItem,
       );
     });
   };
@@ -231,18 +216,15 @@ export const CartProvider = ({ children }) => {
 
   // TOTAL ITEMS
   const totalItems = cartItems.reduce(
-    (total, item) =>
-      total + (Number(item.quantity) || 0),
-    0
+    (total, item) => total + (Number(item.quantity) || 0),
+    0,
   );
 
   // SUBTOTAL
   const subtotal = cartItems.reduce(
     (total, item) =>
-      total +
-      (Number(item.price) || 0) *
-        (Number(item.quantity) || 0),
-    0
+      total + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+    0,
   );
 
   return (
@@ -268,9 +250,7 @@ export const useCart = () => {
   const context = useContext(CartContext);
 
   if (!context) {
-    throw new Error(
-      "useCart must be used within a CartProvider"
-    );
+    throw new Error("useCart must be used within a CartProvider");
   }
 
   return context;

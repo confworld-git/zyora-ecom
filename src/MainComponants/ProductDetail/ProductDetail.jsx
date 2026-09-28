@@ -1,58 +1,38 @@
 import "./ProductDetail.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useCart } from "../../Context/CartContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext";
+import { useProducts } from "../../Context/ProductContext.jsx";
 
 const ProductDetail = () => {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { loading, error: productsError, getProductById } = useProducts();
   const { id } = useParams();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [selectedImage, setSelectedImage] = useState();
-  const [selectedColor, setSelectedColor] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
+  const product = getProductById(id);
+  const [selectionsByProduct, setSelectionsByProduct] = useState({});
+  const selection = selectionsByProduct[id] || {};
+  const selectedImage = selection.image ?? product?.images?.[0] ?? "";
+  const selectedColor = selection.color ?? "";
+  const selectedSize = selection.size ?? "";
 
-  useEffect(() => {
-    const getProduct = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
-        );
-        const matchingProduct = response.data.find(
-          (item) => String(item.id ?? item._id) === String(id),
-        );
-
-        if (!matchingProduct) {
-          setError("Product not found.");
-          return;
-        }
-
-        setProduct(matchingProduct);
-        setSelectedImage(matchingProduct.images?.[0] || "");
-      } catch (requestError) {
-        console.error("Error fetching product:", requestError);
-        setError("Unable to load this product.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProduct();
-  }, [id]);
+  const updateSelection = (key, value) => {
+    setSelectionsByProduct((current) => ({
+      ...current,
+      [id]: { ...current[id], [key]: value },
+    }));
+  };
 
   if (loading) {
     return <main className="product-detail-state">Loading product...</main>;
   }
 
-  if (error || !product) {
+  if (productsError || !product) {
     return (
       <main className="product-detail-state">
-        <p>{error || "Product not found."}</p>
+        <p>{productsError || "Product not found."}</p>
         <Link to="/Zyora_Category">Back to categories</Link>
       </main>
     );
@@ -88,25 +68,17 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!validateSelection()) return;
 
-    const selectedProduct = {
-      ...product,
-      images: selectedImage ? [selectedImage] : [],
-    };
-
-    addToCart(selectedProduct, selectedColor, selectedSize);
-    toast.success("Added to cart");
+    if (addToCart(id, selectedColor, selectedSize, selectedImage)) {
+      toast.success("Added to cart");
+    } else {
+      toast.error("Unable to add this product to cart");
+    }
   };
 
   const handleAddFav = (event) => {
     event.preventDefault();
     event.stopPropagation();
-
-    const selectedProduct = {
-      ...product,
-      images: selectedImage ? [selectedImage] : [],
-    };
-
-    toggleWishlist(selectedProduct);
+    toggleWishlist(id, selectedImage);
   };
 
   return (
@@ -123,7 +95,7 @@ const ProductDetail = () => {
                 key={`${image}-${index}`}
                 src={image}
                 alt={`${productName} ${index + 1}`}
-                onClick={() => setSelectedImage(image)}
+                onClick={() => updateSelection("image", image)}
               />
             ))
           ) : (
@@ -158,7 +130,7 @@ const ProductDetail = () => {
                     type="button"
                     aria-label={`Select ${color} color`}
                     style={{ backgroundColor: color }}
-                    onClick={() => setSelectedColor(color)}
+                    onClick={() => updateSelection("color", color)}
                   />
                 ))
               ) : (
@@ -175,7 +147,7 @@ const ProductDetail = () => {
                     className={selectedSize === size ? "selected" : ""}
                     key={size}
                     type="button"
-                    onClick={() => setSelectedSize(size)}
+                    onClick={() => updateSelection("size", size)}
                   >
                     {size}
                   </button>
