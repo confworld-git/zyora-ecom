@@ -61,6 +61,8 @@
 
 .standFor {
   margin-bottom: 0;
+  background-color: white;
+  padding: 5px 20px 10px 20px;
 }
 
 .standFor > h1 {
@@ -96,7 +98,7 @@
 }
 
 .Our > :last-child {
-  background-color: #16264b;
+  background-color: #070864;
   color: white;
 }
 

@@ -15,8 +15,29 @@ const clothingSizeLabels = {
 
 const Category = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+
   const selectedCategory = searchParams.get("category");
+
   const { products } = useProducts();
+
+  const navigate = useNavigate();
+
+  /* =========================
+     SEARCH
+  ========================= */
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  /* =========================
+     SIZE
+  ========================= */
+
+  const [sizeSliderSize, setSizeSliderSize] = useState("");
+
+  /* =========================
+     MIN PRODUCT PRICE
+  ========================= */
+
   const MIN_PRODUCT_PRICE = useMemo(() => {
     const sellingPrices = products
       .map((product) => product.price?.selling_price)
@@ -26,28 +47,39 @@ const Category = () => {
 
     return sellingPrices.length ? Math.min(...sellingPrices) : 0;
   }, [products]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sizeSliderSize, setSizeSliderSize] = useState("");
+
+  /* =========================
+     FILTER STATE
+  ========================= */
 
   const [filters, setFilters] = useState({
     categories: selectedCategory ? [selectedCategory] : [],
+
     priceMin: null,
     priceMax: null,
+
     colors: [],
     sizes: [],
+
     inStock: false,
     rating: false,
+
     sort: "relevance",
   });
-  const priceMin = filters.priceMin ?? MIN_PRODUCT_PRICE;
 
-  const navigate = useNavigate();
+  /* =========================
+     CATEGORY OPTIONS
+  ========================= */
 
   const categoryOptions = useMemo(() => {
     return [
       ...new Set(products.map((product) => product.category).filter(Boolean)),
     ].sort();
   }, [products]);
+
+  /* =========================
+     MAX PRODUCT PRICE
+  ========================= */
 
   const maxProductPrice = useMemo(() => {
     const highestPrice = products.reduce(
@@ -58,6 +90,32 @@ const Category = () => {
 
     return Math.max(MIN_PRODUCT_PRICE, Math.ceil(highestPrice / 500) * 500);
   }, [products, MIN_PRODUCT_PRICE]);
+
+  /* =========================
+     SLIDER BOUNDARIES
+
+     IMPORTANT:
+     Slider always uses multiples of 50.
+  ========================= */
+
+  const SLIDER_MIN_PRICE = useMemo(() => {
+    return Math.floor(MIN_PRODUCT_PRICE / 50) * 50;
+  }, [MIN_PRODUCT_PRICE]);
+
+  const SLIDER_MAX_PRICE = useMemo(() => {
+    return Math.ceil(maxProductPrice / 50) * 50;
+  }, [maxProductPrice]);
+
+  /* =========================
+     CURRENT PRICE MIN
+  ========================= */
+
+  const priceMin = filters.priceMin ?? SLIDER_MIN_PRICE;
+
+  /* =========================
+     AVAILABLE PRODUCTS
+     Search + Category only
+  ========================= */
 
   const availableProducts = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
@@ -83,6 +141,10 @@ const Category = () => {
     });
   }, [products, searchTerm, filters.categories]);
 
+  /* =========================
+     COLOR OPTIONS
+  ========================= */
+
   const colorOptions = useMemo(() => {
     const colors = availableProducts.flatMap(
       (product) => product.variants?.colours || [],
@@ -93,15 +155,21 @@ const Category = () => {
     );
   }, [availableProducts]);
 
+  /* =========================
+     SIZE OPTIONS
+  ========================= */
+
   const sizeOptions = useMemo(() => {
     const sizes = availableProducts.flatMap(
       (product) => product.variants?.sizes || [],
     );
 
-    const uniqueSizes = [...new Set(sizes.filter(Boolean))];
-
-    return uniqueSizes;
+    return [...new Set(sizes.filter(Boolean))];
   }, [availableProducts]);
+
+  /* =========================
+     ACTIVE COLORS
+  ========================= */
 
   const activeColors = useMemo(() => {
     const availableColors = new Set(
@@ -113,8 +181,14 @@ const Category = () => {
     );
   }, [colorOptions, filters.colors]);
 
+  /* =========================
+     ACTIVE SIZE
+  ========================= */
+
   const activeSizes = useMemo(() => {
-    if (!sizeSliderSize) return [];
+    if (!sizeSliderSize) {
+      return [];
+    }
 
     const selectedSize = sizeOptions.find(
       (size) => String(size).toLowerCase() === sizeSliderSize.toLowerCase(),
@@ -123,6 +197,10 @@ const Category = () => {
     return selectedSize ? [selectedSize] : [];
   }, [sizeOptions, sizeSliderSize]);
 
+  /* =========================
+     SINGLE FILTER
+  ========================= */
+
   const selectSingleFilter = (filterName, value) => {
     setFilters((currentFilters) => ({
       ...currentFilters,
@@ -130,18 +208,48 @@ const Category = () => {
     }));
   };
 
+  /* =========================
+     PRICE RANGE
+  ========================= */
+
+  const priceRangeSpan = Math.max(SLIDER_MAX_PRICE - SLIDER_MIN_PRICE, 1);
+
+  const currentPriceMax = filters.priceMax ?? SLIDER_MAX_PRICE;
+
+  const priceStartPercent =
+    ((priceMin - SLIDER_MIN_PRICE) / priceRangeSpan) * 100;
+
+  const priceEndPercent =
+    ((currentPriceMax - SLIDER_MIN_PRICE) / priceRangeSpan) * 100;
+
+  /* =========================
+     FILTERED PRODUCTS
+  ========================= */
+
   const filteredProducts = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
 
     const result = products.filter((product) => {
       const price = Number(product.price?.selling_price) || 0;
+
       const title = product.title || "";
+
       const brand = product.brand || "";
+
       const category = product.category || "";
+
       const productText = `${title} ${brand} ${category}`.toLowerCase();
+
       const productColors = product.variants?.colours || [];
+
       const productSizes = product.variants?.sizes || [];
+
+      /* Search */
+
       const matchesSearch = !search || productText.includes(search);
+
+      /* Category */
+
       const matchesCategory =
         !filters.categories.length ||
         filters.categories.some(
@@ -149,6 +257,9 @@ const Category = () => {
             String(selectedCategory).toLowerCase() ===
             String(category).toLowerCase(),
         );
+
+      /* Color */
+
       const matchesColor =
         !activeColors.length ||
         activeColors.some((selectedColor) =>
@@ -158,6 +269,9 @@ const Category = () => {
               String(selectedColor).toLowerCase(),
           ),
         );
+
+      /* Size */
+
       const matchesSize =
         !activeSizes.length ||
         activeSizes.some((selectedSize) =>
@@ -167,12 +281,22 @@ const Category = () => {
               String(selectedSize).toLowerCase(),
           ),
         );
+
+      /* Stock */
+
       const matchesStock = !filters.inStock || product.stock?.in_stock === true;
+
+      /* Rating */
+
       const matchesRating =
         !filters.rating || (Number(product.rating?.average) || 0) >= 4;
+
+      /* Price */
+
       const matchesProductPrice =
-        price >= (filters.priceMin ?? MIN_PRODUCT_PRICE) &&
-        price <= (filters.priceMax ?? maxProductPrice);
+        price >= (filters.priceMin ?? SLIDER_MIN_PRICE) &&
+        price <= (filters.priceMax ?? SLIDER_MAX_PRICE);
+
       return (
         matchesSearch &&
         matchesCategory &&
@@ -183,6 +307,11 @@ const Category = () => {
         matchesProductPrice
       );
     });
+
+    /* =========================
+       SORT
+    ========================= */
+
     result.sort((firstProduct, secondProduct) => {
       const firstPrice = Number(firstProduct.price?.selling_price) || 0;
 
@@ -203,20 +332,27 @@ const Category = () => {
   }, [
     activeColors,
     activeSizes,
-    maxProductPrice,
     products,
     searchTerm,
     filters,
-    MIN_PRODUCT_PRICE,
+    SLIDER_MIN_PRICE,
+    SLIDER_MAX_PRICE,
   ]);
+
+  /* =========================
+     CLEAR FILTERS
+  ========================= */
+
   const clearFilters = () => {
     setSearchTerm("");
+
     setSizeSliderSize("");
+
     setSearchParams({}, { replace: true });
 
     setFilters({
       categories: [],
-      priceMin: MIN_PRODUCT_PRICE,
+      priceMin: null,
       priceMax: null,
       colors: [],
       sizes: [],
@@ -225,8 +361,15 @@ const Category = () => {
       sort: "relevance",
     });
   };
+
+  /* =========================
+     COLOR LABEL
+  ========================= */
+
   const getColorLabel = (color) => {
-    if (!color) return "";
+    if (!color) {
+      return "";
+    }
 
     if (String(color).startsWith("#")) {
       return String(color).toUpperCase();
@@ -234,30 +377,51 @@ const Category = () => {
 
     return color;
   };
+
+  /* =========================
+     SIZE LABEL
+  ========================= */
+
   const getSizeLabel = (size) => {
     const normalizedSize = String(size).toUpperCase();
 
     return clothingSizeLabels[normalizedSize] || size;
   };
 
+  /* =========================
+     VARIANT FILTER VISIBILITY
+  ========================= */
+
   const showVariantFilters =
     Boolean(searchTerm.trim()) || filters.categories.length > 0;
-  const priceRangeSpan = Math.max(maxProductPrice - MIN_PRODUCT_PRICE, 1);
+
+  /* =========================
+     SIZE SLIDER
+  ========================= */
+
   const sizeSliderIndex = sizeOptions.findIndex(
     (size) => String(size).toLowerCase() === sizeSliderSize.toLowerCase(),
   );
+
   const sizeSliderMax = sizeOptions.length;
+
   const sizeSliderValue = sizeSliderIndex >= 0 ? sizeSliderIndex + 1 : 0;
+
   const sizeSliderPosition =
     sizeSliderValue > 0 && sizeSliderMax > 0
       ? (sizeSliderValue / sizeSliderMax) * 100
       : 0;
+
+  /* =========================
+     OPEN PRODUCT
+  ========================= */
 
   const openProduct = (product) => {
     const productId = product.id || product._id;
 
     if (!productId) {
       console.error("Product ID missing:", product);
+
       return;
     }
 
@@ -272,21 +436,36 @@ const Category = () => {
 
   return (
     <div className="category">
+      {/* =========================
+          PAGE PATH
+      ========================= */}
+
       <div id="page_path">
         <p>
-          Home <MdKeyboardArrowRight /> Categories
+          Home
+          <MdKeyboardArrowRight />
+          Categories
         </p>
       </div>
+
       <h1>Categories</h1>
+
       <p>
         Explore our wide range of carefully selected categories, made to bring
         style, comfort, and convenience to your everyday life.
       </p>
 
       <section>
+        {/* =========================
+            FILTER SIDEBAR
+        ========================= */}
+
         <div className="categories_list">
+          {/* Search */}
+
           <div className="collection_search">
             <i className="bi bi-search"></i>
+
             <input
               type="search"
               placeholder="Search products..."
@@ -296,6 +475,10 @@ const Category = () => {
           </div>
 
           <div className="filter_panel">
+            {/* =========================
+                CATEGORY
+            ========================= */}
+
             <fieldset>
               <legend>Category</legend>
 
@@ -320,63 +503,81 @@ const Category = () => {
                 </label>
               ))}
             </fieldset>
+
+            {/* =========================
+                PRICE
+            ========================= */}
+
             <fieldset className="price_filter">
               <legend>Price</legend>
 
               <div className="price_range_values">
                 <span>₹{priceMin.toLocaleString("en-IN")}</span>
-                <span>
-                  ₹
-                  {(filters.priceMax ?? maxProductPrice).toLocaleString(
-                    "en-IN",
-                  )}
-                </span>
+
+                <span>₹{currentPriceMax.toLocaleString("en-IN")}</span>
               </div>
 
               <div
                 className="price_slider"
                 style={{
-                  "--range-start": `${((priceMin - MIN_PRODUCT_PRICE) / priceRangeSpan) * 100}%`,
-                  "--range-end": `${(((filters.priceMax ?? maxProductPrice) - MIN_PRODUCT_PRICE) / priceRangeSpan) * 100}%`,
+                  "--range-start": `${Math.max(
+                    0,
+                    Math.min(100, priceStartPercent),
+                  )}%`,
+
+                  "--range-end": `${Math.max(
+                    0,
+                    Math.min(100, priceEndPercent),
+                  )}%`,
                 }}
               >
+                {/* Track */}
+
                 <div className="price_slider_track" />
+
+                {/* Minimum */}
+
                 <input
                   aria-label="Minimum price"
                   className="price_range price_range_min"
                   type="range"
-                  min={MIN_PRODUCT_PRICE}
-                  max={maxProductPrice}
-                  step="50"
+                  min={SLIDER_MIN_PRICE}
+                  max={SLIDER_MAX_PRICE}
+                  step={50}
                   value={priceMin}
                   onChange={(event) => {
                     const value = Number(event.target.value);
 
                     setFilters((current) => ({
                       ...current,
+
                       priceMin: Math.min(
                         value,
-                        current.priceMax ?? maxProductPrice,
+                        current.priceMax ?? SLIDER_MAX_PRICE,
                       ),
                     }));
                   }}
                 />
+
+                {/* Maximum */}
+
                 <input
                   aria-label="Maximum price"
                   className="price_range price_range_max"
                   type="range"
-                  min={MIN_PRODUCT_PRICE}
-                  max={maxProductPrice}
-                  step="50"
-                  value={filters.priceMax ?? maxProductPrice}
+                  min={SLIDER_MIN_PRICE}
+                  max={SLIDER_MAX_PRICE}
+                  step={50}
+                  value={currentPriceMax}
                   onChange={(event) => {
                     const value = Number(event.target.value);
 
                     setFilters((current) => ({
                       ...current,
+
                       priceMax: Math.max(
                         value,
-                        current.priceMin ?? MIN_PRODUCT_PRICE,
+                        current.priceMin ?? SLIDER_MIN_PRICE,
                       ),
                     }));
                   }}
@@ -387,6 +588,10 @@ const Category = () => {
                 Drag either handle to refine
               </small>
             </fieldset>
+
+            {/* =========================
+                COLOR + SIZE
+            ========================= */}
 
             {showVariantFilters && (
               <>
@@ -399,6 +604,9 @@ const Category = () => {
                   onToggle={(value) => selectSingleFilter("colors", value)}
                   getLabel={getColorLabel}
                 />
+
+                {/* SIZE */}
+
                 <fieldset className="size_filter">
                   <legend>Size</legend>
 
@@ -411,7 +619,9 @@ const Category = () => {
                             ? " is_end"
                             : ""
                       }`}
-                      style={{ left: `${sizeSliderPosition}%` }}
+                      style={{
+                        left: `${sizeSliderPosition}%`,
+                      }}
                     >
                       {sizeSliderIndex >= 0
                         ? getSizeLabel(sizeOptions[sizeSliderIndex])
@@ -422,6 +632,7 @@ const Category = () => {
                       className="price_slider_track"
                       style={{
                         "--range-start": "0%",
+
                         "--range-end": `${sizeSliderPosition}%`,
                       }}
                     />
@@ -447,6 +658,11 @@ const Category = () => {
                 </fieldset>
               </>
             )}
+
+            {/* =========================
+                AVAILABILITY
+            ========================= */}
+
             <fieldset>
               <legend>Availability</legend>
 
@@ -458,6 +674,7 @@ const Category = () => {
                   onChange={(event) =>
                     setFilters((current) => ({
                       ...current,
+
                       inStock: event.target.checked,
                     }))
                   }
@@ -465,6 +682,11 @@ const Category = () => {
                 In Stock
               </label>
             </fieldset>
+
+            {/* =========================
+                RATING
+            ========================= */}
+
             <fieldset>
               <legend>Rating</legend>
 
@@ -476,6 +698,7 @@ const Category = () => {
                   onChange={(event) =>
                     setFilters((current) => ({
                       ...current,
+
                       rating: event.target.checked,
                     }))
                   }
@@ -483,6 +706,11 @@ const Category = () => {
                 ⭐ 4 & above
               </label>
             </fieldset>
+
+            {/* =========================
+                CLEAR
+            ========================= */}
+
             <button
               className="clear_filters"
               type="button"
@@ -492,6 +720,11 @@ const Category = () => {
             </button>
           </div>
         </div>
+
+        {/* =========================
+            PRODUCTS
+        ========================= */}
+
         <div className="category_results">
           <div className="sort_row">
             <span>
@@ -506,16 +739,20 @@ const Category = () => {
                 onChange={(event) =>
                   setFilters((current) => ({
                     ...current,
+
                     sort: event.target.value,
                   }))
                 }
               >
                 <option value="relevance">Relevance</option>
+
                 <option value="price-low">Price: low to high</option>
+
                 <option value="price-high">Price: high to low</option>
               </select>
             </label>
           </div>
+
           <div className="categories_items">
             {filteredProducts.map((product) => {
               const productId = product.id || product._id;
@@ -530,6 +767,7 @@ const Category = () => {
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
+
                       openProduct(product);
                     }
                   }}
@@ -538,24 +776,35 @@ const Category = () => {
                     src={product.images?.[0]}
                     alt={product.title || "Product"}
                   />
+
                   <p className="rating_pre">
                     ⭐ {product.rating?.average ?? 0} (
                     {product.rating?.count ?? 0})
                   </p>
+
                   <small>{product.brand}</small>
+
                   <p className="product_description">{product.title}</p>
+
                   <div className="price">
-                    <strong>Rs.{product.price?.selling_price}</strong>
-                    <del>Rs.{product.price?.mrp}</del>
+                    <strong>
+                      Rs.
+                      {product.price?.selling_price}
+                    </strong>
+
+                    <del>
+                      Rs.
+                      {product.price?.mrp}
+                    </del>
+
                     <span>({product.price?.discount_percent}% OFF)</span>
                   </div>
-                  <span>
-                    {/* use frame1, frame2 and heart_anime for this before clicking frame1 and animaiton (heart_anime) and then frame2 image should be in add to fav style*/}
-                    add to fav
-                  </span>
+
+                  <span>add to fav</span>
                 </div>
               );
             })}
+
             {!filteredProducts.length && (
               <p className="empty_results">No products available.</p>
             )}

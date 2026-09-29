@@ -140,6 +140,7 @@
   display: flex;
   justify-content: space-between;
   margin: 2px 0 4px;
+
   color: #d85b01;
   font-size: 13px;
   font-weight: 700;
@@ -152,24 +153,24 @@
   margin: 0 2px 2px;
 }
 
-.price_slider_track,
-.price_slider_track::after {
+.price_slider_track {
   position: absolute;
   top: 50%;
-  right: 0;
   left: 0;
+  right: 0;
   height: 6px;
   border-radius: 999px;
   transform: translateY(-50%);
-}
-
-.price_slider_track {
   background: #f1e4d7;
 }
 
 .price_slider_track::after {
-  right: calc(100% - var(--range-end));
+  position: absolute;
+  top: 0;
+  bottom: 0;
   left: var(--range-start);
+  right: calc(100% - var(--range-end));
+  border-radius: 999px;
   background: linear-gradient(90deg, #ff9a3d, #f15a24);
   content: "";
 }
@@ -181,18 +182,23 @@
   width: 100%;
   height: 30px;
   margin: 0;
+  padding: 0;
   appearance: none;
+  -webkit-appearance: none;
   background: transparent;
   cursor: pointer;
   pointer-events: none;
 }
 
-.price_range::-webkit-slider-runnable-track {
-  height: 6px;
-  background: transparent;
+.price_range_min {
+  z-index: 2;
 }
 
-.price_range::-moz-range-track {
+.price_range_max {
+  z-index: 3;
+}
+
+.price_range::-webkit-slider-runnable-track {
   height: 6px;
   background: transparent;
 }
@@ -202,24 +208,34 @@
   height: 18px;
   margin-top: -6px;
   appearance: none;
-  border: 3px solid white;
+  -webkit-appearance: none;
+  border: 3px solid #fff;
   border-radius: 50%;
   background: #f15a24;
   box-shadow: 0 2px 8px rgba(204, 76, 16, 0.35);
   pointer-events: auto;
+}
+
+.price_range::-moz-range-track {
+  height: 6px;
+  background: transparent;
 }
 
 .price_range::-moz-range-thumb {
   width: 12px;
   height: 12px;
-  border: 3px solid white;
+
+  border: 3px solid #fff;
   border-radius: 50%;
+
   background: #f15a24;
+
   box-shadow: 0 2px 8px rgba(204, 76, 16, 0.35);
+
   pointer-events: auto;
 }
 
-.price_range:focus-visible {
+.price_range:focus {
   outline: none;
 }
 
@@ -237,7 +253,9 @@
 
 .price_range_hint {
   display: block;
+
   color: #8c8178;
+
   font-size: 11px;
   font-weight: 550;
   font-family: "Quicksand", sans-serif;
@@ -714,7 +732,7 @@
   }
 }
 
-.rating_pre{
+.rating_pre {
   position: absolute;
   top: 220px;
   left: 18px;
