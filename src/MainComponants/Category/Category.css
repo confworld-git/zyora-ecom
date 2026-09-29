@@ -460,6 +460,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 20px;
+  perspective: 900px;;
 }
 
 .product_description {
@@ -513,24 +514,45 @@
 }
 
 .categories_items > div {
+  --rx: 0deg;
+  --ry: 0deg;
   width: 280px;
   padding: 10px;
   border-radius: 25px;
   border: 1px solid #f3ece5;
   background-color: white;
   cursor: pointer;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.3s ease;
+  will-change: transform;
 }
 
-.categories_items > div:hover,
+/* fast response while the mouse is moving inside the card */
+.categories_items > div.active {
+  transition:
+    transform 0.08s linear,
+    box-shadow 0.3s ease;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* optional: make the card's contents float above it */
+.categories_items > div > * {
+  transform: translateZ(20px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .categories_items > div { transition: none; }
+}
+
+/* .categories_items > div:hover,
 .categories_items > div:focus-visible {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(70, 48, 31, 0.12);
-  /* outline: 2px solid #ffba74; */
   outline-offset: 2px;
-}
+} */
 
 .categories_items > div > img {
   height: 250px;

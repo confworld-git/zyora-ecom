@@ -143,8 +143,8 @@ const ProductDetail = () => {
           </div>
 
           <div className="product-detail-summary">
-            <small>{product.brand}</small>
-            <p className="product-category">{product.category}</p>
+            <small >{product.brand}</small>
+            {/* <p className="product-category">{product.category}</p> */}
             <h1>{productName}</h1>
             <p className="product-title">{product.title}</p>
 

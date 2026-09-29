@@ -22,6 +22,29 @@ const Category = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
 
+  const TILT_MAX = 10;
+
+  const handleTiltMove = (event) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const card = event.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width; // 0 to 1
+    const y = (event.clientY - rect.top) / rect.height; // 0 to 1
+
+    card.classList.add("tilting");
+    card.style.setProperty("--ry", `${(x - 0.5) * 2 * TILT_MAX}deg`);
+    card.style.setProperty("--rx", `${(0.5 - y) * 2 * TILT_MAX}deg`);
+  };
+
+  const handleTiltLeave = (event) => {
+    const card = event.currentTarget;
+
+    card.classList.remove("tilting");
+    card.style.setProperty("--rx", "0deg");
+    card.style.setProperty("--ry", "0deg");
+  };
+
   const MIN_PRODUCT_PRICE = useMemo(() => {
     const sellingPrices = products
       .map((product) => product.price?.selling_price)
@@ -599,6 +622,8 @@ const Category = () => {
                     key={productId}
                     role="button"
                     tabIndex={0}
+                    onMouseMove={handleTiltMove}
+                    onMouseLeave={handleTiltLeave}
                     onClick={() => openProduct(product)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
