@@ -159,8 +159,8 @@ const Featured = () => {
                     >
                       {product.images?.[0] ? (
                         <img
-                          src={product.images[0]}
-                          alt={product.name || product.title}
+                          src={product.images[0].url}
+                          alt={product.images[0].alt}
                         />
                       ) : (
                         <div className="featured_no_image">

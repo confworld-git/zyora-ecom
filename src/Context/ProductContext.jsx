@@ -19,7 +19,6 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
         );
-
         setProducts(Array.isArray(response.data) ? response.data : []);
       } catch (requestError) {
         console.error("Error fetching products:", requestError);

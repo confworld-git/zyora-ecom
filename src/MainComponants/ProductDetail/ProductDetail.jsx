@@ -18,9 +18,6 @@ const ProductDetail = () => {
   const product = getProductById(id);
   const [selectionsByProduct, setSelectionsByProduct] = useState({});
   const selection = selectionsByProduct[id] || {};
-  const selectedImage = selection.image ?? product?.images?.[0] ?? "";
-  const selectedColor = selection.color ?? "";
-  const selectedSize = selection.size ?? "";
 
   const updateSelection = (key, value) => {
     setSelectionsByProduct((current) => ({
@@ -42,6 +39,26 @@ const ProductDetail = () => {
     );
   }
 
+  const images = product.images || [];
+  const colourNames = product.variants?.colours || [];
+
+  // Each image = one colour option (hex from image.color, name from variants.colours by index)
+  const colorOptions = images.map((image, index) => ({
+    id: image.id,
+    hex: image.color,
+    name: colourNames[index] || image.color,
+    image,
+  }));
+
+  // Selected image (defaults to first image); colour is derived from it
+  const activeImage = selection.image ?? images[0] ?? null;
+  const selectedImage = activeImage?.url ?? "";
+  const selectedColorOption = colorOptions.find(
+    (option) => option.id === activeImage?.id,
+  );
+  const selectedColor = selectedColorOption?.name ?? "";
+  const selectedSize = selection.size ?? "";
+
   const productName = product.name || product.title;
   const ratingAverage = product.rating?.average ?? 0;
   const displayedRating = Math.round(ratingAverage * 2) / 2;
@@ -54,7 +71,7 @@ const ProductDetail = () => {
     ["Item Details", information.item_details],
   ];
 
-  const colorRequired = product.variants?.colours?.length > 0;
+  const colorRequired = colorOptions.length > 0;
   const sizeRequired = product.variants?.sizes?.length > 0;
 
   const validateSelection = () => {
@@ -98,9 +115,6 @@ const ProductDetail = () => {
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Zyora_Category/product/${product.id}/${slug}`}
       />
       <main className="product-detail-page">
-        {/* <Link className="back-link" to="/Zyora_Category">
-        Back to categories
-      </Link> */}
         <div id="page_path">
           <p>
             Home <MdKeyboardArrowRight /> Categories <MdKeyboardArrowRight />{" "}
@@ -109,12 +123,13 @@ const ProductDetail = () => {
         </div>
         <section className="product-detail-hero">
           <div className="product-detail-gallery">
-            {product.images?.length > 0 ? (
-              product.images.map((image, index) => (
+            {images.length > 0 ? (
+              images.map((image) => (
                 <img
-                  key={`${image}-${index}`}
-                  src={image}
-                  alt={`${productName} ${index + 1}`}
+                  key={image.id}
+                  src={image.url}
+                  alt={image.alt || productName}
+                  className={activeImage?.id === image.id ? "selected" : ""}
                   onClick={() => updateSelection("image", image)}
                 />
               ))
@@ -124,10 +139,9 @@ const ProductDetail = () => {
           </div>
 
           <div>
-            {/* <img src={selectedImage} alt={productName} /> */}
             <ProductZoom image={selectedImage} />
           </div>
-          {/* className="preview_image_big" */}
+
           <div className="product-detail-summary">
             <small>{product.brand}</small>
             <p className="product-category">{product.category}</p>
@@ -141,17 +155,22 @@ const ProductDetail = () => {
             </div>
 
             <div className="color-selection">
-              <h3>Color</h3>
+              <h3>
+                Color{selectedColor && <>: <span>{selectedColor}</span></>}
+              </h3>
               <div className="color-options">
-                {product.variants?.colours?.length > 0 ? (
-                  product.variants.colours.map((color) => (
+                {colorOptions.length > 0 ? (
+                  colorOptions.map((option) => (
                     <button
-                      className={selectedColor === color ? "selected" : ""}
-                      key={color}
+                      className={
+                        activeImage?.id === option.id ? "selected" : ""
+                      }
+                      key={option.id}
                       type="button"
-                      aria-label={`Select ${color} color`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => updateSelection("color", color)}
+                      title={option.name}
+                      aria-label={`Select ${option.name} color`}
+                      style={{ backgroundColor: option.hex }}
+                      onClick={() => updateSelection("image", option.image)}
                     />
                   ))
                 ) : (
@@ -159,6 +178,7 @@ const ProductDetail = () => {
                 )}
               </div>
             </div>
+
             <div className="size-selection">
               <h3>Size</h3>
               <div className="size-options">
@@ -178,6 +198,7 @@ const ProductDetail = () => {
                 )}
               </div>
             </div>
+
             <div className="product_btns">
               <button type="button" onClick={handleAddFav}>
                 {isInWishlist(product?.id ?? product?._id)
@@ -216,16 +237,16 @@ const ProductDetail = () => {
             <h2>Variants</h2>
             <div className="variant-colours">
               <span>Colours:</span>
-              {product.variants?.colours?.length > 0 ? (
-                product.variants.colours.map((color) => (
-                  <span className="variant-colour" key={color}>
+              {colorOptions.length > 0 ? (
+                colorOptions.map((option) => (
+                  <span className="variant-colour" key={option.id}>
                     <span
                       className="variant-colour-swatch"
-                      style={{ backgroundColor: color }}
-                      title={color}
-                      aria-label={color}
+                      style={{ backgroundColor: option.color }}
+                      title={option.name}
+                      aria-label={option.name}
                     />
-                    {color}
+                    {option.name}
                   </span>
                 ))
               ) : (

@@ -609,8 +609,10 @@ const Category = () => {
                     }}
                   >
                     <img
-                      src={product.images?.[0]}
-                      alt={product.title || "Product"}
+                      src={product.images?.[0]?.url}
+                      alt={
+                        product.images?.[0]?.alt || product.title || "Product"
+                      }
                     />
 
                     <p className="rating_pre">
@@ -636,7 +638,7 @@ const Category = () => {
                       <span>({product.price?.discount_percent}% OFF)</span>
                     </div>
 
-                    <span>add to fav</span>
+                    {/* <span>add to fav</span> */}
                   </div>
                 );
               })}

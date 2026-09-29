@@ -2,12 +2,9 @@ import "./navbar.css";
 import { Link } from "react-router-dom";
 import { useCart } from "../../Context/CartContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext.jsx";
-import {
-  BsBag,
-  BsBagCheckFill,
-  BsHeart,
-  BsHeartFill,
-} from "react-icons/bs";
+import { TiShoppingCart } from "react-icons/ti";
+import { IoMdHeartEmpty } from "react-icons/io";
+import { IoMdHeart } from "react-icons/io";
 
 const Navbar = () => {
   const { totalItems } = useCart();
@@ -44,7 +41,7 @@ const Navbar = () => {
             aria-label={`Shopping bag${totalItems > 0 ? `, ${totalItems} items` : ""}`}
             title="Shopping bag"
           >
-            {totalItems > 0 ? <BsBagCheckFill /> : <BsBag />}
+            {totalItems > 0 ? <TiShoppingCart /> : <TiShoppingCart />}
             {totalItems > 0 && <span className="cart_badge">{totalItems}</span>}
           </Link>
           <Link
@@ -53,7 +50,7 @@ const Navbar = () => {
             aria-label={`Favorites${totalFavorites > 0 ? `, ${totalFavorites} items` : ""}`}
             title="Favorites"
           >
-            {totalFavorites > 0 ? <BsHeartFill /> : <BsHeart />}
+            {totalFavorites > 0 ? <IoMdHeartEmpty /> : <IoMdHeart />}
             {totalFavorites > 0 && (
               <span className="cart_badge">{totalFavorites}</span>
             )}

@@ -515,7 +515,7 @@
 .categories_items > div {
   width: 280px;
   padding: 10px;
-  border-radius: 20px;
+  border-radius: 25px;
   border: 1px solid #f3ece5;
   background-color: white;
   cursor: pointer;
@@ -538,6 +538,7 @@
   object-fit: cover;
   border-radius: 20px;
   margin-bottom: 8px;
+  mix-blend-mode: multiply;
 }
 
 .categories_items > div > h1 {

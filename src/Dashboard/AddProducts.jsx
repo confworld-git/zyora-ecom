@@ -59,6 +59,7 @@ function AddProduct() {
       const timePart = [time.getHours(), time.getMinutes(), time.getSeconds()]
         .map((part) => String(part).padStart(2, "0"))
         .join("");
+
       const categoryPart = value
         .trim()
         .replace(/[^a-zA-Z0-9]+/g, "-")
@@ -76,6 +77,7 @@ function AddProduct() {
         category: "",
         id: "",
       }));
+
       return;
     }
 
@@ -94,9 +96,11 @@ function AddProduct() {
     if (!formData.category) return;
 
     const time = new Date();
+
     const timePart = [time.getHours(), time.getMinutes(), time.getSeconds()]
       .map((part) => String(part).padStart(2, "0"))
       .join("");
+
     const categoryPart = formData.category
       .trim()
       .replace(/[^a-zA-Z0-9]+/g, "-")
@@ -127,42 +131,87 @@ function AddProduct() {
 
   const discount = calculateDiscount();
 
+  // IMAGE UPLOAD
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
 
     if (files.length === 0) return;
 
     const remainingSlots = 5 - formData.images.length;
-
     const selectedFiles = files.slice(0, remainingSlots);
 
-    const newPreviews = selectedFiles.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-    }));
+    const newImages = selectedFiles.map((file, index) => {
+      const imageNumber = formData.images.length + index + 1;
+
+      return {
+        id: `img-${imageNumber}`,
+        file,
+        url: URL.createObjectURL(file),
+        color: "",
+        alt: `${formData.name.trim() || "Product"} image ${imageNumber}`,
+      };
+    });
 
     setFormData((prev) => ({
       ...prev,
-      images: [...prev.images, ...selectedFiles],
+      images: [...prev.images, ...newImages],
     }));
 
-    setImagePreviews((prev) => [...prev, ...newPreviews]);
+    setImagePreviews((prev) => [...prev, ...newImages]);
 
     e.target.value = "";
   };
 
-  const removeImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
+  const handleImageColorChange = (index, color) => {
+    setFormData((prev) => {
+      const updatedImages = [...prev.images];
+
+      updatedImages[index] = {
+        ...updatedImages[index],
+        color,
+      };
+
+      return {
+        ...prev,
+        images: updatedImages,
+      };
+    });
 
     setImagePreviews((prev) => {
-      const updated = [...prev];
+      const updatedPreviews = [...prev];
 
-      URL.revokeObjectURL(updated[index].url);
+      updatedPreviews[index] = {
+        ...updatedPreviews[index],
+        color,
+      };
 
-      return updated.filter((_, i) => i !== index);
+      return updatedPreviews;
+    });
+  };
+
+  // REMOVE IMAGE
+  const removeImage = (index) => {
+    setFormData((prev) => {
+      const imageToRemove = prev.images[index];
+
+      if (imageToRemove?.url) {
+        URL.revokeObjectURL(imageToRemove.url);
+      }
+
+      return {
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index),
+      };
+    });
+
+    setImagePreviews((prev) => {
+      const imageToRemove = prev[index];
+
+      if (imageToRemove?.url) {
+        URL.revokeObjectURL(imageToRemove.url);
+      }
+
+      return prev.filter((_, i) => i !== index);
     });
   };
 
@@ -316,7 +365,8 @@ function AddProduct() {
       newErrors.selling_price = "Selling price must be less than MRP";
     }
 
-    if (formData.images.length === 0) {
+    // IMAGE IS REQUIRED
+    if (!formData.images || formData.images.length === 0) {
       newErrors.images = "Please upload at least one product image";
     }
 
@@ -346,6 +396,7 @@ function AddProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) {
       window.scrollTo({
         top: 0,
@@ -409,11 +460,25 @@ function AddProduct() {
           quantity: Number(formData.quantity) || 0,
         }),
       );
+
       data.append("is_best_seller", String(formData.is_best_seller));
 
+      // SEND IMAGE FILES
       formData.images.forEach((image) => {
-        data.append("images", image);
+        data.append("images", image.file);
       });
+
+      // SEND IMAGE METADATA
+      data.append(
+        "image_metadata",
+        JSON.stringify(
+          formData.images.map((image) => ({
+            id: image.id,
+            color: image.color,
+            alt: image.alt,
+          })),
+        ),
+      );
 
       const response = await axios.post(`${API_URL}/api/products`, data, {
         headers: {
@@ -423,6 +488,7 @@ function AddProduct() {
       });
 
       toast.success(response.data.message);
+
       setFormData({
         id: "",
         name: "",
@@ -582,13 +648,13 @@ function AddProduct() {
 
               <div className="form-group">
                 <label>
-                  Product Title <span>*</span>
+                  Product Title (Description)<span>*</span>
                 </label>
 
                 <input
                   type="text"
                   name="title"
-                  placeholder="Enter product title"
+                  placeholder="Enter product Description"
                   value={formData.title}
                   onChange={handleChange}
                 />
@@ -615,6 +681,7 @@ function AddProduct() {
                   <small className="field-error">{errors.brand}</small>
                 )}
               </div>
+
               <div className="form-group">
                 <label>
                   Product ID <span>*</span>
@@ -628,6 +695,7 @@ function AddProduct() {
                     value={formData.id}
                     onChange={handleChange}
                   />
+
                   <button
                     type="button"
                     className="small-add-btn"
@@ -637,7 +705,7 @@ function AddProduct() {
                       marginTop: "6px",
                     }}
                   >
-                    Generate <i class="bi bi-arrow-clockwise"></i>
+                    Generate <i className="bi bi-arrow-clockwise"></i>
                   </button>
                 </div>
 
@@ -669,6 +737,7 @@ function AddProduct() {
 
                 <div className="price-input">
                   <span>₹</span>
+
                   <input
                     type="number"
                     name="mrp"
@@ -691,6 +760,7 @@ function AddProduct() {
 
                 <div className="price-input">
                   <span>₹</span>
+
                   <input
                     type="number"
                     name="selling_price"
@@ -755,14 +825,32 @@ function AddProduct() {
             {imagePreviews.length > 0 && (
               <div className="image-preview-grid">
                 {imagePreviews.map((image, index) => (
-                  <div className="image-preview" key={image.url}>
-                    <img src={image.url} alt={`Product ${index + 1}`} />
+                  <div className="image-preview" key={image.id}>
+                    <div className="image-preview-wrapper">
+                      <img src={image.url} alt={image.alt} />
 
-                    {index === 0 && <span className="primary-image">Main</span>}
+                      {index === 0 && (
+                        <span className="primary-image">Main</span>
+                      )}
 
-                    <button type="button" onClick={() => removeImage(index)}>
-                      ×
-                    </button>
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={() => removeImage(index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="color-input-wrapper">
+                      <input
+                        type="color"
+                        value={image.color || "#000000"}
+                        onChange={(e) =>
+                          handleImageColorChange(index, e.target.value)
+                        }
+                      />
+                      <span>{image.color || "Select colour"}</span>
+                    </div>
                   </div>
                 ))}
               </div>
