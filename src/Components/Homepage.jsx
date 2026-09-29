@@ -10,9 +10,9 @@ const Homepage = () => {
   return (
     <>
       <SEO
-        title="ZYORA | Quality & Affordable Products for Everyday Life"
-        description="Shop at ZYORA for quality, functional and affordable products for your home, lifestyle and everyday needs. Explore soft toys, home & kitchen essentials, stationery, handbags and more, with reliable delivery, secure payments and easy 7-day returns."
-        canonical="https://yourdomain.com/"
+        title="ZYORA | Destination for E-commerce"
+        description="Shop at ZYORA for quality, functional and affordable products for everyday life. Discover home and kitchen essentials, stationery, handbags, soft toys, fashion, footwear, electronics, watches, beauty, sports and fitness products, and more. Enjoy competitive prices, secure payments, reliable delivery and easy 7-day returns."
+        canonical={import.meta.env.VITE_API_DOMAIN}
       />
       <Home />
       <Welcome />
