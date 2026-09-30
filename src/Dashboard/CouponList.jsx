@@ -29,12 +29,12 @@ const STATE_LABEL = {
   "used-up": "Used up",
 };
 
-const CouponList = ({ refreshKey = 0 }) => {
+const CouponList = () => {
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const [editing, setEditing] = useState(null); // coupon being edited
+  const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const fetchCoupons = useCallback(async () => {
@@ -52,7 +52,7 @@ const CouponList = ({ refreshKey = 0 }) => {
 
   useEffect(() => {
     fetchCoupons();
-  }, [fetchCoupons, refreshKey]);
+  }, [fetchCoupons]);
 
   const visible = useMemo(
     () =>
@@ -67,7 +67,9 @@ const CouponList = ({ refreshKey = 0 }) => {
   );
 
   const replaceCoupon = (updated) =>
-    setCoupons((prev) => prev.map((c) => (c._id === updated._id ? updated : c)));
+    setCoupons((prev) =>
+      prev.map((c) => (c._id === updated._id ? updated : c)),
+    );
 
   const toggleStatus = async (coupon) => {
     const next = coupon.status === "active" ? "inactive" : "active";
@@ -167,10 +169,15 @@ const CouponList = ({ refreshKey = 0 }) => {
   };
 
   return (
-    <div className="admin-settings-card">
-      <div className="admin-settings-header">
-        <h2>All Coupons ({coupons.length})</h2>
-        <p>Edit, pause, or delete the coupons customers can use at checkout.</p>
+    <div>
+      <div className="page-header">
+        <div>
+          <span className="page-label">COUPON MANAGEMENT</span>
+          <h1>All Coupons</h1>
+          <p>
+            Edit, pause, or delete the coupons customers can use at checkout.
+          </p>
+        </div>
       </div>
 
       <div className="coupon-toolbar">
@@ -276,8 +283,8 @@ const CouponList = ({ refreshKey = 0 }) => {
           <div className="coupon-modal" onClick={(e) => e.stopPropagation()}>
             <h2>Edit {editing.code}</h2>
             <p className="field-hint">
-              The code and discount type can't be changed. Delete the coupon
-              and create a new one instead.
+              The code and discount type can't be changed. Delete the coupon and
+              create a new one instead.
             </p>
 
             <form onSubmit={saveEdit}>
@@ -293,7 +300,9 @@ const CouponList = ({ refreshKey = 0 }) => {
                   value={editing.discountValue}
                   onChange={handleEditChange}
                   min="1"
-                  max={editing.discountType === "percentage" ? "100" : undefined}
+                  max={
+                    editing.discountType === "percentage" ? "100" : undefined
+                  }
                 />
               </div>
 

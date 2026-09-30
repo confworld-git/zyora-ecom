@@ -29,8 +29,8 @@ const Category = () => {
 
     const card = event.currentTarget;
     const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width; // 0 to 1
-    const y = (event.clientY - rect.top) / rect.height; // 0 to 1
+    const x = (event.clientX - rect.left) / rect.width; 
+    const y = (event.clientY - rect.top) / rect.height;
 
     card.classList.add("tilting");
     card.style.setProperty("--ry", `${(x - 0.5) * 2 * TILT_MAX}deg`);

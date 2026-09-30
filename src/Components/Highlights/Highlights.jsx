@@ -1,5 +1,4 @@
 import "./highlights.css";
-import ScrollVideo from "../ScrollVideo";
 import toy from "../../assets/Videos/toys.mp4";
 import stationery from "../../assets/Videos/stationery.mp4";
 import bag from "../../assets/Videos/bag.mp4";
@@ -44,7 +43,7 @@ const Highlights = () => {
       <section>
         {categories.map((item) => (
           <div key={item.title}>
-            <ScrollVideo src={item.src} />
+            <video src={item.src} muted autoPlay loop playsInline />
             <div>
               <h1>{item.title}</h1>
               <p>{item.text}</p>

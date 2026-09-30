@@ -1,5 +1,5 @@
 .highlights {
-  padding: 60px 40px 40px 40px;
+  padding: 20px 60px 60px 60px;
 }
 
 .highlights > section {
@@ -7,6 +7,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  position: relative;
 }
 
 .highlights > section > div {
@@ -15,6 +16,7 @@
   position: relative;
   overflow: hidden;
   height: 350px;
+  position: relative;
 }
 
 .highlights > section > div > video {
@@ -40,7 +42,7 @@
 }
 
 .highlights > div > h1 > span {
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .highlights > p {
@@ -74,7 +76,7 @@
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid rgba(252, 251, 251, 0.178);
-  color: white;
+  /* color: white; */
   transition: 0.6s;
   border-radius: 0 50px 0 0;
 }

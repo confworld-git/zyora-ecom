@@ -1,5 +1,5 @@
 .Featured_Collection {
-  padding: 60px 40px 40px 40px;
+  padding: 20px 60px 40px 60px;
 }
 
 .Featured_Collection > h1 {
@@ -15,7 +15,7 @@
 }
 
 .Featured_Collection > h1 > span {
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .Featured_Collection > section {

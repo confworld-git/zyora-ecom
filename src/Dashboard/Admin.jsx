@@ -2,7 +2,6 @@ import "./Dashboard.css";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import CouponList from "./CouponList";
 
 const Admin = () => {
   const [formData, setFormData] = useState({
@@ -11,7 +10,6 @@ const Admin = () => {
     newPassword: "",
     confirmPassword: "",
   });
-  const [couponRefreshKey, setCouponRefreshKey] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -193,7 +191,6 @@ const Admin = () => {
 
       if (response.data.success) {
         toast.success(response.data.message || "Coupon created successfully");
-        setCouponRefreshKey((k) => k + 1);
         setCouponData({
           code: "",
           discountType: "",
@@ -373,10 +370,6 @@ const Admin = () => {
                 min="1"
                 required
               />
-
-              <p className="field-hint">
-                Maximum amount a customer can save with this coupon.
-              </p>
             </div>
           )}
 
@@ -431,8 +424,6 @@ const Admin = () => {
           </button>
         </form>
       </div>
-      
-      <CouponList refreshKey={couponRefreshKey} />
     </div>
   );
 };

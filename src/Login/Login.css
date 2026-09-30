@@ -83,7 +83,7 @@
   font-size: 11px;
   letter-spacing: 2px;
   font-weight: 700;
-  color: #fd7304;
+  color: #ff4000;
   margin-bottom: 18px;
 }
 
@@ -126,7 +126,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .zyora-login-heading h2 {
@@ -230,7 +230,7 @@
 }
 
 .zyora-remember input {
-  accent-color: #fd7304;
+  accent-color: #ff4000;
   cursor: pointer;
 }
 
@@ -246,7 +246,7 @@
 }
 
 .zyora-forgot:hover {
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .zyora-login-button {
@@ -254,7 +254,7 @@
   height: 54px;
   border: none;
   border-radius: 12px;
-  background: #fd7304;
+  background: #ff4000;
   color: white;
   font-size: 14px;
   font-weight: 700;

@@ -1,5 +1,4 @@
 import "./welcome.css";
-import ScrollVideo from "../ScrollVideo";
 
 const pillars = ["Quality", "Functionality", "Style", "Affordability"];
 
@@ -41,9 +40,13 @@ const Welcome = () => {
 
         <div className="wl-visual" style={{ "--d": ".2s" }}>
           <div className="wl-frame">
-            <ScrollVideo
+            <video
               className="wl-video"
               src="https://res.cloudinary.com/zyora/video/upload/v1790328170/globe2_lgz10s.mp4"
+              muted
+              loop
+              playsInline
+              autoPlay
             />
           </div>
 

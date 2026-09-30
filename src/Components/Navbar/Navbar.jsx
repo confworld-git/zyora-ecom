@@ -50,7 +50,7 @@ const Navbar = () => {
             aria-label={`Favorites${totalFavorites > 0 ? `, ${totalFavorites} items` : ""}`}
             title="Favorites"
           >
-            {totalFavorites > 0 ? <IoMdHeartEmpty /> : <IoMdHeart />}
+            {totalFavorites > 0 ? <IoMdHeart /> : <IoMdHeartEmpty />}
             {totalFavorites > 0 && (
               <span className="cart_badge">{totalFavorites}</span>
             )}

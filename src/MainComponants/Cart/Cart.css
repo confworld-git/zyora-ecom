@@ -16,7 +16,7 @@
 }
 
 .cart_title > span {
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .empty-cart {
@@ -106,13 +106,13 @@
 }
 
 .cart_item_checkbox:hover {
-  border-color: #ff5e00;
+  border-color: #ff4000;
   transform: scale(1.06);
 }
 
 .cart_item_checkbox:checked {
-  border-color: #ff5e00;
-  background-color: #ff5e00;
+  border-color: #ff4000;
+  background-color: #ff4000;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-position: center;
   background-repeat: no-repeat;
@@ -243,7 +243,7 @@
   padding: 5px 9px;
   border-radius: 6px;
   background: #fff0df;
-  color: #ff5e00;
+  color: #ff4000;
   font-family: "Poppins", sans-serif;
   font-size: 11px;
   font-weight: 700;
@@ -287,8 +287,8 @@
 }
 
 .cart_quantity button:hover {
-  background: #ff5e00;
-  border-color: #ff5e00;
+  background: #ff4000;
+  border-color: #ff4000;
   color: #fff;
 }
 
@@ -405,7 +405,7 @@
 }
 
 .promo_code button {
-  background: #ff5e00;
+  background: #ff4000;
   color: #fffefe;
   padding: 11px 16px;
 }
@@ -449,7 +449,7 @@
   border: none;
   padding: 0;
   background: transparent;
-  color: #ff5e00;
+  color: #ff4000;
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -590,19 +590,19 @@
 }
 
 .apply_coupon_link {
-  color: #ff5e00;
+  color: #ff4000;
   font-weight: 600;
 }
 
 .inline_link_btn {
-  color: #ff5e00;
+  color: #ff4000;
   font-size: 12px;
   margin-left: 6px;
   text-decoration: underline;
 }
 
 .know_more_link {
-  color: #ff5e00;
+  color: #ff4000;
   font-weight: 600;
   font-size: 12px;
   margin-left: 4px;
@@ -617,12 +617,12 @@
 }
 
 .order_terms a {
-  color: #ff5e00;
+  color: #ff4000;
   text-decoration: none;
 }
 
 .checkout_btn {
-  background: #ff5e00;
+  background: #ff4000;
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -638,7 +638,7 @@
 .know_more_link {
   border: none;
   background: transparent;
-  color: #ff5e00;
+  color: #ff4000;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;

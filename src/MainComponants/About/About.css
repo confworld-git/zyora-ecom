@@ -23,7 +23,7 @@
 
 .about_title > h1 {
   font-size: 50px;
-  color: #fd7304;
+  color: #ff4000;
   margin-bottom: 5px;
   margin-top: 50px;
   position: relative;
@@ -45,7 +45,7 @@
 
 .About_us > span {
   font-weight: 800;
-  color: #0143d1;
+  color: #020092;
   letter-spacing: 1px;
 }
 
@@ -56,7 +56,7 @@
 }
 
 .About_us > h1 > span {
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .standFor {
@@ -70,7 +70,7 @@
 }
 
 .standFor > h1 > span {
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .standFor > p {
@@ -81,7 +81,7 @@
 
 .standFor > span {
   font-weight: 800;
-  color: #0143d1;
+  color: #020092;
   letter-spacing: 1px;
 }
 
@@ -192,7 +192,7 @@
 }
 
 .why_zyora > h1 > span {
-  color: #fd7304;
+  color: #ff4000;
 }
 
 .why_zyora > section {
@@ -255,7 +255,7 @@
   /* transform: translateY(-50%); */
   height: 12px;
   width: 12px;
-  background-color: #fd7304;
+  background-color: #ff4000;
   border-radius: 50%;
   z-index: 2;
 }
@@ -268,7 +268,7 @@
   /* transform: translateY(-50%); */
   height: 12px;
   width: 12px;
-  background-color: #fd7304;
+  background-color: #ff4000;
   border-radius: 50%;
   z-index: 2;
 }

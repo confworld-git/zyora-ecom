@@ -256,7 +256,7 @@ const ProductDetail = () => {
             <p>
               Sizes:
               <span>
-                {product.variants?.sizes?.join(", ") || "Not specified"}
+                {product.variants?.sizes?.join("  |  ") || "Not specified"}
               </span>
             </p>
           </div>

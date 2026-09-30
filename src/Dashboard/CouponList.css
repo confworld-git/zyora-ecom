@@ -8,8 +8,9 @@
 .coupon-toolbar input {
   flex: 1 1 200px;
   padding: 12px 14px;
-  border: 1px solid #d4d4d8;
-  border-radius: 8px;
+  /* border: 1px solid #d4d4d8; */
+  border: none;
+  border-radius: 500px;
   outline: none;
   font-size: 14px;
   box-sizing: border-box;
@@ -19,8 +20,9 @@
 .coupon-toolbar select {
   flex: 0 0 160px;
   padding: 12px 14px;
-  border: 1px solid #d4d4d8;
-  border-radius: 8px;
+  /* border: 1px solid #d4d4d8; */
+  border: none;
+  border-radius: 500px;
   outline: none;
   font-size: 14px;
   box-sizing: border-box;
@@ -41,6 +43,25 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  margin-top: 20px;
+}
+
+.coupon-table > thead {
+  background-color: #ff4000;
+  color: white;
+}
+
+.coupon-table > thead > tr > th {
+  font-family: "poppins", sans-serif;
+  font-weight: 500;
+}
+
+.coupon-table > thead > tr > :first-child {
+  border-radius: 15px 0px 0px 0px;
+}
+
+.coupon-table > thead > tr > :last-child {
+  border-radius: 0px 15px 0px 0px;
 }
 
 .coupon-table > tbody {
@@ -48,12 +69,22 @@
   font-size: 13px;
 }
 
+.coupon-table > tbody {
+  background-color: white;
+}
+
 .coupon-table th,
 .coupon-table td {
   padding: 12px 10px;
-  text-align: left;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+  text-align: center;
+  border-bottom: 1px solid #fff2cd;
   white-space: nowrap;
+}
+
+.coupon-table > tbody > tr > :last-child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .coupon-code {
@@ -100,12 +131,13 @@
 
 .coupon-actions button {
   padding: 5px 10px;
-  border-radius: 6px;
+  border-radius: 50px;
   border: 1px solid rgba(128, 128, 128, 0.4);
   background: transparent;
   color: inherit;
   cursor: pointer;
   font-size: 13px;
+  font-family: "poppins", sans-serif;
 }
 
 .coupon-actions button:disabled {
@@ -114,8 +146,10 @@
 }
 
 .coupon-actions button.danger {
-  color: #c0392b;
-  border-color: #c0392b;
+  background-color: #fd1900;
+  border-color: #ff1900;
+  color: white;
+  border-radius: 50px;
 }
 
 .coupon-modal-backdrop {
@@ -153,4 +187,14 @@
   border: 1px solid #bbb;
   background: transparent;
   cursor: pointer;
+}
+
+.coupon-modal > h2 {
+  margin: 0;
+  font-family: "poppins", sans-serif;
+}
+
+.coupon-modal > p {
+  margin: 10px 0px 20px 0px;
+  font-size: 14px;
 }

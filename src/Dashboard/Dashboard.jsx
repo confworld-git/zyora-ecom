@@ -4,6 +4,7 @@ import { LuMessageCircleQuestion } from "react-icons/lu";
 import { AiOutlineProduct } from "react-icons/ai";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { RiHome4Line } from "react-icons/ri";
+import { MdOutlineLocalOffer } from "react-icons/md";
 import EnquiryData from "./EnquiryData";
 import Admin from "./Admin";
 import Home from "./Home";
@@ -13,6 +14,7 @@ import AddProduct from "./AddProducts";
 import { useNavigate } from "react-router-dom";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
+import CouponList from "./CouponList";
 
 const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
@@ -75,6 +77,10 @@ const Dashboard = () => {
             <AiOutlineProduct />
             Add Products
           </li>
+          <li onClick={() => setActiveSection("coupon_code")}>
+            <MdOutlineLocalOffer />
+            Coupon Code
+          </li>
           <li onClick={() => setActiveSection("admin")}>
             <MdOutlinePersonOutline />
             Admin Panel
@@ -86,21 +92,18 @@ const Dashboard = () => {
         </div>
         <div className="dashboard_right_section">
           {activeSection === "home" && <Home totalEnquiries={totalEnquiries} />}
-
           {activeSection === "orders" && (
             <div>
               <h2>Orders</h2>
               <p>Orders will appear here.</p>
             </div>
           )}
-
           {activeSection === "enquiry" && (
             <EnquiryData enquiryData={enquiryData} />
           )}
-
           {activeSection === "add_product" && <AddProduct />}
-
           {activeSection === "admin" && <Admin />}
+          {activeSection === "coupon_code" && <CouponList />}
         </div>
       </section>
     </div>
