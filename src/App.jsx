@@ -16,6 +16,7 @@ import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.jsx";
 import Layout from "./ProtectedRoute/Layout.jsx";
 
 import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
+import PaymentSuccess from "./MainComponants/Success/PaymentSuccess.jsx";
 
 import "./index.css";
 
@@ -48,6 +49,7 @@ export const AppRoutes = () => {
             path="/Zyora_Category/product/:productId/:slug"
             element={<ProductDetail />}
           />
+          <Route path="/Payment_result" element={<PaymentSuccess />} />
           <Route
             path="/Dashboard"
             element={

@@ -327,13 +327,16 @@
 }
 
 .cart_summary {
-  flex: 0.9;
   background: #fff;
   border: 1px solid #f3ece5;
   border-radius: 20px;
   padding: 24px;
   box-shadow: 0 12px 30px rgba(18, 18, 18, 0.04);
+}
+
+.cart_summary_list {
   position: sticky;
+  flex: 0.9;
   top: 90px;
 }
 
@@ -372,7 +375,7 @@
 .promo_code {
   display: flex;
   gap: 10px;
-  margin: 24px 0 18px;
+  margin: 10px 0 18px;
 }
 
 .promo_code input {
@@ -627,9 +630,9 @@
 }
 
 .shipping_message {
-  font-weight: 500;
+  font-weight: 700;
   text-align: center;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .know_more_link {
@@ -645,15 +648,13 @@
 
 .platform_fee_overlay {
   position: fixed;
-  left: 0;
-  bottom: 0;
+  inset: 0;
+  z-index: 1000;
   width: 100%;
-  height: calc(100vh - 60px);
   background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
 }
 
 .platform_fee_popup {
@@ -711,4 +712,94 @@
   font-weight: 600;
 
   cursor: pointer;
+}
+
+.offers_coupons {
+  background: #fff;
+  border: 1px solid #f3ece5;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(18, 18, 18, 0.04);
+  margin-bottom: 20px;
+}
+
+.offers_coupons h1 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-family: "Quicksand", sans-serif;
+  color: #333333;
+}
+
+.offers_button {
+  width: 100%;
+  height: 42px;
+  border: none;
+  border-radius: 500px;
+  background: #ffecdf;
+  font-family: "poppins", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 500;
+}
+
+.offers_icon {
+  font-size: 22px;
+}
+
+.offers_button span:nth-child(2) {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.offers_arrow {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.applied_coupon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 0 0 0;
+}
+
+.applied_coupon_icon {
+  font-size: 25px;
+}
+
+.applied_coupon_details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.applied_coupon_details strong {
+  font-size: 14px;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 600;
+}
+
+.applied_coupon_details span {
+  font-size: 12px;
+  color: #00752d;
+  font-family: "poppins", sans-serif;
+}
+
+.coupon_edit_button {
+  background: transparent;
+  border: 1px solid #ff4000;
+  background-color: #ff4000;
+  padding: 6px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: "poppins", sans-serif;
+  border-radius: 500px;
+  color: white;
 }

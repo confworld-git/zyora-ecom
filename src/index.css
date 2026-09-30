@@ -7,11 +7,12 @@ body {
   margin: 0;
   font-family: "Playfair Display SC", sans-serif;
   background-color: #ffffff;
-  zoom: 0.9;
+  /* zoom: 0.9; */
 }
 
 body p {
   font-family: "Quicksand", sans-serif;
+  scroll-behavior: smooth;
 }
 
 #page_path > p {

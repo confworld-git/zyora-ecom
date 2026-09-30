@@ -1,0 +1,239 @@
+/* Optional: swap the display face for one that matches your brand */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap");
+
+/* Change these six values to re-theme the whole popup */
+.cp_overlay {
+  --cp-ink: #22172f;
+  --cp-paper: #f4f1fa;
+  --cp-sheet: #ffffff;
+  --cp-mark: #ffae00;
+  --cp-good: #1f7a4d;
+  --cp-bad: #b3261e;
+  --cp-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.575);
+}
+
+.cp_sheet {
+  width: 100%;
+  max-width: 440px;
+  max-height: 84vh;
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--cp-sheet);
+  color: var(--cp-ink);
+}
+
+.cp_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cp_header h3 {
+  margin: 0;
+  font-family: var(--cp-display);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.cp_close {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cp-paper);
+  color: var(--cp-ink);
+  cursor: pointer;
+}
+
+.cp_list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---- The coupon: a dark stub torn from a paper body ---- */
+.cp_card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--cp-paper);
+}
+
+/* Notches where the stub meets the body */
+.cp_card::before,
+.cp_card::after {
+  content: "";
+  position: absolute;
+  left: 92px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: var(--cp-sheet);
+}
+.cp_card::before {
+  top: -8px;
+}
+.cp_card::after {
+  bottom: -8px;
+}
+
+.cp_stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 14px 6px;
+  background: var(--cp-ink);
+  color: var(--cp-paper);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.cp_stub_value {
+  font-family: var(--cp-display);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.cp_stub_word {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.cp_card.applied .cp_stub {
+  background: var(--cp-mark);
+  color: var(--cp-ink);
+}
+
+.cp_body {
+  padding: 14px 16px 14px 20px;
+  border-left: 2px dashed rgba(34, 23, 47, 0.22);
+}
+
+.cp_body_head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cp_code {
+  font-family: var(--cp-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.cp_apply {
+  padding: 6px 14px;
+  border: 2px solid var(--cp-ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cp-ink);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.cp_apply:hover:not(:disabled) {
+  background: var(--cp-ink);
+  color: var(--cp-paper);
+}
+
+.cp_apply:disabled {
+  border-color: rgba(34, 23, 47, 0.25);
+  color: rgba(34, 23, 47, 0.45);
+  cursor: default;
+}
+
+.cp_card.applied .cp_apply:disabled {
+  border-color: var(--cp-ink);
+  background: var(--cp-ink);
+  color: var(--cp-paper);
+}
+
+.cp_details {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-family: "poppins", sans-serif;
+}
+
+.cp_details div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cp_details dt {
+  color: rgba(34, 23, 47, 0.62);
+}
+
+.cp_details dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cp_foot {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(34, 23, 47, 0.1);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cp_good {
+  color: var(--cp-good);
+}
+.cp_bad {
+  color: var(--cp-bad);
+}
+
+.cp_card.locked .cp_stub {
+  background: rgba(34, 23, 47, 0.55);
+}
+.cp_card.locked .cp_code,
+.cp_card.locked .cp_details {
+  opacity: 0.7;
+}
+
+.cp_note {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+
+.cp_close:focus-visible,
+.cp_apply:focus-visible {
+  outline: 3px solid var(--cp-mark);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp_stub,
+  .cp_apply {
+    transition: none;
+  }
+}

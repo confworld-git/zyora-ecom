@@ -1,11 +1,53 @@
 import "./Cart.css";
 import { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { useCart } from "../../Context/CartContext.jsx";
 import Confetti from "../../Confetti/Confetti.jsx";
 import nocart from "../../assets/Videos/nocart.gif";
 import Order from "../Order/Order.jsx";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import CouponPopup from "./CouponPopup.jsx";
+import { BiSolidOffer } from "react-icons/bi";
+
+const API = import.meta.env.VITE_API_BASE_URL;
+
+const FREE_SHIPPING_LIMIT = 1999;
+const SHIPPING_CHARGE = 250;
+const PLATFORM_FEE = 23;
+
+const getStoredAddresses = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem("addresses") || "null");
+    if (Array.isArray(stored) && stored.length > 0) return stored;
+  } catch (error) {
+    console.error("Unable to parse saved addresses", error);
+  }
+
+  try {
+    const def = JSON.parse(localStorage.getItem("defaultAddress") || "null");
+    return def ? [def] : [];
+  } catch (error) {
+    console.error("Unable to parse default address", error);
+    return [];
+  }
+};
+
+const persistAddresses = (list) => {
+  try {
+    const def = list.find((a) => a.isDefault);
+    if (def) localStorage.setItem("defaultAddress", JSON.stringify(def));
+    else localStorage.removeItem("defaultAddress");
+    localStorage.setItem("addresses", JSON.stringify(list));
+  } catch (error) {
+    console.error("Unable to save addresses", error);
+  }
+};
+
+const couponLabel = (coupon) =>
+  coupon.discountType === "percentage"
+    ? `${coupon.discountValue}% discount applied.`
+    : `₹${coupon.discountValue} discount applied.`;
 
 const Cart = () => {
   const {
@@ -19,45 +61,28 @@ const Cart = () => {
   const [selectedCartIds, setSelectedCartIds] = useState(
     () => new Set(cartItems.map((item) => item.cartId)),
   );
+
+  // Coupon state
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponMessage, setCouponMessage] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const [showCouponPopup, setShowCouponPopup] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+  const [couponsLoading, setCouponsLoading] = useState(false);
+  const [couponsError, setCouponsError] = useState("");
+
   const [showPlatformFee, setShowPlatformFee] = useState(false);
-  const getStoredAddresses = () => {
-    try {
-      const storedAddresses = JSON.parse(
-        localStorage.getItem("addresses") || "null",
-      );
-      if (Array.isArray(storedAddresses) && storedAddresses.length > 0) {
-        return storedAddresses;
-      }
-    } catch (error) {
-      console.error("Unable to parse saved addresses", error);
-    }
 
-    try {
-      const defaultAddress = JSON.parse(
-        localStorage.getItem("defaultAddress") || "null",
-      );
-      return defaultAddress ? [defaultAddress] : [];
-    } catch (error) {
-      console.error("Unable to parse default address", error);
-      return [];
-    }
-  };
-
+  // Address state
   const [addresses, setAddresses] = useState(() => getStoredAddresses());
-  const [hasDefaultAddress, setHasDefaultAddress] = useState(() =>
-    Boolean(JSON.parse(localStorage.getItem("defaultAddress") || "null")),
-  );
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const hasDefaultAddress = addresses.some((a) => a.isDefault);
 
-  const FREE_SHIPPING_LIMIT = 1999;
-  const SHIPPING_CHARGE = 250;
-  const PLATFORM_FEE = 23;
-
+  // Keep selected cart items synchronized with cartItems
   useEffect(() => {
     setSelectedCartIds((currentIds) => {
       const cartItemIds = new Set(cartItems.map((item) => item.cartId));
@@ -66,77 +91,69 @@ const Cart = () => {
       );
 
       cartItems.forEach((item) => {
-        if (!currentIds.has(item.cartId)) {
-          nextIds.add(item.cartId);
-        }
+        if (!currentIds.has(item.cartId)) nextIds.add(item.cartId);
       });
 
       return nextIds;
     });
   }, [cartItems]);
 
+  // Fetch available coupons once on mount so the offers count is correct
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      setCouponsLoading(true);
+      setCouponsError("");
+      try {
+        const res = await axios.get(`${API}/api/coupons`, {
+          withCredentials: true,
+        });
+        if (!cancelled && res.data.success) {
+          setAvailableCoupons(res.data.coupons || []);
+        }
+      } catch (error) {
+        console.error("Get coupons error:", error);
+        if (!cancelled) setCouponsError("Unable to load coupons right now.");
+      } finally {
+        if (!cancelled) setCouponsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const selectedItems = cartItems.filter((item) =>
     selectedCartIds.has(item.cartId),
   );
+
   const subtotal = selectedItems.reduce(
-    (total, item) =>
-      total + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+    (sum, item) =>
+      sum + (Number(item.price) || 0) * (Number(item.quantity) || 0),
     0,
   );
 
   const shipping =
     subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_LIMIT ? 0 : SHIPPING_CHARGE;
 
-  const coupons = {
-    ZYORA10: {
-      type: "percentage",
-      value: 10,
-      maxDiscount: 500,
-    },
+  const totalMRP = selectedItems.reduce(
+    (sum, item) => sum + (Number(item.mrp) || 0) * (Number(item.quantity) || 0),
+    0,
+  );
 
-    ZYORA50: {
-      type: "fixed",
-      value: 50,
-    },
-  };
-
-  const calculateDiscount = () => {
-    if (!appliedCoupon) return 0;
-    const coupon = coupons[appliedCoupon];
-    if (!coupon) return 0;
-    if (coupon.type === "percentage") {
-      const percentageDiscount = (subtotal * coupon.value) / 100;
-
-      return Math.min(
-        percentageDiscount,
-        coupon.maxDiscount ?? percentageDiscount,
-      );
-    }
-
-    if (coupon.type === "fixed") {
-      return Math.min(coupon.value, subtotal);
-    }
-
-    return 0;
-  };
-
-  const totalMRP = selectedItems.reduce((total, item) => {
+  const productDiscount = selectedItems.reduce((sum, item) => {
     const mrp = Number(item.mrp) || 0;
-    const quantity = Number(item.quantity) || 0;
-    return total + mrp * quantity;
+    const price = Number(item.price) || 0;
+    const qty = Number(item.quantity) || 0;
+    return sum + Math.max(0, mrp - price) * qty;
   }, 0);
 
-  const productDiscount = selectedItems.reduce((total, item) => {
-    const mrp = Number(item.mrp) || 0;
-    const sellingPrice = Number(item.price) || 0;
-    const quantity = Number(item.quantity) || 0;
+  const couponDiscount = appliedCoupon?.discountAmount || 0;
 
-    return total + Math.max(0, mrp - sellingPrice) * quantity;
-  }, 0);
-
-  const couponDiscount = calculateDiscount();
   const totalItemsCount = selectedItems.reduce(
-    (total, item) => total + (Number(item.quantity) || 0),
+    (sum, item) => sum + (Number(item.quantity) || 0),
     0,
   );
 
@@ -151,98 +168,93 @@ const Cart = () => {
   const toggleCartItem = (cartId) => {
     setSelectedCartIds((currentIds) => {
       const nextIds = new Set(currentIds);
-      if (nextIds.has(cartId)) {
-        nextIds.delete(cartId);
-      } else {
-        nextIds.add(cartId);
-      }
+      if (nextIds.has(cartId)) nextIds.delete(cartId);
+      else nextIds.add(cartId);
       return nextIds;
     });
   };
 
+  // ---------- Addresses ----------
   const handleAddressSaved = (address) => {
-    const normalizedAddress = {
-      ...address,
-      isDefault: Boolean(address.isDefault),
-    };
+    const normalized = { ...address, isDefault: Boolean(address.isDefault) };
 
-    setAddresses((currentAddresses) => {
-      let nextAddresses = [...currentAddresses];
+    const base = normalized.isDefault
+      ? addresses.map((a) => ({ ...a, isDefault: false }))
+      : addresses;
+    const next = [...base, normalized];
 
-      if (normalizedAddress.isDefault) {
-        nextAddresses = nextAddresses.map((currentAddress) => ({
-          ...currentAddress,
-          isDefault: false,
-        }));
-      }
-
-      nextAddresses = [...nextAddresses, normalizedAddress];
-      const defaultAddress =
-        nextAddresses.find((item) => item.isDefault) || null;
-
-      if (defaultAddress) {
-        localStorage.setItem("defaultAddress", JSON.stringify(defaultAddress));
-      } else {
-        localStorage.removeItem("defaultAddress");
-      }
-
-      localStorage.setItem("addresses", JSON.stringify(nextAddresses));
-      return nextAddresses;
-    });
-
-    setSelectedAddressIndex(addresses.length);
-    setHasDefaultAddress(Boolean(normalizedAddress.isDefault));
+    setAddresses(next);
+    persistAddresses(next);
+    setSelectedAddressIndex(next.length - 1);
     setShowAddressForm(false);
   };
 
   const handleDeleteAddress = (addressIndex) => {
-    const nextAddresses = addresses.filter(
-      (_, index) => index !== addressIndex,
-    );
-    const deletedAddress = addresses[addressIndex];
-    const remainingDefault = nextAddresses.find((address) => address.isDefault);
+    const next = addresses.filter((_, i) => i !== addressIndex);
 
-    setAddresses(nextAddresses);
+    setAddresses(next);
+    persistAddresses(next);
     setSelectedAddressIndex(
-      Math.max(0, Math.min(addressIndex, nextAddresses.length - 1)),
+      Math.max(0, Math.min(addressIndex, next.length - 1)),
     );
-    setHasDefaultAddress(Boolean(remainingDefault));
     setShowAddressForm(false);
-
-    if (remainingDefault) {
-      localStorage.setItem("defaultAddress", JSON.stringify(remainingDefault));
-    } else {
-      localStorage.removeItem("defaultAddress");
-    }
-
-    localStorage.setItem("addresses", JSON.stringify(nextAddresses));
-
-    if (deletedAddress?.isDefault && !remainingDefault) {
-      console.log("Default address removed");
-    }
   };
 
-  const handleApplyCoupon = () => {
-    const code = couponCode.trim().toUpperCase();
+  // ---------- Coupons ----------
+  // Always validated against subtotal, so apply and revalidation agree
+  const applyCoupon = async (rawCode) => {
+    const code = (rawCode || "").trim().toUpperCase();
+
     setCouponMessage("");
+
     if (!code) {
       setCouponMessage("Please enter a coupon code.");
-      return;
+      return false;
     }
 
-    if (!coupons[code]) {
-      setAppliedCoupon(null);
-      setCouponMessage("Invalid coupon code.");
-      return;
+    if (subtotal <= 0) {
+      setCouponMessage("Add items to your cart before applying a coupon.");
+      return false;
     }
-    setAppliedCoupon(code);
-    const coupon = coupons[code];
-    if (coupon.type === "percentage") {
-      setCouponMessage(`${coupon.value}% discount applied.`);
-    } else {
-      setCouponMessage(`₹${coupon.value} discount applied.`);
+
+    try {
+      setCouponLoading(true);
+
+      const response = await axios.post(
+        `${API}/api/coupons/apply`,
+        { code, cartTotal: subtotal },
+        { withCredentials: true },
+      );
+
+      if (response.data.success) {
+        const coupon = response.data.coupon;
+
+        setAppliedCoupon({
+          ...coupon,
+          discountAmount: Number(response.data.discountAmount) || 0,
+          finalAmount: Number(response.data.finalAmount) || 0,
+        });
+        setCouponCode(coupon.code);
+        setCouponMessage(couponLabel(coupon));
+        setShowCouponInput(false);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Apply coupon error:", error);
+      setAppliedCoupon(null);
+      setCouponMessage(
+        error.response?.data?.message ||
+          "Unable to apply coupon. Please try again.",
+      );
+      return false;
+    } finally {
+      setCouponLoading(false);
     }
   };
+
+  const handleApplyCoupon = () => applyCoupon(couponCode);
 
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
@@ -251,23 +263,100 @@ const Cart = () => {
     setShowCouponInput(false);
   };
 
+  // Revalidate the applied coupon whenever the subtotal changes
+  useEffect(() => {
+    if (!appliedCoupon?.code) return;
+
+    if (subtotal <= 0) {
+      setAppliedCoupon(null);
+      setCouponCode("");
+      setCouponMessage("");
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const response = await axios.post(
+          `${API}/api/coupons/apply`,
+          { code: appliedCoupon.code, cartTotal: subtotal },
+          { withCredentials: true },
+        );
+
+        if (cancelled) return;
+
+        if (response.data.success) {
+          setAppliedCoupon({
+            ...response.data.coupon,
+            discountAmount: Number(response.data.discountAmount) || 0,
+            finalAmount: Number(response.data.finalAmount) || 0,
+          });
+        }
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Coupon revalidation error:", error);
+        setAppliedCoupon(null);
+        setCouponCode("");
+        setCouponMessage(
+          error.response?.data?.message ||
+            "Coupon is no longer valid for this cart.",
+        );
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
+
+  // ---------- Free shipping celebration ----------
   const [celebrate, setCelebrate] = useState(false);
   const [burstKey, setBurstKey] = useState(0);
+  const celebrateTimerRef = useRef(null);
   const wasFreeShippingRef = useRef(
     subtotal >= FREE_SHIPPING_LIMIT && subtotal > 0,
   );
 
   useEffect(() => {
     const isFreeShippingNow = subtotal >= FREE_SHIPPING_LIMIT && subtotal > 0;
+
     if (isFreeShippingNow && !wasFreeShippingRef.current) {
       setBurstKey((k) => k + 1);
       setCelebrate(true);
-      const timer = setTimeout(() => setCelebrate(false), 2800);
-      wasFreeShippingRef.current = isFreeShippingNow;
-      return () => clearTimeout(timer);
+      clearTimeout(celebrateTimerRef.current);
+      celebrateTimerRef.current = setTimeout(() => setCelebrate(false), 2800);
     }
+
     wasFreeShippingRef.current = isFreeShippingNow;
   }, [subtotal]);
+
+  useEffect(() => () => clearTimeout(celebrateTimerRef.current), []);
+
+  // ---------- Place order ----------
+  const handlePlaceOrder = () => {
+    const address = addresses[selectedAddressIndex];
+
+    if (!address) {
+      setShowAddressForm(true);
+      return;
+    }
+
+    // TODO: send this to your order endpoint. Recompute totals on the server.
+    const payload = {
+      items: selectedItems.map((item) => ({
+        cartId: item.cartId,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+      })),
+      address,
+      couponCode: appliedCoupon?.code || null,
+    };
+
+    console.log("Place order payload:", payload);
+  };
 
   return (
     <div className="cart">
@@ -276,18 +365,23 @@ const Cart = () => {
           Home <MdKeyboardArrowRight /> Cart
         </p>
       </div>
+
       {cartItems.length > 0 && (
         <>
           <h1 className="cart_title">
             Your <span>Cart</span>
           </h1>
+
           <p>You’ve got taste, and honestly, we’re impressed.</p>
         </>
       )}
+
       {cartItems.length === 0 ? (
         <div className="empty-cart">
           <img src={nocart} alt="" />
+
           <h2>Your cart is empty</h2>
+
           <p>
             Looks like you haven’t added anything yet. Explore our best picks
             and fill your cart with something you’ll love.
@@ -305,14 +399,19 @@ const Cart = () => {
                   onChange={() => toggleCartItem(item.cartId)}
                   aria-label={`Include ${item.name} in price details`}
                 />
+
                 <img src={item.image} alt={item.name} />
+
                 <div>
                   <div className="cart_item_details">
                     <span>{item.brand}</span>
+
                     <h2>{item.name}</h2>
+
                     {item.title && item.title !== item.name && (
                       <p>{item.title}</p>
                     )}
+
                     <div
                       style={{
                         display: "flex",
@@ -345,8 +444,6 @@ const Cart = () => {
                         )}
                       </label>
 
-                      {/* COLOR */}
-
                       <label className="cart_option">
                         <span>Color:</span>
 
@@ -378,10 +475,12 @@ const Cart = () => {
                         <i className="bi bi-currency-rupee"></i>
                         {Number(item.price).toLocaleString("en-IN")}
                       </span>
+
                       <span className="cart_mrp_price">
                         <i className="bi bi-currency-rupee"></i>
                         {Number(item.mrp).toLocaleString("en-IN")}
                       </span>
+
                       <span className="cart_discount_badge">
                         {item.discountPercent}% OFF
                       </span>
@@ -428,6 +527,7 @@ const Cart = () => {
                 </div>
               </div>
             ))}
+
             {showAddressForm && (
               <Order
                 onAddressSaved={handleAddressSaved}
@@ -436,184 +536,207 @@ const Cart = () => {
             )}
           </div>
 
-          <aside className="cart_summary">
-            <h2 className="price_details_title">
-              PRICE DETAILS ({totalItemsCount}{" "}
-              {totalItemsCount === 1 ? "Item" : "Items"})
-            </h2>
+          <div className="cart_summary_list">
+            <div className="offers_coupons">
+              <h1>OFFERS & COUPONS</h1>
+              <button
+                type="button"
+                className="offers_button"
+                onClick={() => setShowCouponPopup(true)}
+              >
+                <span className="offers_icon">♧</span>
+                <span>{availableCoupons.length} Offers On Your Bag</span>
+                <span className="offers_arrow">›</span>
+              </button>
 
-            <div className="summary_row">
-              <span>Total MRP</span>
-              <strong>
-                <i className="bi bi-currency-rupee"></i>
-                {totalMRP.toLocaleString("en-IN")}
-              </strong>
-            </div>
+              {appliedCoupon && (
+                <div className="applied_coupon">
+                  <div className="applied_coupon_icon">
+                    <BiSolidOffer />
+                  </div>
 
-            <div className="summary_row">
-              <span>Discount on MRP</span>
-              <strong className={productDiscount > 0 ? "discount" : ""}>
-                {productDiscount > 0 ? (
-                  <>
-                    - <i className="bi bi-currency-rupee"></i>
-                    {productDiscount.toLocaleString("en-IN")}
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-currency-rupee"></i>0
-                  </>
-                )}
-              </strong>
-            </div>
+                  <div className="applied_coupon_details">
+                    <strong>1 Coupon applied</strong>
 
-            <div className="summary_row">
-              <span>Coupon Discount</span>
+                    <span>
+                      You saved additionally ₹
+                      {Number(appliedCoupon.discountAmount).toFixed(2)}
+                    </span>
+                  </div>
 
-              {appliedCoupon ? (
-                <strong className="discount">
-                  - <i className="bi bi-currency-rupee"></i>
-                  {couponDiscount.toLocaleString("en-IN")}{" "}
                   <button
                     type="button"
-                    className="inline_link_btn"
-                    onClick={handleRemoveCoupon}
+                    className="coupon_edit_button"
+                    onClick={() => setShowCouponPopup(true)}
                   >
-                    Remove
+                    EDIT
                   </button>
-                </strong>
-              ) : (
-                <button
-                  type="button"
-                  className="apply_coupon_link"
-                  onClick={() => setShowCouponInput((prev) => !prev)}
-                >
-                  Apply Coupon
-                </button>
+                </div>
               )}
             </div>
 
-            {showCouponInput && !appliedCoupon && (
-              <div className="promo_code">
-                <input
-                  type="text"
-                  placeholder="Coupon code"
-                  value={couponCode}
-                  onChange={(event) => setCouponCode(event.target.value)}
-                />
-                <button type="button" onClick={handleApplyCoupon}>
-                  Apply
-                </button>
+            <aside className="cart_summary">
+              <h2 className="price_details_title">
+                PRICE DETAILS ({totalItemsCount}{" "}
+                {totalItemsCount === 1 ? "Item" : "Items"})
+              </h2>
+
+              <div className="summary_row">
+                <span>Total MRP</span>
+
+                <strong>
+                  <i className="bi bi-currency-rupee"></i>
+                  {totalMRP.toLocaleString("en-IN")}
+                </strong>
               </div>
-            )}
 
-            {couponMessage && (
-              <p
-                className={
-                  appliedCoupon
-                    ? "coupon_message success"
-                    : "coupon_message error"
-                }
-              >
-                {couponMessage}
-              </p>
-            )}
+              <div className="summary_row">
+                <span>Discount on MRP</span>
 
-            <div className="summary_row">
-              <span>
-                Platform Fee
-                <button
-                  type="button"
-                  className="know_more_link"
-                  onClick={() => setShowPlatformFee(true)}
-                >
-                  Know More
-                </button>
-              </span>
-              <strong>
-                <i className="bi bi-currency-rupee"></i>
-                {PLATFORM_FEE}
-              </strong>
-            </div>
+                <strong className={productDiscount > 0 ? "discount" : ""}>
+                  {productDiscount > 0 ? (
+                    <>
+                      - <i className="bi bi-currency-rupee"></i>
+                      {productDiscount.toLocaleString("en-IN")}
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-currency-rupee"></i>0
+                    </>
+                  )}
+                </strong>
+              </div>
 
-            {showPlatformFee && (
-              <div
-                className="platform_fee_overlay"
-                onClick={() => setShowPlatformFee(false)}
-              >
-                <div
-                  className="platform_fee_popup"
-                  onClick={(e) => e.stopPropagation()}
-                >
+              <div className="summary_row">
+                <span>Coupon Discount</span>
+
+                {appliedCoupon ? (
+                  <strong className="discount">
+                    - <i className="bi bi-currency-rupee"></i>
+                    {couponDiscount.toLocaleString("en-IN")}{" "}
+                    <button
+                      type="button"
+                      className="inline_link_btn"
+                      onClick={handleRemoveCoupon}
+                    >
+                      Remove
+                    </button>
+                  </strong>
+                ) : (
                   <button
                     type="button"
-                    className="platform_fee_close"
-                    onClick={() => setShowPlatformFee(false)}
+                    className="apply_coupon_link"
+                    onClick={() => setShowCouponInput((previous) => !previous)}
                   >
-                    <i className="bi bi-x-lg"></i>
+                    Apply Coupon
                   </button>
-
-                  <h3>Platform Fee</h3>
-
-                  <p>
-                    Fee levied by Zyora to sustain the efficient operations and
-                    continuous improvement of the platform, for a hassle-free
-                    shopping experience.
-                  </p>
-
-                  <div className="platform_fee_footer">
-                    Have a question? Refer <button type="button">FAQs</button>{" "}
-                    or read <button type="button">T&amp;Cs</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="summary_row">
-              <span>Shipping</span>
-              <strong>
-                {shipping === 0 && subtotal > 0 ? (
-                  <span className="free_shipping">FREE</span>
-                ) : (
-                  <>
-                    <i className="bi bi-currency-rupee"></i>
-                    {shipping.toLocaleString("en-IN")}
-                  </>
                 )}
-              </strong>
-            </div>
-            {subtotal > 0 && subtotal < FREE_SHIPPING_LIMIT && (
-              <p className="shipping_message">
-                Add ₹{(FREE_SHIPPING_LIMIT - subtotal).toLocaleString("en-IN")}{" "}
-                more to get free shipping.
+              </div>
+
+              {showCouponInput && !appliedCoupon && (
+                <div className="promo_code">
+                  <input
+                    type="text"
+                    placeholder="Coupon code"
+                    value={couponCode}
+                    onChange={(event) =>
+                      setCouponCode(event.target.value.toUpperCase())
+                    }
+                    disabled={couponLoading}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading}
+                  >
+                    {couponLoading ? "Applying..." : "Apply"}
+                  </button>
+                </div>
+              )}
+
+              {couponMessage && (
+                <p
+                  className={
+                    appliedCoupon
+                      ? "coupon_message success"
+                      : "coupon_message error"
+                  }
+                >
+                  {couponMessage}
+                </p>
+              )}
+
+              <div className="summary_row">
+                <span>
+                  Platform Fee{" "}
+                  <button
+                    type="button"
+                    className="know_more_link"
+                    onClick={() => setShowPlatformFee(true)}
+                  >
+                    Know More
+                  </button>
+                </span>
+
+                <strong>
+                  <i className="bi bi-currency-rupee"></i>
+                  {PLATFORM_FEE}
+                </strong>
+              </div>
+
+              <div className="summary_row">
+                <span>Shipping</span>
+
+                <strong>
+                  {shipping === 0 && subtotal > 0 ? (
+                    <span className="free_shipping">FREE</span>
+                  ) : (
+                    <>
+                      <i className="bi bi-currency-rupee"></i>
+                      {shipping.toLocaleString("en-IN")}
+                    </>
+                  )}
+                </strong>
+              </div>
+
+              {subtotal > 0 && subtotal < FREE_SHIPPING_LIMIT && (
+                <p className="shipping_message">
+                  Add ₹
+                  {(FREE_SHIPPING_LIMIT - subtotal).toLocaleString("en-IN")}{" "}
+                  more to get free shipping.
+                </p>
+              )}
+
+              {subtotal >= FREE_SHIPPING_LIMIT && (
+                <p
+                  className="shipping_message"
+                  style={{ position: "relative" }}
+                >
+                  🎉 You unlocked free shipping 🎉
+                </p>
+              )}
+
+              <div className="summary_total">
+                <span>Total Amount</span>
+
+                <strong>
+                  <i className="bi bi-currency-rupee"></i>
+                  {total.toLocaleString("en-IN")}
+                </strong>
+              </div>
+
+              <p className="order_terms">
+                By placing the order, you agree to Zyora's{" "}
+                <a href="/terms">Terms of Use</a> and{" "}
+                <a href="/privacy">Privacy Policy</a>
               </p>
-            )}
 
-            {subtotal >= FREE_SHIPPING_LIMIT && (
-              <p className="shipping_message" style={{ position: "relative" }}>
-                🎉 You unlocked free shipping 🎉
-              </p>
-            )}
-
-            <div className="summary_total">
-              <span>Total Amount</span>
-
-              <strong>
-                <i className="bi bi-currency-rupee"></i>
-                {total.toLocaleString("en-IN")}
-              </strong>
-            </div>
-
-            <p className="order_terms">
-              By placing the order, you agree to Zyora's{" "}
-              <a href="/terms">Terms of Use</a> and{" "}
-              <a href="/privacy">Privacy Policy</a>
-            </p>
-
-            {(addresses.length > 0 || !hasDefaultAddress) &&
-              !showAddressForm && (
+              {!showAddressForm && (
                 <div className="cart_address_section">
                   <div className="cart_address_heading">
                     <h3>Select Address</h3>
+
                     <button
                       type="button"
                       className="add_address_btn"
@@ -622,6 +745,7 @@ const Cart = () => {
                       {hasDefaultAddress ? "Add new address" : "Add address"}
                     </button>
                   </div>
+
                   {addresses.length > 0 && (
                     <>
                       <div
@@ -651,6 +775,7 @@ const Cart = () => {
                             </option>
                           ))}
                         </select>
+
                         <button
                           type="button"
                           className="remove_address_btn"
@@ -663,26 +788,145 @@ const Cart = () => {
                           <i className="bi bi-x-circle-fill"></i>
                         </button>
                       </div>
+
                       <p className="cart_selected_address">
-                        {addresses[selectedAddressIndex].address},{" "}
-                        {addresses[selectedAddressIndex].locality},{" "}
-                        {addresses[selectedAddressIndex].state}
+                        {addresses[selectedAddressIndex]?.address},{" "}
+                        {addresses[selectedAddressIndex]?.locality},{" "}
+                        {addresses[selectedAddressIndex]?.state}
                       </p>
                     </>
                   )}
                 </div>
               )}
-            <button
-              className="checkout_btn"
-              type="button"
-              disabled={selectedItems.length === 0}
-            >
-              PLACE ORDER
-            </button>
-            <Confetti active={celebrate} burstKey={burstKey} />
-          </aside>
+
+              <button
+                className="checkout_btn"
+                type="button"
+                disabled={selectedItems.length === 0 || addresses.length === 0}
+                onClick={handlePlaceOrder}
+              >
+                PLACE ORDER
+              </button>
+
+              <Confetti active={celebrate} burstKey={burstKey} />
+            </aside>
+          </div>
         </section>
       )}
+
+      {/* Platform fee popup (outside the aside so it isn't clipped) */}
+      {showPlatformFee && (
+        <div
+          className="platform_fee_overlay"
+          onClick={() => setShowPlatformFee(false)}
+        >
+          <div
+            className="platform_fee_popup"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="platform_fee_close"
+              onClick={() => setShowPlatformFee(false)}
+              aria-label="Close"
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+
+            <h3>Platform Fee</h3>
+
+            <p>
+              Fee levied by Zyora to sustain the efficient operations and
+              continuous improvement of the platform, for a hassle-free shopping
+              experience.
+            </p>
+
+            <div className="platform_fee_footer">
+              Have a question? Refer <button type="button">FAQs</button> or read{" "}
+              <button type="button">T&amp;Cs</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Coupon popup */}
+      {/* {showCouponPopup && (
+        <div
+          className="platform_fee_overlay"
+          onClick={() => setShowCouponPopup(false)}
+        >
+          <div
+            className="platform_fee_popup coupon_popup"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="platform_fee_close"
+              onClick={() => setShowCouponPopup(false)}
+              aria-label="Close"
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+
+            <h3>Available Coupons</h3>
+
+            {couponsLoading ? (
+              <p>Loading coupons...</p>
+            ) : couponsError ? (
+              <p className="coupon_message error">{couponsError}</p>
+            ) : availableCoupons.length === 0 ? (
+              <p>No coupons available right now.</p>
+            ) : (
+              <div className="coupon_list">
+                {availableCoupons.map((coupon) => {
+                  const isApplied = appliedCoupon?.code === coupon.code;
+
+                  return (
+                    <div className="coupon_card" key={coupon.code}>
+                      <div className="coupon_card_info">
+                        <strong>{coupon.code}</strong>
+                        <p>
+                          {coupon.discountType === "percentage"
+                            ? `${coupon.discountValue}% off`
+                            : `₹${coupon.discountValue} off`}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="coupon_card_btn"
+                        disabled={couponLoading || isApplied}
+                        onClick={async () => {
+                          const ok = await applyCoupon(coupon.code);
+                          if (ok) setShowCouponPopup(false);
+                        }}
+                      >
+                        {isApplied ? "APPLIED" : "APPLY"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {couponMessage && !appliedCoupon && (
+              <p className="coupon_message error">{couponMessage}</p>
+            )}
+          </div>
+        </div>
+      )} */}
+      <CouponPopup
+        open={showCouponPopup}
+        onClose={() => setShowCouponPopup(false)}
+        coupons={availableCoupons}
+        loading={couponsLoading}
+        error={couponsError}
+        subtotal={subtotal}
+        appliedCoupon={appliedCoupon}
+        applying={couponLoading}
+        message={couponMessage}
+        onApply={applyCoupon}
+      />
     </div>
   );
 };
