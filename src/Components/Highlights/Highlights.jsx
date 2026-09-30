@@ -1,61 +1,56 @@
 import "./highlights.css";
-// import toys from "../../assets/Images/toys.png";
-// import bags from "../../assets/Images/handbags.png";
-// import home from "../../assets/Images/home.png";
-// import stationery from "../../assets/Images/stationery.png";
-
+import ScrollVideo from "../ScrollVideo";
 import toy from "../../assets/Videos/toys.mp4";
 import stationery from "../../assets/Videos/stationery.mp4";
 import bag from "../../assets/Videos/bag.mp4";
 import home from "../../assets/Videos/home.mp4";
 
+const categories = [
+  {
+    src: toy,
+    title: "Soft Toys",
+    text: "Cuddles guaranteed. Perfect gifts for every age.",
+  },
+  {
+    src: home,
+    title: "Home & Kitchen",
+    text: "Smart essentials to make your space work better.",
+  },
+  {
+    src: stationery,
+    title: "Stationery",
+    text: "For students and professionals who mean business.",
+  },
+  {
+    src: bag,
+    title: "Fashion",
+    text: "Everyday elegance for the modern woman.",
+  },
+];
+
 const Highlights = () => {
   return (
     <div className="highlights">
       <div>
-        <h1>Category <span>Highlights</span></h1>
+        <h1>
+          Category <span>Highlights</span>
+        </h1>
         <p className="explore_category_link">
           View products
-          <i class="bi bi-arrow-right"></i>
+          <i className="bi bi-arrow-right"></i>
         </p>
       </div>
       <p>Explore our signature pillars of everyday quality</p>
       <section>
-        <div>
-          <video src={toy} autoPlay muted loop playsInline/>
-          {/* <img src={toys} alt="Soft Toys" /> */}
-          <div>
-            <h1>Soft Toys</h1>
-            <p>Cuddles guaranteed. Perfect gifts for every age.</p>
+        {categories.map((item) => (
+          <div key={item.title}>
+            <ScrollVideo src={item.src} />
+            <div>
+              <h1>{item.title}</h1>
+              <p>{item.text}</p>
+            </div>
           </div>
-        </div>
-
-        <div>
-          {/* <img src={home} alt="Home & Kitchen" /> */}
-          <video src={home} autoPlay muted loop playsInline/>
-          <div>
-            <h1>Home & Kitchen</h1>
-            <p>Smart essentials to make your space work better.</p>
-          </div>
-        </div>
-
-        <div>
-          {/* <img src={stationery} alt="Stationery Items" /> */}
-          <video src={stationery} autoPlay muted loop playsInline/>
-          <div>
-            <h1>Stationery</h1>
-            <p>For students and professionals who mean business.</p>
-          </div>
-        </div>
-
-        <div>
-          {/* <img src={bags} alt="Handbags" /> */}
-          <video src={bag} autoPlay muted loop playsInline/>
-          <div>
-            <h1>Fashion</h1>
-            <p>Everyday elegance for the modern woman.</p>
-          </div>
-        </div>
+        ))}
       </section>
     </div>
   );
