@@ -3,11 +3,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 100px;
-  background-color: #ffffff71;
-  backdrop-filter: blur(50px);
+  background-color: #ffffff;
   position: sticky;
   top: 0;
   z-index: 1000;
+  transition:
+    background-color 0.35s ease,
+    backdrop-filter 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.navbar.navbar-scrolled {
+  background-color: #ffffff71;
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .navbar > h1 {

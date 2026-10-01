@@ -143,7 +143,7 @@ const ProductDetail = () => {
           </div>
 
           <div className="product-detail-summary">
-            <small >{product.brand}</small>
+            <small>{product.brand}</small>
             {/* <p className="product-category">{product.category}</p> */}
             <h1>{productName}</h1>
             <p className="product-title">{product.title}</p>
@@ -153,10 +153,18 @@ const ProductDetail = () => {
               <del>₹{product.price?.mrp}</del>
               <span>{product.price?.discount_percent}% OFF</span>
             </div>
-
+            <p className="product-quantity">
+              <span>Total Quantity</span>
+              <strong>{product.stock?.quantity}</strong>
+            </p>
             <div className="color-selection">
               <h3>
-                Color{selectedColor && <>: <span>{selectedColor}</span></>}
+                Color
+                {selectedColor && (
+                  <>
+                    : <span>{selectedColor}</span>
+                  </>
+                )}
               </h3>
               <div className="color-options">
                 {colorOptions.length > 0 ? (

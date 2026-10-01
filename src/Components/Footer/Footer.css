@@ -4,6 +4,8 @@
   padding-top: 3rem;
   padding-bottom: 2rem;
   border-top: 1px solid #1e293b;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-container {
@@ -76,7 +78,7 @@
 }
 
 .footer-links > li {
-  font-family: "Quicksand", sans-serif;
+  font-family: "poppins", sans-serif;
 }
 
 .footer-link {
@@ -116,11 +118,7 @@
   justify-content: center;
   transition: color 0.2s ease;
   color: white;
-}
-
-.social-icon {
-  width: 1rem;
-  height: 1rem;
+  font-size: 20px;
 }
 
 .instagram:hover {
@@ -137,7 +135,7 @@
 
 .footer-newsletter-text {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #a6b8ce;
   margin: 0 0 0.75rem;
 }
 

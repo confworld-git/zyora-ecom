@@ -335,6 +335,9 @@ main.product-detail-state a:hover {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  background-color: #020092;
+  color: white;
+  padding: 2px;
 }
 
 .product-detail-summary h1 {
@@ -348,6 +351,25 @@ main.product-detail-state a:hover {
   font-size: 13px;
   font-weight: 450;
   color: #3a3a3a;
+}
+
+.product-quantity {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--pd-line);
+  border-radius: 8px;
+  background: var(--pd-soft);
+  /* color: var(--pd-mute); */
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+}
+
+.product-quantity strong {
+  color: var(--pd-acc);
+  font-size: 14px;
 }
 
 /* Price */

@@ -15,8 +15,12 @@ const PublicRoute = ({ children }) => {
 
         setAuthenticated(true);
       } catch (error) {
-        console.log(error);
-        setAuthenticated(false);
+        if (error.response?.status === 401) {
+          setAuthenticated(false);
+        } else {
+          console.error("Authentication check failed:", error);
+          setAuthenticated(false);
+        }
       } finally {
         setLoading(false);
       }

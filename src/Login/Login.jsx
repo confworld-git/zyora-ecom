@@ -1,165 +1,463 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
 import { toast } from "react-hot-toast";
+import CanvasParticles from "canvasparticles-js";
 import "./Login.css";
-import logo from "../assets/Logo/Zyora_logo.jpg";
+
+const PARTICLE_COLOR = "#ffffff";
+const API = import.meta.env.VITE_API_BASE_URL;
+
+const emptyForm = {
+  name: "",
+  email: "",
+  mobile: "",
+  password: "",
+  confirmPassword: "",
+  termsAccepted: false,
+};
 
 const Login = () => {
   const navigate = useNavigate();
+  const particlesRef = useRef(null);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  // "login" | "register"
+  const [mode, setMode] = useState("login");
+  const [formData, setFormData] = useState(emptyForm);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const isLogin = mode === "login";
+
+  useEffect(() => {
+    const container = particlesRef.current;
+    if (!container) return;
+
+    const canvas = document.createElement("canvas");
+    container.appendChild(canvas);
+
+    const particles = new CanvasParticles(canvas, {
+      mouse: {
+        interactionType: 2,
+        connectDistMult: 0.8,
+        distRatio: 0.8,
+      },
+      particles: {
+        color: PARTICLE_COLOR,
+        ppm: 120,
+        connectDistance: 140,
+      },
+    });
+
+    particles.setParticleColor?.(PARTICLE_COLOR);
+    particles.start();
+
+    return () => particles.destroy();
+  }, []);
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const switchMode = (next) => {
+    setMode(next);
+    setShowPassword(false);
 
-    if (!formData.email || !formData.password) {
-      toast.error("Please enter email and password");
+    setFormData((prev) => ({
+      ...emptyForm,
+      email: prev.email,
+    }));
+  };
+
+  const handleLogin = async () => {
+    const payload = {
+      email: formData.email.trim(),
+      password: formData.password,
+    };
+
+    if (!payload.email || !payload.password) {
+      toast.error("Enter your email and password");
       return;
     }
 
     try {
       setLoading(true);
+
+      try {
+        const adminResponse = await axios.post(
+          `${API}/api/auth/login`,
+          payload,
+          {
+            withCredentials: true,
+          },
+        );
+
+        if (adminResponse.data.success) {
+          toast.success("Admin signed in");
+          navigate("/Dashboard", { replace: true });
+          return;
+        }
+      } catch (adminError) {
+        if (adminError.response?.status !== 401) {
+          throw adminError;
+        }
+      }
+
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
-        formData,
+        `${API}/api/auth/customer-login`,
+        payload,
         {
           withCredentials: true,
         },
       );
 
       if (response.data.success) {
-        toast.success("Login successful");
-        navigate("/Dashboard", { replace: true });
+        toast.success("Signed in");
+        navigate("/", { replace: true });
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to login");
+      toast.error(error.response?.data?.message || "Unable to sign in");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleRegister = async () => {
+    const payload = {
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      mobile: formData.mobile.trim(),
+      password: formData.password,
+      termsAccepted: formData.termsAccepted,
+    };
+
+    if (!payload.name) {
+      toast.error("Enter your full name");
+      return;
+    }
+
+    if (!payload.email) {
+      toast.error("Enter your email address");
+      return;
+    }
+
+    if (!payload.mobile) {
+      toast.error("Enter your mobile number");
+      return;
+    }
+
+    // Basic Indian mobile validation
+    if (!/^[6-9]\d{9}$/.test(payload.mobile)) {
+      toast.error("Enter a valid 10-digit mobile number");
+      return;
+    }
+
+    if (!payload.password) {
+      toast.error("Enter a password");
+      return;
+    }
+
+    if (payload.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (payload.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (!payload.termsAccepted) {
+      toast.error("Please accept the Terms & Conditions");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post(`${API}/api/auth/register`, payload, {
+        withCredentials: true,
+      });
+
+      if (response.data.success) {
+        toast.success("Account created. Sign in to continue.");
+
+        switchMode("login");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to create account");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (loading) return;
+
+    return isLogin ? handleLogin() : handleRegister();
+  };
+
+  const passwordToggle = (
+    <button
+      type="button"
+      className="zyora-password-toggle"
+      onClick={() => setShowPassword((v) => !v)}
+      aria-label={showPassword ? "Hide password" : "Show password"}
+      aria-pressed={showPassword}
+    >
+      {showPassword ? <FiEyeOff /> : <FiEye />}
+    </button>
+  );
+
   return (
-    <div className="zyora-login-page">
+    <main className="zyora-login-page">
       <div className="zyora-login-container">
-        <div className="zyora-login-brand">
-          <div className="zyora-login-logo">
-            <img src={logo} alt="" />
-          </div>
+        {/* LEFT BRAND SECTION */}
+        <section className="zyora-login-brand" aria-label="ZYORA">
+          <div
+            ref={particlesRef}
+            className="zyora-login-particles"
+            aria-hidden="true"
+          />
+
           <div className="zyora-login-brand-content">
-            <span>ADMIN DASHBOARD</span>
-            <h1>
-              Manage your
-              <br />
-              store with ease.
-            </h1>
+            <span className="zyora-login-brand-mark" aria-hidden="true">
+              ✳
+            </span>
+
+            <h2>HELLO ZYORA!</h2>
+
             <p>
-              Manage products, enquiries, customers and your Zyora store from
-              one place.
+              Thoughtfully curated finds, managed in one place. Sign in to keep
+              your store running smoothly.
             </p>
           </div>
-        </div>
-        <div className="zyora-login-form-section">
+
+          <p className="zyora-login-footer">© ZYORA. All rights reserved.</p>
+        </section>
+
+        {/* FORM SECTION */}
+        <section className="zyora-login-form-section">
           <div className="zyora-login-form-wrapper">
             <div className="zyora-login-heading">
-              <span>WELCOME BACK</span>
-              <h1>Admin Login</h1>
-              <p>Sign in to access your Zyora dashboard.</p>
+              {isLogin ? (
+                <>
+                  <h1>Welcome back</h1>
+
+                  <p>
+                    Sign in to your ZYORA account to continue shopping and
+                    manage your orders. Don’t have an account? <br />
+                    <button
+                      type="button"
+                      className="zyora-link"
+                      onClick={() => switchMode("register")}
+                    >
+                      Create a new account
+                    </button>{" "}
+                    — it’s quick, easy, and free!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1>Create your account</h1>
+
+                  <p>
+                    Join ZYORA to shop curated finds and track your orders.
+                    <br />
+                    <button
+                      type="button"
+                      className="zyora-link"
+                      onClick={() => switchMode("login")}
+                    >
+                      Already have an account?
+                    </button>
+                  </p>
+                </>
+              )}
             </div>
-            <form className="zyora-login-form" onSubmit={handleSubmit}>
+
+            <form
+              key={mode}
+              className="zyora-login-form"
+              onSubmit={handleSubmit}
+            >
+              {/* NAME */}
+              {!isLogin && (
+                <div className="zyora-input-group">
+                  <label htmlFor="name">Full name</label>
+
+                  <div className="zyora-input-wrapper">
+                    <input
+                      id="name"
+                      type="text"
+                      name="name"
+                      placeholder="Your name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      autoComplete="name"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* EMAIL */}
               <div className="zyora-input-group">
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="email">Email address</label>
+
                 <div className="zyora-input-wrapper">
-                  <FiMail />
                   <input
                     id="email"
                     type="email"
                     name="email"
-                    placeholder="admin@zyora.com"
+                    placeholder="you@example.com"
                     value={formData.email}
                     onChange={handleChange}
                     autoComplete="email"
+                    required
                   />
                 </div>
               </div>
 
+              {/* MOBILE */}
+              {!isLogin && (
+                <div className="zyora-input-group">
+                  <label htmlFor="mobile">Mobile number</label>
+
+                  <div className="zyora-input-wrapper">
+                    <input
+                      id="mobile"
+                      type="tel"
+                      name="mobile"
+                      placeholder="10-digit mobile number"
+                      value={formData.mobile}
+                      onChange={handleChange}
+                      autoComplete="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* PASSWORD */}
               <div className="zyora-input-group">
                 <label htmlFor="password">Password</label>
 
                 <div className="zyora-input-wrapper">
-                  <FiLock />
-
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     name="password"
-                    placeholder="Enter your password"
+                    placeholder={
+                      isLogin ? "Enter your password" : "At least 8 characters"
+                    }
                     value={formData.password}
                     onChange={handleChange}
-                    autoComplete="current-password"
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    required
                   />
 
-                  <button
-                    type="button"
-                    className="zyora-password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
+                  {passwordToggle}
                 </div>
               </div>
 
-              <div className="zyora-login-options">
-                <label className="zyora-remember">
-                  <input type="checkbox" />
+              {/* CONFIRM PASSWORD */}
+              {!isLogin && (
+                <div className="zyora-input-group">
+                  <label htmlFor="confirmPassword">Confirm password</label>
 
-                  <span>Remember me</span>
-                </label>
+                  <div className="zyora-input-wrapper">
+                    <input
+                      id="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="Re-enter your password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  className="zyora-forgot"
-                  onClick={() =>
-                    toast("Contact the administrator to reset your password")
-                  }
-                >
-                  Forgot password?
-                </button>
-              </div>
+              {/* TERMS */}
+              {!isLogin && (
+                <div className="zyora-terms">
+                  <label className="zyora-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="termsAccepted"
+                      checked={formData.termsAccepted}
+                      onChange={handleChange}
+                      required
+                    />
 
+                    <span>
+                      I agree to ZYORA's{" "}
+                      <button
+                        type="button"
+                        className="zyora-link"
+                        onClick={() => navigate("/terms-and-conditions")}
+                      >
+                        Terms & Conditions
+                      </button>{" "}
+                      and Privacy Policy.
+                    </span>
+                  </label>
+                </div>
+              )}
+
+              {/* FORGOT PASSWORD */}
+              {isLogin && (
+                <div className="zyora-login-options">
+                  <button
+                    type="button"
+                    className="zyora-forgot"
+                    onClick={() =>
+                      toast("Contact the administrator to reset your password")
+                    }
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              {/* SUBMIT */}
               <button
                 type="submit"
                 className="zyora-login-button"
                 disabled={loading}
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {loading
+                  ? isLogin
+                    ? "Signing in…"
+                    : "Creating account…"
+                  : isLogin
+                    ? "Sign in"
+                    : "Create account"}
               </button>
             </form>
 
             <div className="zyora-login-security">
-              <FiLock />
-              Secure admin access
+              <FiLock aria-hidden="true" />
+
+              <span>Securely Access Your Account</span>
             </div>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 };
 

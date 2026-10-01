@@ -17,6 +17,7 @@ import Layout from "./ProtectedRoute/Layout.jsx";
 
 import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
 import PaymentSuccess from "./MainComponants/Success/PaymentSuccess.jsx";
+import Jewellery from "./MainComponants/Jewellery/Jewellery.jsx"
 
 import "./index.css";
 
@@ -45,6 +46,7 @@ export const AppRoutes = () => {
           <Route path="/Cart" element={<Cart />} />
           <Route path="/Favorites" element={<Favorites />} />
           <Route path="/Zyora_Category" element={<Category />} />
+          <Route path="/Jewellery" element={<Jewellery />} />
           <Route
             path="/Zyora_Category/product/:productId/:slug"
             element={<ProductDetail />}
