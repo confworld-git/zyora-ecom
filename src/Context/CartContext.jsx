@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useProducts } from "./ProductContext.jsx";
@@ -48,7 +55,11 @@ const capCartItemsToProductStock = (items) => {
 };
 
 export const CartProvider = ({ children }) => {
-  const { getProductById, loading: productsLoading } = useProducts();
+  const {
+    getProductById,
+    loading: productsLoading,
+    products,
+  } = useProducts();
   const { customer, isLoggedIn, loading: authLoading } = useAuth();
 
   const customerId = customer?.id ? String(customer.id) : null;
@@ -77,6 +88,18 @@ export const CartProvider = ({ children }) => {
 
   const saveQueueRef = useRef(Promise.resolve());
 
+  const updateCartItems = useCallback((update) => {
+    const currentItems = cartItemsRef.current;
+    const nextItems = update(currentItems);
+
+    if (nextItems !== currentItems) {
+      cartItemsRef.current = nextItems;
+      setCartItems(nextItems);
+    }
+
+    return nextItems;
+  }, []);
+
   const isCartSyncing =
     isLoggedIn &&
     !authLoading &&
@@ -87,6 +110,35 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     cartItemsRef.current = cartItems;
   }, [cartItems]);
+
+  useEffect(() => {
+    if (productsLoading || cartItemsRef.current.length === 0) return;
+
+    const currentItems = cartItemsRef.current;
+    const withCurrentStock = currentItems.map((item) => {
+      const product = getProductById(item.id);
+      if (!product) return item;
+
+      return {
+        ...item,
+        stock: {
+          in_stock: product.stock?.in_stock === true,
+          quantity: Number(product.stock?.quantity) || 0,
+        },
+      };
+    });
+    const nextItems = capCartItemsToProductStock(withCurrentStock);
+
+    if (
+      nextItems.length !== currentItems.length ||
+      nextItems.some(
+        (item, index) => item.quantity !== currentItems[index].quantity,
+      )
+    ) {
+      toast.warning("Your cart was updated to match available stock.");
+      updateCartItems(() => nextItems);
+    }
+  }, [getProductById, products, productsLoading, updateCartItems]);
 
   // Save cart to localStorage
   useEffect(() => {
@@ -117,7 +169,7 @@ export const CartProvider = ({ children }) => {
         activeCustomerRef.current = null;
         syncedCustomerRef.current = null;
 
-        setCartItems([]);
+        updateCartItems(() => []);
 
         try {
           localStorage.removeItem(CART_STORAGE_KEY);
@@ -159,7 +211,7 @@ export const CartProvider = ({ children }) => {
             : [];
 
         if (storedOwner && storedOwner !== customerId) {
-          setCartItems([]);
+          updateCartItems(() => []);
           localStorage.setItem(CART_STORAGE_KEY, "[]");
         }
 
@@ -311,7 +363,7 @@ export const CartProvider = ({ children }) => {
 
         setSyncedCustomerId(customerId);
 
-        setCartItems(nextCart);
+        updateCartItems(() => nextCart);
       } catch (error) {
         if (cancelled) return;
 
@@ -349,6 +401,7 @@ export const CartProvider = ({ children }) => {
     getProductById,
     isLoggedIn,
     productsLoading,
+    updateCartItems,
   ]);
 
   // Serialize updates so rapid cart changes cannot save out of order.
@@ -569,7 +622,7 @@ export const CartProvider = ({ children }) => {
       quantity: 1,
     };
 
-    setCartItems((currentItems) => {
+    updateCartItems((currentItems) => {
       const currentProductQuantity = currentItems
         .filter((item) => String(item.id) === String(productId))
         .reduce((total, item) => total + (Number(item.quantity) || 0), 0);
@@ -652,7 +705,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    setCartItems((items) =>
+    updateCartItems((items) =>
       items.map((item) => {
         if (item.cartId !== cartId) {
           return item;
@@ -732,7 +785,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    setCartItems((items) =>
+    updateCartItems((items) =>
       items
         .map((item) =>
           item.cartId === cartId
@@ -762,7 +815,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    setCartItems((items) =>
+    updateCartItems((items) =>
       items.filter(
         (item) =>
           item.cartId !== cartId,
@@ -786,7 +839,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    setCartItems((items) => {
+    updateCartItems((items) => {
       const item = items.find(
         (currentItem) =>
           currentItem.cartId === cartId,
@@ -964,7 +1017,7 @@ export const CartProvider = ({ children }) => {
   // =========================================================
 
   const clearCart = () => {
-    setCartItems([]);
+    updateCartItems(() => []);
   };
 
   // =========================================================

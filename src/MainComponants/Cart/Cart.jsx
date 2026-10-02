@@ -380,6 +380,12 @@ const Cart = () => {
         navigate("/Payment_result", { state: { order: res.data.order } });
       }
     } catch (error) {
+      if (error.response?.status === 409) {
+        const productsRefreshed = await refreshProducts();
+        if (!productsRefreshed) {
+          toast.error("Unable to refresh stock. Please reload the page.");
+        }
+      }
       toast.error(error.response?.data?.message || "Unable to place order");
     } finally {
       setPlacingOrder(false);

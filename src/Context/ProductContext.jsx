@@ -14,11 +14,17 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
   const [loading, setLoading] = useState(!initialProducts);
   const [error, setError] = useState("");
 
+  const fetchProducts = useCallback(
+    () =>
+      axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
+      ),
+    [],
+  );
+
   const refreshProducts = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
-      );
+      const response = await fetchProducts();
       setProducts(Array.isArray(response.data) ? response.data : []);
       setError("");
       return true;
@@ -29,7 +35,7 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchProducts]);
 
   useEffect(() => {
     // During SSG, products are already provided.
@@ -37,8 +43,27 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
       return;
     }
 
-    refreshProducts();
-  }, [initialProducts, refreshProducts]);
+    let cancelled = false;
+    const loadProducts = async () => {
+      try {
+        const response = await fetchProducts();
+        if (cancelled) return;
+        setProducts(Array.isArray(response.data) ? response.data : []);
+        setError("");
+      } catch (requestError) {
+        if (cancelled) return;
+        console.error("Error fetching products:", requestError);
+        setError("Unable to load products.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    loadProducts();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchProducts, initialProducts]);
 
   const getProductById = (productId) =>
     products.find(
