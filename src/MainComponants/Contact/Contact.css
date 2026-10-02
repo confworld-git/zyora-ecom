@@ -120,11 +120,11 @@
   font-weight: 650;
   cursor: pointer;
   border: none;
-  background-color: #fd7304;
+  background-color: #ff4000;
   color: white;
   font-size: 15px;
   border-radius: 500px;
-  border: 1px solid #ff7300;
+  border: 1px solid #ff4000;
 }
 
 .contact_content > h1 {

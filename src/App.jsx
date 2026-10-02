@@ -18,6 +18,9 @@ import Layout from "./ProtectedRoute/Layout.jsx";
 import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
 import PaymentSuccess from "./MainComponants/Success/PaymentSuccess.jsx";
 import Jewellery from "./MainComponants/Jewellery/Jewellery.jsx";
+import Profile from "./Profile/Profile.jsx";
+
+import CustomerRoute from "./ProtectedRoute/CustomerRoute.jsx";
 
 import "./index.css";
 
@@ -47,6 +50,14 @@ export const AppRoutes = () => {
           <Route path="/Favorites" element={<Favorites />} />
           <Route path="/Zyora_Category" element={<Category />} />
           <Route path="/Jewellery" element={<Jewellery />} />
+          <Route
+            path="/Profile"
+            element={
+              <CustomerRoute>
+                <Profile />
+              </CustomerRoute>
+            }
+          />
           <Route
             path="/Zyora_Category/product/:productId/:slug"
             element={<ProductDetail />}

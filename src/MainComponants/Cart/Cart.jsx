@@ -5,10 +5,12 @@ import { HiOutlineTrash } from "react-icons/hi2";
 import { useCart } from "../../Context/CartContext.jsx";
 import Confetti from "../../Confetti/Confetti.jsx";
 import nocart from "../../assets/Videos/nocart.gif";
-import Order from "../Order/Order.jsx";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import CouponPopup from "./CouponPopup.jsx";
 import { BiSolidOffer } from "react-icons/bi";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../../Context/AuthContext.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -59,6 +61,11 @@ const Cart = () => {
     isCartSyncing,
   } = useCart();
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isLoggedIn } = useAuth();
+  const [placingOrder, setPlacingOrder] = useState(false);
+
   const [selectedCartIds, setSelectedCartIds] = useState(
     () => new Set(cartItems.map((item) => item.cartId)),
   );
@@ -79,9 +86,10 @@ const Cart = () => {
 
   // Address state
   const [addresses, setAddresses] = useState(() => getStoredAddresses());
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const hasDefaultAddress = addresses.some((a) => a.isDefault);
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(() => {
+    const defaultIndex = addresses.findIndex((address) => address.isDefault);
+    return defaultIndex >= 0 ? defaultIndex : 0;
+  });
 
   // Keep selected cart items synchronized with cartItems
   useEffect(() => {
@@ -176,29 +184,17 @@ const Cart = () => {
   };
 
   // ---------- Addresses ----------
-  const handleAddressSaved = (address) => {
-    const normalized = { ...address, isDefault: Boolean(address.isDefault) };
-
-    const base = normalized.isDefault
-      ? addresses.map((a) => ({ ...a, isDefault: false }))
-      : addresses;
-    const next = [...base, normalized];
-
-    setAddresses(next);
-    persistAddresses(next);
-    setSelectedAddressIndex(next.length - 1);
-    setShowAddressForm(false);
-  };
-
   const handleDeleteAddress = (addressIndex) => {
     const next = addresses.filter((_, i) => i !== addressIndex);
 
+    if (next.length > 0 && !next.some((address) => address.isDefault)) {
+      next[0] = { ...next[0], isDefault: true };
+    }
+
     setAddresses(next);
     persistAddresses(next);
-    setSelectedAddressIndex(
-      Math.max(0, Math.min(addressIndex, next.length - 1)),
-    );
-    setShowAddressForm(false);
+    const defaultIndex = next.findIndex((address) => address.isDefault);
+    setSelectedAddressIndex(defaultIndex >= 0 ? defaultIndex : 0);
   };
 
   // ---------- Coupons ----------
@@ -336,27 +332,50 @@ const Cart = () => {
   useEffect(() => () => clearTimeout(celebrateTimerRef.current), []);
 
   // ---------- Place order ----------
-  const handlePlaceOrder = () => {
-    const address = addresses[selectedAddressIndex];
+  const handlePlaceOrder = async () => {
+    if (placingOrder) return;
 
+    if (!isLoggedIn) {
+      toast("Please sign in to place your order");
+      navigate("/Login", { state: { from: location } });
+      return;
+    }
+
+    const address = addresses[selectedAddressIndex];
     if (!address) {
       setShowAddressForm(true);
       return;
     }
 
-    // TODO: send this to your order endpoint. Recompute totals on the server.
-    const payload = {
-      items: selectedItems.map((item) => ({
-        cartId: item.cartId,
-        quantity: item.quantity,
-        size: item.size,
-        color: item.color,
-      })),
-      address,
-      couponCode: appliedCoupon?.code || null,
-    };
+    try {
+      setPlacingOrder(true);
 
-    console.log("Place order payload:", payload);
+      const res = await axios.post(
+        `${API}/api/orders`,
+        {
+          items: selectedItems.map((item) => ({
+            productId: item.productId ?? item.id, // the product's id, e.g. ZYR-PRD-FASHION-105257
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+          })),
+          shippingAddress: address,
+          couponCode: appliedCoupon?.code || null,
+          paymentMethod: "cod",
+        },
+        { withCredentials: true },
+      );
+
+      if (res.data.success) {
+        selectedItems.forEach((item) => removeFromCart(item.cartId));
+        toast.success(`Order placed! #${res.data.order.orderId}`);
+        navigate("/Profile?tab=orders");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to place order");
+    } finally {
+      setPlacingOrder(false);
+    }
   };
 
   return (
@@ -533,13 +552,6 @@ const Cart = () => {
                 </div>
               </div>
             ))}
-
-            {showAddressForm && (
-              <Order
-                onAddressSaved={handleAddressSaved}
-                onCancel={() => setShowAddressForm(false)}
-              />
-            )}
           </div>
 
           <div className="cart_summary_list">
@@ -738,80 +750,82 @@ const Cart = () => {
                 <a href="/privacy">Privacy Policy</a>
               </p>
 
-              {!showAddressForm && (
-                <div className="cart_address_section">
-                  <div className="cart_address_heading">
-                    <h3>Select Address</h3>
+              <div className="cart_address_section">
+                <div className="cart_address_heading">
+                  <h3>Select Address</h3>
 
-                    <button
-                      type="button"
-                      className="add_address_btn"
-                      onClick={() => setShowAddressForm(true)}
-                    >
-                      {hasDefaultAddress ? "Add new address" : "Add address"}
-                    </button>
-                  </div>
-
-                  {addresses.length > 0 && (
-                    <>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "12px",
-                          width: "100%",
-                        }}
-                      >
-                        <select
-                          className="cart_address_select"
-                          value={selectedAddressIndex}
-                          onChange={(event) =>
-                            setSelectedAddressIndex(Number(event.target.value))
-                          }
-                          aria-label="Select delivery address"
-                          style={{ flex: 1 }}
-                        >
-                          {addresses.map((address, index) => (
-                            <option
-                              key={`${address.mobile}-${index}`}
-                              value={index}
-                            >
-                              {address.name} - {address.houseNumber},{" "}
-                              {address.city} - {address.pinCode}
-                            </option>
-                          ))}
-                        </select>
-
-                        <button
-                          type="button"
-                          className="remove_address_btn"
-                          onClick={() =>
-                            handleDeleteAddress(selectedAddressIndex)
-                          }
-                          aria-label="Delete selected address"
-                          title="Delete selected address"
-                        >
-                          <i className="bi bi-x-circle-fill"></i>
-                        </button>
-                      </div>
-
-                      <p className="cart_selected_address">
-                        {addresses[selectedAddressIndex]?.address},{" "}
-                        {addresses[selectedAddressIndex]?.locality},{" "}
-                        {addresses[selectedAddressIndex]?.state}
-                      </p>
-                    </>
-                  )}
+                  <button
+                    type="button"
+                    className="add_address_btn"
+                    onClick={() => navigate("/Profile?tab=addresses")}
+                  >
+                    {addresses.length > 0 ? "Manage addresses" : "Add address"}
+                  </button>
                 </div>
-              )}
+
+                {addresses.length > 0 && (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        width: "100%",
+                      }}
+                    >
+                      <select
+                        className="cart_address_select"
+                        value={selectedAddressIndex}
+                        onChange={(event) =>
+                          setSelectedAddressIndex(Number(event.target.value))
+                        }
+                        aria-label="Select delivery address"
+                        style={{ flex: 1 }}
+                      >
+                        {addresses.map((address, index) => (
+                          <option
+                            key={`${address.mobile}-${index}`}
+                            value={index}
+                          >
+                            {address.name} - {address.houseNumber},{" "}
+                            {address.city} - {address.pinCode}
+                          </option>
+                        ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        className="remove_address_btn"
+                        onClick={() =>
+                          handleDeleteAddress(selectedAddressIndex)
+                        }
+                        aria-label="Delete selected address"
+                        title="Delete selected address"
+                      >
+                        <i className="bi bi-x-circle-fill"></i>
+                      </button>
+                    </div>
+
+                    <p className="cart_selected_address">
+                      {addresses[selectedAddressIndex]?.address},
+                      {addresses[selectedAddressIndex]?.locality},
+                      {addresses[selectedAddressIndex]?.state}
+                    </p>
+                  </>
+                )}
+              </div>
 
               <button
                 className="checkout_btn"
                 type="button"
-                disabled={selectedItems.length === 0 || addresses.length === 0}
+                disabled={
+                  selectedItems.length === 0 ||
+                  addresses.length === 0 ||
+                  placingOrder
+                }
                 onClick={handlePlaceOrder}
               >
-                PLACE ORDER
+                {placingOrder ? "PLACING ORDER…" : "PLACE ORDER"}
               </button>
 
               <Confetti active={celebrate} burstKey={burstKey} />

@@ -1,0 +1,667 @@
+
+.zyora-profile-page {
+  --pf-brand: #ff4d00;        
+  --pf-brand-dark: #e03f00;
+  --pf-brand-soft: #fff1ea;   
+  --pf-brand-line: #ffd2bd;   
+  --pf-bg: #fffaf7;
+  --pf-card: #ffffff;
+  --pf-text: #1c1714;
+  --pf-muted: #7a716b;
+  --pf-border: #f0e6df;
+  --pf-danger: #ff1a01;
+  --pf-success: #1e8e5a;
+  --pf-radius: 18px;
+  --pf-shadow: 0 1px 2px rgba(60, 30, 10, 0.04),
+    0 12px 32px rgba(60, 30, 10, 0.06);
+
+  min-height: 100vh;
+  background: var(--pf-bg);
+  color: var(--pf-text);
+  padding: 36px 16px 80px;
+  font-family: "Poppins", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.zyora-profile-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.zyora-profile-header {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: var(--pf-card);
+  border: 1px solid var(--pf-border);
+  border-radius: var(--pf-radius);
+  box-shadow: var(--pf-shadow);
+  padding: 104px 32px 26px;
+  margin-bottom: 24px;
+}
+
+.zyora-profile-header::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 88px;
+  background:
+    radial-gradient(circle at 88% 10%, rgba(255, 77, 0, 0.35), transparent 55%),
+    linear-gradient(270deg, #240079 0%, #ff5500 100%);
+}
+
+.zyora-profile-avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-top: -48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--pf-card);
+  background: var(--pf-brand);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(255, 77, 0, 0.28);
+  flex-shrink: 0;
+}
+
+.zyora-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.zyora-profile-who {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  padding-bottom: 4px;
+}
+
+.zyora-profile-who h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.zyora-profile-who p {
+  margin: 4px 0 0;
+  color: var(--pf-muted);
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.zyora-profile-header-actions {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.zyora-profile-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.zyora-profile-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--pf-card);
+  border: 1px solid var(--pf-border);
+  border-radius: var(--pf-radius);
+  box-shadow: var(--pf-shadow);
+  padding: 10px;
+  position: sticky;
+  top: 20px;
+}
+
+.zyora-profile-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--pf-muted);
+  padding: 12px 18px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.zyora-profile-tabs button svg {
+  font-size: 18px;
+}
+
+.zyora-profile-tabs button:hover {
+  background: var(--pf-brand-soft);
+  color: var(--pf-brand);
+}
+
+.zyora-profile-tabs button.active {
+  background: var(--pf-brand-soft);
+  border-color: var(--pf-brand-line);
+  color: var(--pf-brand);
+  font-weight: 600;
+}
+
+.zyora-profile-tabs button:focus-visible,
+.zyora-profile-btn:focus-visible,
+.zyora-address-actions button:focus-visible {
+  outline: 2px solid var(--pf-brand);
+  outline-offset: 2px;
+}
+
+.zyora-profile-panel {
+  background: var(--pf-card);
+  border: 1px solid var(--pf-border);
+  border-radius: var(--pf-radius);
+  box-shadow: var(--pf-shadow);
+  padding: 32px;
+  animation: pf-rise 0.35s ease both;
+}
+
+@keyframes pf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.zyora-profile-panel h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.zyora-profile-sub {
+  margin: 6px 0 26px;
+  color: var(--pf-muted);
+  font-size: 14px;
+}
+
+.zyora-profile-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.zyora-profile-muted {
+  color: var(--pf-muted);
+  font-size: 13px;
+}
+
+.zyora-profile-error {
+  color: var(--pf-danger);
+  font-size: 14px;
+}
+
+.zyora-profile-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.zyora-profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zyora-profile-field.full,
+.zyora-profile-check.full,
+.zyora-profile-actions.full {
+  grid-column: 1 / -1;
+}
+
+.zyora-profile-field label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--pf-muted);
+}
+
+.zyora-profile-field input {
+  border: 1px solid var(--pf-border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  font: inherit;
+  font-size: 15px;
+  background: #fff;
+  color: var(--pf-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.zyora-profile-field input::placeholder {
+  color: #b5aaa3;
+}
+
+.zyora-profile-field input:hover:not(:disabled) {
+  border-color: var(--pf-brand-line);
+}
+
+.zyora-profile-field input:focus {
+  outline: none;
+  border-color: var(--pf-brand);
+  box-shadow: 0 0 0 4px rgba(255, 77, 0, 0.12);
+}
+
+.zyora-profile-field input:disabled {
+  background: #fbf7f4;
+  color: var(--pf-muted);
+  cursor: not-allowed;
+}
+
+.zyora-profile-field small {
+  color: var(--pf-muted);
+  font-size: 12px;
+}
+
+.zyora-profile-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.zyora-profile-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pf-brand);
+}
+
+.zyora-profile-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.address-form {
+  margin: 4px 0 28px;
+  padding: 24px;
+  background: #fffaf7;
+  border: 1px dashed var(--pf-brand-line);
+  border-radius: 14px;
+}
+
+.zyora-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--pf-brand);
+  background: var(--pf-brand);
+  color: #fff;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  width: fit-content;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+}
+
+.zyora-profile-btn:hover:not(:disabled) {
+  background: var(--pf-brand-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(255, 77, 0, 0.28);
+}
+
+.zyora-profile-btn:active:not(:disabled) {
+  transform: none;
+}
+
+.zyora-profile-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.zyora-profile-btn.outline {
+  background: var(--pf-brand-soft);
+  color: var(--pf-brand);
+  border-color: var(--pf-brand-line);
+}
+
+.zyora-profile-btn.outline:hover:not(:disabled) {
+  background: var(--pf-brand-soft);
+  border-color: var(--pf-brand);
+  box-shadow: none;
+}
+
+.zyora-profile-btn.outline.danger {
+  background: #fff;
+  color: var(--pf-danger);
+  border-color: #f1cdc8;
+}
+
+.zyora-profile-btn.outline.danger:hover:not(:disabled) {
+  background: #fdf3f1;
+  border-color: var(--pf-danger);
+}
+
+.zyora-profile-empty {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 56px 24px;
+}
+
+.zyora-profile-empty.small {
+  padding: 32px 0 8px;
+}
+
+.zyora-profile-empty svg {
+  font-size: 44px;
+  color: var(--pf-brand);
+}
+
+.zyora-profile-empty p {
+  margin: 0 0 8px;
+  color: var(--pf-muted);
+  font-size: 14px;
+}
+
+.zyora-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.zyora-order-card {
+  border: 1px solid var(--pf-border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.zyora-order-card:hover {
+  border-color: var(--pf-brand-line);
+  box-shadow: 0 8px 24px rgba(255, 77, 0, 0.08);
+}
+
+.zyora-order-head,
+.zyora-order-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  background: #fffaf7;
+  font-size: 13px;
+}
+
+.zyora-order-head div {
+  display: flex;
+  flex-direction: column;
+}
+
+.zyora-order-head div span {
+  color: var(--pf-muted);
+}
+
+.zyora-order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--pf-brand-soft);
+  color: var(--pf-brand);
+}
+
+.zyora-order-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.zyora-order-status.status-delivered {
+  background: #e0f4ea;
+  color: var(--pf-success);
+}
+
+.zyora-order-status.status-cancelled {
+  background: #fbe7e4;
+  color: var(--pf-danger);
+}
+
+.zyora-order-status.status-shipped,
+.zyora-order-status.status-confirmed {
+  background: #e4edfc;
+  color: #2a5db0;
+}
+
+.zyora-order-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.zyora-order-items li {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--pf-border);
+}
+
+.zyora-order-items li:first-child {
+  border-top: 0;
+}
+
+.zyora-order-items img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--pf-bg);
+}
+
+.zyora-order-items p {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.zyora-order-items small {
+  color: var(--pf-muted);
+  font-size: 12px;
+}
+
+.zyora-order-items li > span {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.zyora-address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.zyora-address-card {
+  position: relative;
+  border: 1px solid var(--pf-border);
+  border-radius: 14px;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.zyora-address-card:hover {
+  box-shadow: 0 8px 24px rgba(255, 77, 0, 0.08);
+}
+
+.zyora-address-card.is-default {
+  border-color: var(--pf-brand);
+  background: var(--pf-brand-soft);
+}
+
+.zyora-address-card strong {
+  font-size: 15px;
+}
+
+.zyora-address-card p {
+  margin: 8px 0 0;
+}
+
+.zyora-address-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--pf-brand);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.zyora-address-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--pf-brand-line);
+}
+
+.zyora-address-actions button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--pf-brand);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.zyora-address-actions button:hover {
+  text-decoration: underline;
+}
+
+.zyora-address-actions button.danger {
+  color: var(--pf-danger);
+}
+
+@media (max-width: 860px) {
+  .zyora-profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .zyora-profile-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    position: static;
+    scrollbar-width: none;
+  }
+
+  .zyora-profile-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .zyora-profile-tabs button {
+    white-space: nowrap;
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .zyora-profile-page {
+    padding: 20px 12px 60px;
+  }
+
+  .zyora-profile-header {
+    padding: 96px 20px 22px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .zyora-profile-avatar {
+    width: 88px;
+    height: 88px;
+    margin-top: -44px;
+  }
+
+  .zyora-profile-header-actions {
+    width: 100%;
+  }
+
+  .zyora-profile-header-actions .zyora-profile-btn {
+    flex: 1;
+  }
+
+  .zyora-profile-panel {
+    padding: 22px 18px;
+  }
+
+  .zyora-profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .address-form {
+    padding: 18px;
+  }
+
+  .zyora-order-items li {
+    grid-template-columns: 56px 1fr;
+  }
+
+  .zyora-order-items li > span {
+    grid-column: 2;
+  }
+
+  .zyora-order-items img {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zyora-profile-panel {
+    animation: none;
+  }
+
+  .zyora-profile-btn,
+  .zyora-profile-tabs button,
+  .zyora-order-card,
+  .zyora-address-card {
+    transition: none;
+  }
+}

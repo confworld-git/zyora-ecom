@@ -13,7 +13,8 @@ const Layout = () => {
   const isAdminPage =
     path === "/login" || path.startsWith("/dashboard");
   const isPaymentResultPage = path === "/payment_result";
-  const hideChrome = isAdminPage || isPaymentResultPage;
+  const isProfilePage = path === "/profile";
+  const hideChrome = isAdminPage || isPaymentResultPage || isProfilePage;
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

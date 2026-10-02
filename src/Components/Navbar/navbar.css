@@ -159,6 +159,14 @@
   outline-offset: 3px;
 }
 
+.nav-user{
+  cursor: pointer;
+}
+
+.nav-account{
+  cursor: pointer;
+}
+
 .nav-user,
 .nav-login-link {
   min-height: 42px;

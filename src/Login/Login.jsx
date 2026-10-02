@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
 import { toast } from "react-hot-toast";
@@ -21,6 +21,9 @@ const emptyForm = {
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  // page the visitor wanted before being sent to login (set by CustomerRoute)
+  const redirectTo = location.state?.from?.pathname || "/";
   const particlesRef = useRef(null);
   const { isLoggedIn, loading: authLoading, refresh } = useAuth();
 
@@ -137,13 +140,13 @@ const Login = () => {
       );
 
       if (response.data.success) {
-        const me = await refresh();
+        const me = await refresh(); // updates global auth state and returns the customer
         const firstName = me?.name?.split(" ")[0];
 
         toast.success(
           firstName ? `Welcome to ZYORA, ${firstName}!` : "Welcome to ZYORA!",
         );
-        navigate("/", { replace: true });
+        navigate(redirectTo, { replace: true });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to sign in");
@@ -248,7 +251,7 @@ const Login = () => {
   // Already signed-in customers don't need the login page
   // (must stay below all hooks)
   if (!authLoading && isLoggedIn) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return (

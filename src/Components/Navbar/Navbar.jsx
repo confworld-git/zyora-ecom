@@ -1,5 +1,5 @@
 import "./navbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "../../Context/CartContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext.jsx";
@@ -9,6 +9,7 @@ import { useAuth } from "../../Context/AuthContext.jsx";
 import { AiOutlineLogin } from "react-icons/ai";
 
 const Navbar = () => {
+  const navigate = useNavigate ();
   const { customer, isLoggedIn } = useAuth();
   const { totalItems } = useCart();
   const { wishlistItems } = useWishlist();
@@ -80,7 +81,7 @@ const Navbar = () => {
             )}
           </Link>
           {isLoggedIn ? (
-            <div className="nav-user">
+            <div className="nav-user" onClick={() => navigate("/Profile")} aria-label="Account" title="Account">
               <span className="nav-user-avatar" aria-hidden="true">
                 <i className="bi bi-person-fill"></i>
               </span>
@@ -97,7 +98,6 @@ const Navbar = () => {
                 aria-label="Account"
                 title="Account"
               >
-                {/* <i className="bi bi-person"></i> */}
                 <span>Login</span>
                 <AiOutlineLogin />
               </Link>
