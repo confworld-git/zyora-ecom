@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import axios from "axios";
 import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import CanvasParticles from "canvasparticles-js";
+import { useAuth } from "../Context/AuthContext.jsx";
 import "./Login.css";
 
 const PARTICLE_COLOR = "#ffffff";
@@ -21,6 +22,7 @@ const emptyForm = {
 const Login = () => {
   const navigate = useNavigate();
   const particlesRef = useRef(null);
+  const { isLoggedIn, loading: authLoading, refresh } = useAuth();
 
   // "login" | "register"
   const [mode, setMode] = useState("login");
@@ -54,6 +56,23 @@ const Login = () => {
     particles.start();
 
     return () => particles.destroy();
+  }, []);
+
+  // Show errors sent back by the Google OAuth redirect (/login?error=...)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get("error");
+    if (!err) return;
+
+    const messages = {
+      google_cancelled: "Google sign-in was cancelled",
+      invalid_state: "Sign-in session expired. Please try again",
+      email_not_verified: "Your Google email isn't verified",
+      google_failed: "Google sign-in failed. Please try again",
+    };
+
+    toast.error(messages[err] || "Unable to sign in");
+    window.history.replaceState({}, "", window.location.pathname);
   }, []);
 
   const handleChange = (e) => {
@@ -118,7 +137,12 @@ const Login = () => {
       );
 
       if (response.data.success) {
-        toast.success("Signed in");
+        const me = await refresh();
+        const firstName = me?.name?.split(" ")[0];
+
+        toast.success(
+          firstName ? `Welcome to ZYORA, ${firstName}!` : "Welcome to ZYORA!",
+        );
         navigate("/", { replace: true });
       }
     } catch (error) {
@@ -205,6 +229,10 @@ const Login = () => {
     return isLogin ? handleLogin() : handleRegister();
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${API}/api/auth/google`;
+  };
+
   const passwordToggle = (
     <button
       type="button"
@@ -216,6 +244,12 @@ const Login = () => {
       {showPassword ? <FiEyeOff /> : <FiEye />}
     </button>
   );
+
+  // Already signed-in customers don't need the login page
+  // (must stay below all hooks)
+  if (!authLoading && isLoggedIn) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <main className="zyora-login-page">
@@ -261,7 +295,7 @@ const Login = () => {
                       onClick={() => switchMode("register")}
                     >
                       Create a new account
-                    </button>{" "}
+                    </button>
                     — it’s quick, easy, and free!
                   </p>
                 </>
@@ -447,6 +481,26 @@ const Login = () => {
                     ? "Sign in"
                     : "Create account"}
               </button>
+              <div className="zyora-login-divider">
+                <span>OR</span>
+              </div>
+              <button
+                type="button"
+                className="zyora-google-button"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+              >
+                <img
+                  src="https://img.icons8.com/color/48/google-logo.png"
+                  alt="Google"
+                  className="zyora-google-icon"
+                />
+                Continue with Google
+              </button>
+              <p style={{ fontSize: "12px", opacity: 0.7, textAlign: "center" }}>
+                By continuing with Google you agree to our Terms & Conditions
+                and Privacy Policy.
+              </p>
             </form>
 
             <div className="zyora-login-security">

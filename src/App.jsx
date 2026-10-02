@@ -17,7 +17,7 @@ import Layout from "./ProtectedRoute/Layout.jsx";
 
 import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
 import PaymentSuccess from "./MainComponants/Success/PaymentSuccess.jsx";
-import Jewellery from "./MainComponants/Jewellery/Jewellery.jsx"
+import Jewellery from "./MainComponants/Jewellery/Jewellery.jsx";
 
 import "./index.css";
 

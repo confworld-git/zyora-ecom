@@ -5,8 +5,10 @@ import { useCart } from "../../Context/CartContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext.jsx";
 import { TiShoppingCart } from "react-icons/ti";
 import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
+import { useAuth } from "../../Context/AuthContext.jsx";
 
 const Navbar = () => {
+  const { customer, isLoggedIn, logout } = useAuth();
   const { totalItems } = useCart();
   const { wishlistItems } = useWishlist();
   const totalFavorites = wishlistItems.length;
@@ -49,19 +51,34 @@ const Navbar = () => {
         </li>
 
         <div className="nav_icons">
-          <Link
+          {isLoggedIn ? (
+            <div className="nav-user">
+              <span>Hi, {customer.name.split(" ")[0]}</span>
+              <button type="button" onClick={logout}>
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              className="nav_icon_link"
+              to="/Login"
+              aria-label="Account"
+              title="Account"
+            >
+              <i className="bi bi-person-fill"></i>
+            </Link>
+          )}
+          {/* <Link
             className="nav_icon_link"
             to="/Login"
             aria-label="Account"
             title="Account"
           >
             <i className="bi bi-person-fill"></i>
-          </Link>
+          </Link> */}
 
           <Link
-            className={`nav_icon_link ${
-              totalItems > 0 ? "has_items" : ""
-            }`}
+            className={`nav_icon_link ${totalItems > 0 ? "has_items" : ""}`}
             to="/Cart"
             aria-label={`Shopping bag${
               totalItems > 0 ? `, ${totalItems} items` : ""
@@ -70,15 +87,11 @@ const Navbar = () => {
           >
             <TiShoppingCart />
 
-            {totalItems > 0 && (
-              <span className="cart_badge">{totalItems}</span>
-            )}
+            {totalItems > 0 && <span className="cart_badge">{totalItems}</span>}
           </Link>
 
           <Link
-            className={`nav_icon_link ${
-              totalFavorites > 0 ? "has_items" : ""
-            }`}
+            className={`nav_icon_link ${totalFavorites > 0 ? "has_items" : ""}`}
             to="/Favorites"
             aria-label={`Favorites${
               totalFavorites > 0 ? `, ${totalFavorites} items` : ""

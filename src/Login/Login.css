@@ -148,10 +148,9 @@
 .zyora-login-form-section {
   min-width: 0;
   padding: 58px 13%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: #fff;
+  height: 100vh;
+  overflow-y: scroll;
 }
 
 .zyora-login-form-wrapper {
@@ -296,6 +295,75 @@
   opacity: 0.6;
 }
 
+.zyora-login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  color: #8a8a8a;
+}
+
+.zyora-login-divider::before,
+.zyora-login-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--zy-line);
+}
+
+.zyora-login-divider span {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.zyora-google-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 16px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid var(--zy-line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--zy-ink);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.zyora-google-button:hover:not(:disabled) {
+  border-color: #aaa;
+  background: #f8f8fa;
+  box-shadow: 0 2px 8px rgba(23, 23, 23, 0.08);
+}
+
+.zyora-google-button:focus-visible {
+  outline: 2px solid var(--zy-indigo);
+  outline-offset: 2px;
+}
+
+.zyora-google-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.zyora-google-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  object-fit: contain;
+}
+
 .zyora-login-security {
   margin-top: 24px;
   display: flex;
@@ -424,7 +492,7 @@
 
 .zyora-terms {
   margin-top: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
 }
 
 .zyora-checkbox-label {
@@ -445,7 +513,7 @@
 }
 
 .zyora-checkbox-label span {
-  color: #666;
+  color: #414141;
 }
 
 .zyora-checkbox-label .zyora-link {
@@ -454,6 +522,7 @@
   border: 0;
   background: transparent;
   font: inherit;
-  color: #fd7304;
+  color: #ff4000;
+  font-weight: 600;
   cursor: pointer;
 }
