@@ -6,9 +6,10 @@ import { useWishlist } from "../../Context/WishlistContext.jsx";
 import { TiShoppingCart } from "react-icons/ti";
 import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { useAuth } from "../../Context/AuthContext.jsx";
+import { AiOutlineLogin } from "react-icons/ai";
 
 const Navbar = () => {
-  const { customer, isLoggedIn, logout } = useAuth();
+  const { customer, isLoggedIn } = useAuth();
   const { totalItems } = useCart();
   const { wishlistItems } = useWishlist();
   const totalFavorites = wishlistItems.length;
@@ -51,32 +52,6 @@ const Navbar = () => {
         </li>
 
         <div className="nav_icons">
-          {isLoggedIn ? (
-            <div className="nav-user">
-              <span>Hi, {customer.name.split(" ")[0]}</span>
-              <button type="button" onClick={logout}>
-                Logout
-              </button>
-            </div>
-          ) : (
-            <Link
-              className="nav_icon_link"
-              to="/Login"
-              aria-label="Account"
-              title="Account"
-            >
-              <i className="bi bi-person-fill"></i>
-            </Link>
-          )}
-          {/* <Link
-            className="nav_icon_link"
-            to="/Login"
-            aria-label="Account"
-            title="Account"
-          >
-            <i className="bi bi-person-fill"></i>
-          </Link> */}
-
           <Link
             className={`nav_icon_link ${totalItems > 0 ? "has_items" : ""}`}
             to="/Cart"
@@ -104,6 +79,30 @@ const Navbar = () => {
               <span className="cart_badge">{totalFavorites}</span>
             )}
           </Link>
+          {isLoggedIn ? (
+            <div className="nav-user">
+              <span className="nav-user-avatar" aria-hidden="true">
+                <i className="bi bi-person-fill"></i>
+              </span>
+              <span className="nav-user-greeting">
+                <small>Welcome back</small>
+                <strong>{customer?.name?.trim()?.split(/\s+/)[0] || "there"}</strong>
+              </span>
+            </div>
+          ) : (
+            <div className="nav-account">
+              <Link
+                className="nav-login-link"
+                to="/Login"
+                aria-label="Account"
+                title="Account"
+              >
+                {/* <i className="bi bi-person"></i> */}
+                <span>Login</span>
+                <AiOutlineLogin />
+              </Link>
+            </div>
+          )}
         </div>
       </ul>
     </nav>

@@ -56,6 +56,7 @@ const Cart = () => {
     decreaseQuantity,
     removeFromCart,
     updateCartItemOption,
+    isCartSyncing,
   } = useCart();
 
   const [selectedCartIds, setSelectedCartIds] = useState(
@@ -425,6 +426,7 @@ const Cart = () => {
                         {item.sizes?.length > 0 ? (
                           <select
                             value={item.size}
+                            disabled={isCartSyncing}
                             onChange={(event) =>
                               updateCartItemOption(
                                 item.cartId,
@@ -450,6 +452,7 @@ const Cart = () => {
                         {item.colors?.length > 0 ? (
                           <select
                             value={item.color}
+                            disabled={isCartSyncing}
                             onChange={(event) =>
                               updateCartItemOption(
                                 item.cartId,
@@ -498,6 +501,7 @@ const Cart = () => {
                     <div className="cart_quantity">
                       <button
                         type="button"
+                        disabled={isCartSyncing}
                         onClick={() => decreaseQuantity(item.cartId)}
                         aria-label="Decrease quantity"
                       >
@@ -508,6 +512,7 @@ const Cart = () => {
 
                       <button
                         type="button"
+                        disabled={isCartSyncing}
                         onClick={() => increaseQuantity(item.cartId)}
                         aria-label="Increase quantity"
                       >
@@ -518,6 +523,7 @@ const Cart = () => {
                     <button
                       type="button"
                       className="cart_trash"
+                      disabled={isCartSyncing}
                       onClick={() => removeFromCart(item.cartId)}
                       aria-label={`Remove ${item.name}`}
                     >

@@ -1,6 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router";
 import { HelmetProvider } from "react-helmet-async";
+import { AuthProvider } from "./Context/AuthContext.jsx";
 import { ProductProvider } from "./Context/ProductContext.jsx";
 import { WishlistProvider } from "./Context/WishlistContext.jsx";
 import { CartProvider } from "./Context/CartContext.jsx";
@@ -12,15 +13,17 @@ export function render(url, initialProducts = null) {
 
   const app = (
     <HelmetProvider context={helmetContext}>
-      <ProductProvider initialProducts={initialProducts}>
-        <WishlistProvider>
-          <CartProvider>
-            <StaticRouter location={url}>
-              <AppRoutes />
-            </StaticRouter>
-          </CartProvider>
-        </WishlistProvider>
-      </ProductProvider>
+      <AuthProvider>
+        <ProductProvider initialProducts={initialProducts}>
+          <WishlistProvider>
+            <CartProvider>
+              <StaticRouter location={url}>
+                <AppRoutes />
+              </StaticRouter>
+            </CartProvider>
+          </WishlistProvider>
+        </ProductProvider>
+      </AuthProvider>
     </HelmetProvider>
   );
 

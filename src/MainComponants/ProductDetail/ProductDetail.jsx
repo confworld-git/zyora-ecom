@@ -10,8 +10,12 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO.jsx";
 
 const ProductDetail = () => {
-  const { addToCart } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addToCart, isCartSyncing } = useCart();
+  const {
+    toggleWishlist,
+    isInWishlist,
+    isWishlistSyncing,
+  } = useWishlist();
   const { loading, error: productsError, getProductById } = useProducts();
   const { productId, slug } = useParams();
   const id = productId;
@@ -208,7 +212,11 @@ const ProductDetail = () => {
             </div>
 
             <div className="product_btns">
-              <button type="button" onClick={handleAddFav}>
+              <button
+                type="button"
+                onClick={handleAddFav}
+                disabled={isWishlistSyncing}
+              >
                 {isInWishlist(product?.id ?? product?._id)
                   ? "Changed my mind"
                   : "This one's mine"}
@@ -220,8 +228,13 @@ const ProductDetail = () => {
                   }
                 ></i>
               </button>
-              <button type="button" onClick={handleAddToCart}>
-                Add to cart <i className="bi bi-bag-check"></i>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={isCartSyncing}
+              >
+                {isCartSyncing ? "Syncing cart…" : "Add to cart"}{" "}
+                <i className="bi bi-bag-check"></i>
               </button>
             </div>
           </div>

@@ -8,8 +8,12 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import toast from "react-hot-toast";
 
 const Favorites = () => {
-  const { wishlistItems, removeFromWishlist } = useWishlist();
-  const { addToCart } = useCart();
+  const {
+    wishlistItems,
+    removeFromWishlist,
+    isWishlistSyncing,
+  } = useWishlist();
+  const { addToCart, isCartSyncing } = useCart();
   const [hoveredProductId, setHoveredProductId] = useState(null);
   const navigate = useNavigate();
 
@@ -26,8 +30,9 @@ const Favorites = () => {
 
   const handleAddToCart = (event, product) => {
     event.stopPropagation();
-    addToCart(product);
-    toast.success("Added to cart");
+    if (addToCart(product)) {
+      toast.success("Added to cart");
+    }
   };
 
   return (
@@ -67,6 +72,7 @@ const Favorites = () => {
               >
                 <button
                   type="button"
+                  disabled={isWishlistSyncing}
                   onClick={(event) => {
                     event.stopPropagation();
                     removeFromWishlist(productId);
@@ -93,6 +99,7 @@ const Favorites = () => {
                 <button
                   type="button"
                   className="favourite_add_to_cart"
+                  disabled={isCartSyncing}
                   style={{
                     opacity: hoveredProductId === productId ? 1 : 0,
                     pointerEvents:

@@ -64,7 +64,7 @@ function makeStarSprite(hex) {
 
 export default function ParticleBackground({
   particles = 1000,
-  sparkleRatio = 0.09, // share of particles that are diamond glints
+  sparkleRatio = 0.19, // share of particles that are diamond glints
   // champagne gold, warm gold, ivory, rose gold, silver
   colors = ["#ffc125", "#df9827", "#f7d597", "#f2b8a2", "#dfe6f2"],
   // format: "rgba(r,g,b," (alpha and closing bracket are added in code)

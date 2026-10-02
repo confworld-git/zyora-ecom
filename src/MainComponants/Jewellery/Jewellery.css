@@ -23,40 +23,99 @@
   align-items: center;
 }
 .jewellery-container > div > div > h1 {
-  font-size: 70px;
+  font-size: 100px;
   margin: 0;
+  background: linear-gradient(
+    135deg,
+    #fff8c7 0%,
+    #f9d65c 20%,
+    #fff4a8 40%,
+    #d9a928 60%,
+    #fff1a1 80%,
+    #c88a05 100%
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  text-shadow:
+    0 0 12px rgba(255, 221, 90, 0.35),
+    0 0 28px rgba(255, 200, 50, 0.18);
 }
 
 .jewellery-container > div > div > p {
   width: 50%;
   margin-top: 0px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .shop-now-button-jew {
   font-family: "poppins", sans-serif;
   color: black;
-  border-radius: 50px;
+  border-radius: 50%;
   outline: none;
-  border: 2px solid rgb(255, 217, 0);
-  padding: 5px 20px;
+  border: none;
+  padding: 5px;
+  height: 40px;
+  width: 40px;
+  box-shadow: rgba(36, 36, 182, 0.521) 0px 7px 29px 0px;
   cursor: pointer;
-  font-weight: 600;
   letter-spacing: 1px;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 5px;
-  background: linear-gradient(
-    135deg,
-    #8c6a1d 0%,
-    #d4af37 25%,
-    #ffeb91 50%,
-    #d4af37 75%,
-    #8c6a1d 100%
-  );
 }
 
-.shop-now-button-jew>svg{
-    font-size: 28px;
+.shop-now-button-jew > svg {
+  font-size: 18px;
+  color: rgb(121, 93, 0);
+}
+
+.jewellery-categories {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.jewellery-categories > p {
+  font-family: "poppins", sans-serif;
+  color: white;
+  color: rgb(119, 58, 0);
+  font-size: 18px;
+  border: 2px solid rgb(255, 217, 0);
+  border-radius: 200px;
+  padding: 6px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 0;
+  margin-bottom: 30px;
+  background:
+    radial-gradient(
+      circle at center,
+      #fff5b8 0%,
+      #fde474 15%,
+      rgba(253, 228, 116, 0.5) 35%,
+      transparent 70%
+    ),
+    linear-gradient(135deg, #c78c02, #e7be37, #fde474, #e6bc35, #cc9003);
+
+  background-size: 300% 300%;
+  animation: goldShimmer 5s ease infinite;
+}
+
+@keyframes goldShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
