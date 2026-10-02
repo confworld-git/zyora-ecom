@@ -163,6 +163,24 @@
   border-radius: 99px;
 }
 
+.ps-address {
+  border-top: 1px dashed var(--line);
+  margin-top: 8px;
+  padding-top: 12px;
+  font-size: 14px;
+}
+.ps-address span {
+  color: var(--mute);
+  font-family: "poppins", sans-serif;
+}
+.ps-address address {
+  margin-top: 6px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  font-style: normal;
+  line-height: 1.6;
+}
+
 .ps-actions {
   display: grid;
   gap: 10px;

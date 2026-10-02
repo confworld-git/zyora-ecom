@@ -21,6 +21,32 @@ const getProductImage = (product, color) => {
   return typeof image === "string" ? image : image?.url || "";
 };
 
+const capCartItemsToProductStock = (items) => {
+  const quantitiesByProduct = new Map();
+
+  return items
+    .map((item) => {
+      const productId = String(item.id);
+      const stockQuantity = Number(item.stock?.quantity) || 0;
+      const inStock = item.stock?.in_stock === true;
+      const alreadyInCart = quantitiesByProduct.get(productId) || 0;
+      const quantity = inStock
+        ? Math.min(
+            Number(item.quantity) || 1,
+            Math.max(0, stockQuantity - alreadyInCart),
+          )
+        : 0;
+
+      quantitiesByProduct.set(productId, alreadyInCart + quantity);
+
+      return {
+        ...item,
+        quantity,
+      };
+    })
+    .filter((item) => item.quantity > 0);
+};
+
 export const CartProvider = ({ children }) => {
   const { getProductById, loading: productsLoading } = useProducts();
   const { customer, isLoggedIn, loading: authLoading } = useAuth();
@@ -157,28 +183,13 @@ export const CartProvider = ({ children }) => {
                 return null;
               }
 
-              const stockQuantity =
-                Number(product?.stock?.quantity) || 0;
-
-              const isInStock =
-                product?.stock?.in_stock === true;
-
-              // Never send more than current stock
-              const quantity =
-                isInStock && stockQuantity > 0
-                  ? Math.min(
-                      Number(item.quantity) || 1,
-                      stockQuantity,
-                    )
-                  : 0;
-
-              if (quantity <= 0) {
-                return null;
-              }
-
               return {
-                productId: String(productId),
-                quantity,
+                ...item,
+                id: String(productId),
+                stock: {
+                  in_stock: product?.stock?.in_stock === true,
+                  quantity: Number(product?.stock?.quantity) || 0,
+                },
                 color:
                   item.color === "Not specified"
                     ? ""
@@ -191,10 +202,19 @@ export const CartProvider = ({ children }) => {
             })
             .filter(Boolean);
 
-          if (items.length > 0) {
+          const cappedItems = capCartItemsToProductStock(items).map(
+            (item) => ({
+              productId: item.id,
+              quantity: item.quantity,
+              color: item.color,
+              size: item.size,
+            }),
+          );
+
+          if (cappedItems.length > 0) {
             const merged = await axios.post(
               `${API}/api/cart/merge`,
-              { items },
+              { items: cappedItems },
               { withCredentials: true },
             );
 
@@ -205,7 +225,7 @@ export const CartProvider = ({ children }) => {
         if (cancelled) return;
 
         // Convert backend cart into frontend cart structure
-        const nextCart = serverItems
+        const nextCart = capCartItemsToProductStock(serverItems
           .filter((item) => item.product)
           .map((item) => {
             const product = item.product;
@@ -230,18 +250,6 @@ export const CartProvider = ({ children }) => {
 
             const isInStock =
               product.stock?.in_stock === true;
-
-            const serverQuantity =
-              Number(item.quantity) || 1;
-
-            // Never allow cart quantity above current stock
-            const quantity =
-              isInStock && stockQuantity > 0
-                ? Math.min(
-                    serverQuantity,
-                    stockQuantity,
-                  )
-                : 0;
 
             return {
               cartId: `${String(id)}-${color}-${size}`,
@@ -290,9 +298,9 @@ export const CartProvider = ({ children }) => {
                 quantity: stockQuantity,
               },
 
-              quantity,
+              quantity: Number(item.quantity) || 1,
             };
-          });
+          }));
 
         localStorage.setItem(
           CART_OWNER_STORAGE_KEY,
@@ -353,7 +361,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    const items = cartItems
+    const items = capCartItemsToProductStock(cartItems
       .map((item) => {
         const product = getProductById(item.id);
 
@@ -364,24 +372,13 @@ export const CartProvider = ({ children }) => {
           return null;
         }
 
-        const stockQuantity =
-          Number(product?.stock?.quantity) || 0;
-
-        const isInStock =
-          product?.stock?.in_stock === true;
-
-        // Never save more than current stock
-        const quantity =
-          isInStock && stockQuantity > 0
-            ? Math.min(
-                Number(item.quantity) || 1,
-                stockQuantity,
-              )
-            : 0;
-
         return {
-          productId: String(productId),
-          quantity,
+          id: String(productId),
+          quantity: item.quantity,
+          stock: {
+            in_stock: product?.stock?.in_stock === true,
+            quantity: Number(product?.stock?.quantity) || 0,
+          },
           color:
             item.color === "Not specified"
               ? ""
@@ -392,7 +389,12 @@ export const CartProvider = ({ children }) => {
               : item.size,
         };
       })
-      .filter(Boolean);
+      .filter(Boolean)).map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        color: item.color,
+        size: item.size,
+      }));
 
     saveQueueRef.current = saveQueueRef.current
       .catch(() => {})
@@ -515,6 +517,15 @@ export const CartProvider = ({ children }) => {
       return false;
     }
 
+    const productQuantityInCart = cartItemsRef.current
+      .filter((item) => String(item.id) === String(productId))
+      .reduce((total, item) => total + (Number(item.quantity) || 0), 0);
+
+    if (productQuantityInCart >= stockQuantity) {
+      toast.warning(`Only ${stockQuantity} item(s) available in stock.`);
+      return false;
+    }
+
     const cartItem = {
       cartId,
 
@@ -559,6 +570,15 @@ export const CartProvider = ({ children }) => {
     };
 
     setCartItems((currentItems) => {
+      const currentProductQuantity = currentItems
+        .filter((item) => String(item.id) === String(productId))
+        .reduce((total, item) => total + (Number(item.quantity) || 0), 0);
+
+      if (currentProductQuantity >= stockQuantity) {
+        toast.warning(`Only ${stockQuantity} item(s) available in stock.`);
+        return currentItems;
+      }
+
       const existingItem =
         currentItems.find(
           (item) =>
@@ -653,6 +673,14 @@ export const CartProvider = ({ children }) => {
           item.stock?.in_stock ??
           false;
 
+        const productQuantityInCart = items
+          .filter((cartItem) => String(cartItem.id) === String(item.id))
+          .reduce(
+            (total, cartItem) =>
+              total + (Number(cartItem.quantity) || 0),
+            0,
+          );
+
         if (
           !isInStock ||
           stockQuantity <= 0
@@ -665,7 +693,7 @@ export const CartProvider = ({ children }) => {
         }
 
         if (
-          item.quantity >=
+          productQuantityInCart >=
           stockQuantity
         ) {
           toast.error(

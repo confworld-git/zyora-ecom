@@ -11,6 +11,7 @@ import { BiSolidOffer } from "react-icons/bi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../Context/AuthContext.jsx";
+import { useProducts } from "../../Context/ProductContext.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -64,6 +65,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isLoggedIn } = useAuth();
+  const { refreshProducts } = useProducts();
   const [placingOrder, setPlacingOrder] = useState(false);
 
   const [selectedCartIds, setSelectedCartIds] = useState(
@@ -343,7 +345,7 @@ const Cart = () => {
 
     const address = addresses[selectedAddressIndex];
     if (!address) {
-      setShowAddressForm(true);
+      navigate("/Profile?tab=addresses");
       return;
     }
 
@@ -369,7 +371,13 @@ const Cart = () => {
       if (res.data.success) {
         selectedItems.forEach((item) => removeFromCart(item.cartId));
         toast.success(`Order placed! #${res.data.order.orderId}`);
-        navigate("/Profile?tab=orders");
+        const productsRefreshed = await refreshProducts();
+        if (!productsRefreshed) {
+          toast.error(
+            "Order placed, but stock could not be refreshed. Reload before shopping again.",
+          );
+        }
+        navigate("/Payment_result", { state: { order: res.data.order } });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to place order");

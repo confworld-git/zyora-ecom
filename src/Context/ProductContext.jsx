@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import axios from "axios";
 
 const ProductContext = createContext(null);
@@ -8,28 +14,31 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
   const [loading, setLoading] = useState(!initialProducts);
   const [error, setError] = useState("");
 
+  const refreshProducts = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
+      );
+      setProducts(Array.isArray(response.data) ? response.data : []);
+      setError("");
+      return true;
+    } catch (requestError) {
+      console.error("Error refreshing products:", requestError);
+      setError("Unable to load products.");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     // During SSG, products are already provided.
     if (initialProducts) {
       return;
     }
 
-    const getProducts = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/products/get_products`,
-        );
-        setProducts(Array.isArray(response.data) ? response.data : []);
-      } catch (requestError) {
-        console.error("Error fetching products:", requestError);
-        setError("Unable to load products.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProducts();
-  }, [initialProducts]);
+    refreshProducts();
+  }, [initialProducts, refreshProducts]);
 
   const getProductById = (productId) =>
     products.find(
@@ -38,7 +47,7 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
 
   return (
     <ProductContext.Provider
-      value={{ products, loading, error, getProductById }}
+      value={{ products, loading, error, getProductById, refreshProducts }}
     >
       {children}
     </ProductContext.Provider>
