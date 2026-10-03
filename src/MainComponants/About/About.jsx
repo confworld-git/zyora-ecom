@@ -6,12 +6,27 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO";
 
 const About = () => {
+  const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
+  const aboutJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: "About ZYORA",
+    url: `${siteUrl}/About_Us`,
+    mainEntity: {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "ZYORA",
+      url: siteUrl,
+    },
+  };
+
   return (
     <>
       <SEO
         title="About ZYORA | Quality & Affordable Products for Everyday Life"
         description="Learn more about ZYORA, a growing e-commerce brand focused on making everyday shopping simple, convenient and reliable. Discover our commitment to quality, affordability, functionality and style across home essentials, stationery, handbags, soft toys, fashion, footwear, electronics and more."
         canonical={`${import.meta.env.VITE_API_DOMAIN}/About_Us`}
+        jsonLd={aboutJsonLd}
       />
       <div className="About_us">
         <div id="page_path">

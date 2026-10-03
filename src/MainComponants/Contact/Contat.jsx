@@ -12,6 +12,7 @@ import SEO from "../../SEO";
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Contact = () => {
+  const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
   const {
     register,
     handleSubmit,
@@ -48,6 +49,26 @@ const Contact = () => {
         title="Contact ZYORA | Customer Support & Assistance"
         description="Get in touch with ZYORA for product enquiries, order assistance, customer support and general questions. Our team is here to help with your shopping experience, product information, delivery, returns and other queries. Contact ZYORA for reliable and friendly support."
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Contact_Us`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          name: "Contact ZYORA",
+          url: `${siteUrl}/Contact_Us`,
+          mainEntity: {
+            "@type": "Organization",
+            "@id": `${siteUrl}/#organization`,
+            name: "ZYORA",
+            url: siteUrl,
+            email: "support@zyora.com",
+            contactPoint: {
+              "@type": "ContactPoint",
+              telephone: "+91 9965165261",
+              email: "support@zyora.com",
+              contactType: "customer support",
+              availableLanguage: ["English"],
+            },
+          },
+        }}
       />
       <div className="contact_main">
         <div id="page_path">

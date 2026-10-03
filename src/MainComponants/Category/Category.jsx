@@ -29,7 +29,7 @@ const Category = () => {
 
     const card = event.currentTarget;
     const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width; 
+    const x = (event.clientX - rect.left) / rect.width;
     const y = (event.clientY - rect.top) / rect.height;
 
     card.classList.add("tilting");
@@ -316,6 +316,41 @@ const Category = () => {
       ? (sizeSliderValue / sizeSliderMax) * 100
       : 0;
 
+  const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
+  const categoryJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Shop All Categories | ZYORA",
+    url: `${siteUrl}/Zyora_Category`,
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: filteredProducts.flatMap((product, index) => {
+        const productId = product.id || product._id;
+        const productName = product.name || product.title;
+
+        if (!productId || !productName) return [];
+
+        const slug = productName
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+        return [
+          {
+            "@type": "ListItem",
+            position: index + 1,
+            item: {
+              "@type": "Product",
+              name: productName,
+              url: `${siteUrl}/Zyora_Category/product/${encodeURIComponent(productId)}/${encodeURIComponent(slug)}`,
+            },
+          },
+        ];
+      }),
+    },
+  };
+
   const openProduct = (product) => {
     const productId = product.id || product._id;
 
@@ -340,6 +375,7 @@ const Category = () => {
         title="Shop All Categories | ZYORA"
         description="Explore all product categories at ZYORA and discover quality, functional and affordable products for everyday life. Shop home and kitchen essentials, stationery, handbags, soft toys, fashion, footwear, electronics, watches, beauty, sports and fitness, and more. Find products that fit your needs with secure payments, reliable delivery and easy 7-day returns."
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Zyora_Category`}
+        jsonLd={categoryJsonLd}
       />
       <div className="category">
         <div id="page_path">

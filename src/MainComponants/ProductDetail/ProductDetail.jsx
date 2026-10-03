@@ -158,6 +158,7 @@ const ProductDetail = () => {
         title={`${product.name} | ${product.brand || "ZYORA"} | ZYORA`}
         description={seoDescription}
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Zyora_Category/product/${product.id}/${slug}`}
+        jsonLd={productJsonLd}
       />
       <Helmet>
         <meta property="og:type" content="product" />
@@ -185,9 +186,6 @@ const ProductDetail = () => {
           content={product.price?.currency || "INR"}
         />
 
-        <script type="application/ld+json">
-          {JSON.stringify(productJsonLd)}
-        </script>
       </Helmet>
       <main className="product-detail-page">
         <div id="page_path">
