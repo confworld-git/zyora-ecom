@@ -477,6 +477,20 @@
   overflow: hidden;
 }
 
+.product-stock-badge {
+  position: absolute;
+  z-index: 1;
+  top: 18px;
+  left: 18px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #991b1b;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
 .product_card > small {
   font-weight: 600;
   color: black;

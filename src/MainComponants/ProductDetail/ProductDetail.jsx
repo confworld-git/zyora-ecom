@@ -41,6 +41,9 @@ const ProductDetail = () => {
     );
   }
 
+  const stockQuantity = Number(product.stock?.quantity) || 0;
+  const isOutOfStock =
+    product.stock?.in_stock !== true || stockQuantity <= 0;
   const images = product.images || [];
   const colourNames = product.variants?.colours || [];
 
@@ -145,7 +148,7 @@ const ProductDetail = () => {
       url: productUrl,
       priceCurrency: product.price?.currency || "INR",
       price: String(product.price?.selling_price ?? ""),
-      availability: product.stock?.in_stock
+      availability: !isOutOfStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
@@ -227,8 +230,10 @@ const ProductDetail = () => {
               <span>{product.price?.discount_percent}% OFF</span>
             </div>
             <p className="product-quantity">
-              <span>Total Quantity</span>
-              <strong>{product.stock?.quantity}</strong>
+              <span>Availability</span>
+              <strong className={isOutOfStock ? "out-of-stock" : "in-stock"}>
+                {isOutOfStock ? "Out of stock" : `In stock (${stockQuantity})`}
+              </strong>
             </p>
             <div className="color-selection">
               <h3>
@@ -300,9 +305,13 @@ const ProductDetail = () => {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                disabled={isCartSyncing}
+                disabled={isCartSyncing || isOutOfStock}
               >
-                {isCartSyncing ? "Syncing cart…" : "Add to cart"}{" "}
+                {isOutOfStock
+                  ? "Out of stock"
+                  : isCartSyncing
+                    ? "Syncing cart…"
+                    : "Add to cart"}{" "}
                 <i className="bi bi-bag-check"></i>
               </button>
             </div>

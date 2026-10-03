@@ -372,6 +372,14 @@ main.product-detail-state a:hover {
   font-size: 14px;
 }
 
+.product-quantity strong.out-of-stock {
+  color: #991b1b;
+}
+
+.product-quantity strong.in-stock {
+  color: #15803d;
+}
+
 /* Price */
 .detail-price {
   display: flex;
@@ -539,6 +547,18 @@ main.product-detail-state a:hover {
 .product_btns > button:hover {
   transform: translateY(-3px);
   box-shadow: 0 14px 24px rgba(23, 23, 23, 0.2);
+}
+
+.product_btns > button:disabled {
+  background: #737373;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.product_btns > button:disabled::before,
+.product_btns > button:disabled:hover > i {
+  display: none;
 }
 
 .product_btns > button:hover::before {

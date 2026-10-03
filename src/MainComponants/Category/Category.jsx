@@ -217,7 +217,10 @@ const Category = () => {
           ),
         );
 
-      const matchesStock = !filters.inStock || product.stock?.in_stock === true;
+      const hasStock =
+        product.stock?.in_stock === true &&
+        Number(product.stock?.quantity) > 0;
+      const matchesStock = !filters.inStock || hasStock;
       const matchesRating =
         !filters.rating || (Number(product.rating?.average) || 0) >= 4;
 
@@ -651,6 +654,9 @@ const Category = () => {
             <div className="categories_items">
               {filteredProducts.map((product) => {
                 const productId = product.id || product._id;
+                const hasStock =
+                  product.stock?.in_stock === true &&
+                  Number(product.stock?.quantity) > 0;
 
                 return (
                   <div
@@ -675,6 +681,15 @@ const Category = () => {
                         product.images?.[0]?.alt || product.title || "Product"
                       }
                     />
+
+                    {!hasStock && (
+                      <span
+                        className="product-stock-badge"
+                        aria-label="Out of stock"
+                      >
+                        Out of stock
+                      </span>
+                    )}
 
                     <p className="rating_pre">
                       ⭐ {product.rating?.average ?? 0} (
