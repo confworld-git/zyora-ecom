@@ -35,7 +35,7 @@
 
 .zyora-login-container {
   width: 100%;
-  max-width: 1440px;
+  /* max-width: 1440px; */
   min-height: 100vh;
   display: grid;
   grid-template-columns: 58% 42%;

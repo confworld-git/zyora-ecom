@@ -22,20 +22,20 @@ const Category = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
 
-  const TILT_MAX = 10;
+  // const TILT_MAX = 5;
 
-  const handleTiltMove = (event) => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  // const handleTiltMove = (event) => {
+  //   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const card = event.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
+  //   const card = event.currentTarget;
+  //   const rect = card.getBoundingClientRect();
+  //   const x = (event.clientX - rect.left) / rect.width;
+  //   const y = (event.clientY - rect.top) / rect.height;
 
-    card.classList.add("tilting");
-    card.style.setProperty("--ry", `${(x - 0.5) * 2 * TILT_MAX}deg`);
-    card.style.setProperty("--rx", `${(0.5 - y) * 2 * TILT_MAX}deg`);
-  };
+  //   card.classList.add("tilting");
+  //   card.style.setProperty("--ry", `${(x - 0.5) * 2 * TILT_MAX}deg`);
+  //   card.style.setProperty("--rx", `${(0.5 - y) * 2 * TILT_MAX}deg`);
+  // };
 
   const handleTiltLeave = (event) => {
     const card = event.currentTarget;
@@ -658,7 +658,7 @@ const Category = () => {
                     key={productId}
                     role="button"
                     tabIndex={0}
-                    onMouseMove={handleTiltMove}
+                    // onMouseMove={handleTiltMove}
                     onMouseLeave={handleTiltLeave}
                     onClick={() => openProduct(product)}
                     onKeyDown={(event) => {

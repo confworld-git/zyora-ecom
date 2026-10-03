@@ -2,11 +2,62 @@
   padding: 20px;
   text-align: center;
   position: relative;
+  isolation: isolate;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
+
+/* .home-container::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  z-index: -1;
+
+  background:
+    radial-gradient(
+      55% 55% at 92% 12%,
+      #087cff 0%,
+      #1745dc 30%,
+      transparent 72%
+    ),
+    radial-gradient(
+      55% 45% at 62% 10%,
+      #5b22e8 0%,
+      #3b0da9 38%,
+      transparent 72%
+    ),
+    radial-gradient(
+      65% 70% at 5% 40%,
+      #ff1717 0%,
+      #d90045 32%,
+      #79006f 62%,
+      transparent 82%
+    ),
+    radial-gradient(
+      55% 55% at 18% 92%,
+      #ff4d27 0%,
+      #ed174b 35%,
+      transparent 75%
+    ),
+    radial-gradient(
+      50% 45% at 58% 63%,
+      #d00078 0%,
+      #8c087e 35%,
+      transparent 72%
+    ),
+    radial-gradient(
+      45% 50% at 76% 48%,
+      #5f16d5 0%,
+      #38118c 40%,
+      transparent 75%
+    ),
+    linear-gradient(135deg, #10052f 0%, #190d54 45%, #08184e 100%);
+
+  filter: blur(35px) saturate(135%);
+  transform: scale(1.08);
+} */
 
 .image-wrapper > img {
   height: 400px;
@@ -38,7 +89,7 @@
 }
 
 .home-container > p {
-  color: black;
+  /* color: black; */
   font-size: 18px;
   text-align: center;
   position: relative;

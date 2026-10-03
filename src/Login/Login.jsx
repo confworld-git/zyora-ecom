@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
 import { toast } from "react-hot-toast";
-import CanvasParticles from "canvasparticles-js";
 import { useAuth } from "../Context/AuthContext.jsx";
+import ParticleEffect from "../Components/ParticleEffect.jsx";
 import "./Login.css";
 import SEO from "../SEO.jsx";
 
-const PARTICLE_COLOR = "#ffffff";
 const API = import.meta.env.VITE_API_BASE_URL;
 
 const emptyForm = {
@@ -25,7 +24,6 @@ const Login = () => {
   const location = useLocation();
   // page the visitor wanted before being sent to login (set by CustomerRoute)
   const redirectTo = location.state?.from?.pathname || "/";
-  const particlesRef = useRef(null);
   const { isLoggedIn, loading: authLoading, refresh } = useAuth();
 
   // "login" | "register"
@@ -35,32 +33,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const isLogin = mode === "login";
-
-  useEffect(() => {
-    const container = particlesRef.current;
-    if (!container) return;
-
-    const canvas = document.createElement("canvas");
-    container.appendChild(canvas);
-
-    const particles = new CanvasParticles(canvas, {
-      mouse: {
-        interactionType: 2,
-        connectDistMult: 0.8,
-        distRatio: 0.8,
-      },
-      particles: {
-        color: PARTICLE_COLOR,
-        ppm: 120,
-        connectDistance: 140,
-      },
-    });
-
-    particles.setParticleColor?.(PARTICLE_COLOR);
-    particles.start();
-
-    return () => particles.destroy();
-  }, []);
 
   // Show errors sent back by the Google OAuth redirect (/login?error=...)
   useEffect(() => {
@@ -267,11 +239,7 @@ const Login = () => {
         <div className="zyora-login-container">
           {/* LEFT BRAND SECTION */}
           <section className="zyora-login-brand" aria-label="ZYORA">
-            <div
-              ref={particlesRef}
-              className="zyora-login-particles"
-              aria-hidden="true"
-            />
+            <ParticleEffect className="zyora-login-particles" />
 
             <div className="zyora-login-brand-content">
               <span className="zyora-login-brand-mark" aria-hidden="true">

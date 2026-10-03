@@ -547,12 +547,12 @@
   .categories_items > div { transition: none; }
 }
 
-/* .categories_items > div:hover,
+.categories_items > div:hover,
 .categories_items > div:focus-visible {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(70, 48, 31, 0.12);
   outline-offset: 2px;
-} */
+}
 
 .categories_items > div > img {
   height: 250px;

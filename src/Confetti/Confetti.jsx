@@ -5,7 +5,7 @@ const CONFETTI_COLORS = [
   "#ff6b6b", "#ffd93d", "#6bc5ff", "#4dd599",
   "#ff9ff3", "#a29bfe", "#ff8c42", "#00d2d3",
 ];
-const EMOJIS = ["🎉", "🎊", "✨", "🎈"];
+const EMOJIS = ["🎉", "🎊", "✨", "🎈", "💫", "🌟", "⚡️"];
 
 const generateConfetti = (side, seed) =>
   Array.from({ length: 90 }, (_, i) => {
@@ -14,7 +14,7 @@ const generateConfetti = (side, seed) =>
     const power = 200 + Math.random() * 320;
     const rad = (angle * Math.PI) / 180;
     const isEmoji = Math.random() > 0.9;
-    const gravityBias = 0.6 + Math.random() * 0.8; // how "heavy" this piece falls
+    const gravityBias = 0.6 + Math.random() * 0.8;
     return {
       id: `${side}-${seed}-${i}`,
       isEmoji,
