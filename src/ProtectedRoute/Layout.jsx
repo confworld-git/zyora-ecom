@@ -17,10 +17,16 @@ const Layout = () => {
   const hideChrome = isAdminPage || isPaymentResultPage || isProfilePage;
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (reduce || isAdminPage) return;
 
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true, autoRaf: true });
+    const lenis = new Lenis({
+      duration: 1.1,
+      smoothWheel: true,
+      autoRaf: true,
+    });
     lenisRef.current = lenis;
 
     return () => {
