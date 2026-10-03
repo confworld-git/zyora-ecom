@@ -21,6 +21,7 @@ import { TiHomeOutline } from "react-icons/ti";
 import { BsCart4 } from "react-icons/bs";
 import { useAuth } from "../Context/AuthContext.jsx";
 import "./Profile.css";
+import SEO from "../SEO.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -628,79 +629,82 @@ const Profile = () => {
     .join("");
 
   return (
-    <main className="zyora-profile-page">
-      <div className="zyora-profile-wrap">
-        {/* Header card */}
-        <header className="zyora-profile-header">
-          <div className="zyora-profile-avatar">
-            {customer.profileImage && !avatarFailed ? (
-              <img
-                src={customer.profileImage}
-                alt={customer.name}
-                referrerPolicy="no-referrer"
-                onError={() => setAvatarFailed(true)}
-              />
-            ) : (
-              <span>{initials}</span>
-            )}
-          </div>
+    <>
+      <SEO title="My Account | ZYORA" noindex />
+      <main className="zyora-profile-page">
+        <div className="zyora-profile-wrap">
+          {/* Header card */}
+          <header className="zyora-profile-header">
+            <div className="zyora-profile-avatar">
+              {customer.profileImage && !avatarFailed ? (
+                <img
+                  src={customer.profileImage}
+                  alt={customer.name}
+                  referrerPolicy="no-referrer"
+                  onError={() => setAvatarFailed(true)}
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </div>
 
-          <div className="zyora-profile-who">
-            <h1>{customer.name}</h1>
-            <p>{customer.email}</p>
-          </div>
+            <div className="zyora-profile-who">
+              <h1>{customer.name}</h1>
+              <p>{customer.email}</p>
+            </div>
 
-          <div className="zyora-profile-header-actions">
-            <Link to="/" className="zyora-profile-btn outline">
-              <TiHomeOutline aria-hidden="true" /> Home
-            </Link>
+            <div className="zyora-profile-header-actions">
+              <Link to="/" className="zyora-profile-btn outline">
+                <TiHomeOutline aria-hidden="true" /> Home
+              </Link>
 
-            <Link to="/Cart" className="zyora-profile-btn outline">
-              <BsCart4 aria-hidden="true" /> Cart
-            </Link>
+              <Link to="/Cart" className="zyora-profile-btn outline">
+                <BsCart4 aria-hidden="true" /> Cart
+              </Link>
 
-            <Link to="/Favorites" className="zyora-profile-btn outline">
-              <FiHeart aria-hidden="true" /> Favorites
-            </Link>
+              <Link to="/Favorites" className="zyora-profile-btn outline">
+                <FiHeart aria-hidden="true" /> Favorites
+              </Link>
 
-            <button
-              type="button"
-              className="zyora-profile-btn outline danger"
-              onClick={handleLogout}
-            >
-              <FiLogOut aria-hidden="true" /> Logout
-            </button>
-          </div>
-        </header>
-
-        <div className="zyora-profile-layout">
-          {/* Tabs */}
-          <nav className="zyora-profile-tabs" aria-label="Profile sections">
-            {TABS.map(({ id, label, icon: Icon }) => (
               <button
-                key={id}
                 type="button"
-                className={tab === id ? "active" : ""}
-                onClick={() => setParams({ tab: id }, { replace: true })}
-                aria-current={tab === id ? "page" : undefined}
+                className="zyora-profile-btn outline danger"
+                onClick={handleLogout}
               >
-                <Icon aria-hidden="true" />
-                {label}
+                <FiLogOut aria-hidden="true" /> Logout
               </button>
-            ))}
-          </nav>
+            </div>
+          </header>
 
-          {/* Content */}
-          <div className="zyora-profile-content">
-            {tab === "account" && (
-              <AccountTab customer={customer} refresh={refresh} />
-            )}
-            {tab === "orders" && <OrdersTab />}
-            {tab === "addresses" && <AddressesTab />}
+          <div className="zyora-profile-layout">
+            {/* Tabs */}
+            <nav className="zyora-profile-tabs" aria-label="Profile sections">
+              {TABS.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={tab === id ? "active" : ""}
+                  onClick={() => setParams({ tab: id }, { replace: true })}
+                  aria-current={tab === id ? "page" : undefined}
+                >
+                  <Icon aria-hidden="true" />
+                  {label}
+                </button>
+              ))}
+            </nav>
+
+            {/* Content */}
+            <div className="zyora-profile-content">
+              {tab === "account" && (
+                <AccountTab customer={customer} refresh={refresh} />
+              )}
+              {tab === "orders" && <OrdersTab />}
+              {tab === "addresses" && <AddressesTab />}
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 };
 

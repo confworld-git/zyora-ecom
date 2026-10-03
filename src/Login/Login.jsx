@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import CanvasParticles from "canvasparticles-js";
 import { useAuth } from "../Context/AuthContext.jsx";
 import "./Login.css";
+import SEO from "../SEO.jsx";
 
 const PARTICLE_COLOR = "#ffffff";
 const API = import.meta.env.VITE_API_BASE_URL;
@@ -255,266 +256,286 @@ const Login = () => {
   }
 
   return (
-    <main className="zyora-login-page">
-      <div className="zyora-login-container">
-        {/* LEFT BRAND SECTION */}
-        <section className="zyora-login-brand" aria-label="ZYORA">
-          <div
-            ref={particlesRef}
-            className="zyora-login-particles"
-            aria-hidden="true"
-          />
+    <>
+      <SEO
+        title="Sign in | ZYORA"
+        description="Sign in to your ZYORA account to track orders and shop faster."
+        canonical={`${import.meta.env.VITE_API_DOMAIN}/Login`}
+        noindex
+      />
+      <main className="zyora-login-page">
+        <div className="zyora-login-container">
+          {/* LEFT BRAND SECTION */}
+          <section className="zyora-login-brand" aria-label="ZYORA">
+            <div
+              ref={particlesRef}
+              className="zyora-login-particles"
+              aria-hidden="true"
+            />
 
-          <div className="zyora-login-brand-content">
-            <span className="zyora-login-brand-mark" aria-hidden="true">
-              ✳
-            </span>
+            <div className="zyora-login-brand-content">
+              <span className="zyora-login-brand-mark" aria-hidden="true">
+                ✳
+              </span>
 
-            <h2>HELLO ZYORA!</h2>
+              <h2>HELLO ZYORA!</h2>
 
-            <p>
-              Thoughtfully curated finds, managed in one place. Sign in to keep
-              your store running smoothly.
-            </p>
-          </div>
-
-          <p className="zyora-login-footer">© ZYORA. All rights reserved.</p>
-        </section>
-
-        {/* FORM SECTION */}
-        <section className="zyora-login-form-section">
-          <div className="zyora-login-form-wrapper">
-            <div className="zyora-login-heading">
-              {isLogin ? (
-                <>
-                  <h1>Welcome back</h1>
-
-                  <p>
-                    Sign in to your ZYORA account to continue shopping and
-                    manage your orders. Don’t have an account? <br />
-                    <button
-                      type="button"
-                      className="zyora-link"
-                      onClick={() => switchMode("register")}
-                    >
-                      Create a new account
-                    </button>
-                    — it’s quick, easy, and free!
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h1>Create your account</h1>
-
-                  <p>
-                    Join ZYORA to shop curated finds and track your orders.
-                    <br />
-                    <button
-                      type="button"
-                      className="zyora-link"
-                      onClick={() => switchMode("login")}
-                    >
-                      Already have an account?
-                    </button>
-                  </p>
-                </>
-              )}
+              <p>
+                Thoughtfully curated finds, managed in one place. Sign in to
+                keep your store running smoothly.
+              </p>
             </div>
 
-            <form
-              key={mode}
-              className="zyora-login-form"
-              onSubmit={handleSubmit}
-            >
-              {/* NAME */}
-              {!isLogin && (
-                <div className="zyora-input-group">
-                  <label htmlFor="name">Full name</label>
+            <p className="zyora-login-footer">© ZYORA. All rights reserved.</p>
+          </section>
 
-                  <div className="zyora-input-wrapper">
-                    <input
-                      id="name"
-                      type="text"
-                      name="name"
-                      placeholder="Your name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      autoComplete="name"
-                      required
-                    />
-                  </div>
-                </div>
-              )}
+          {/* FORM SECTION */}
+          <section className="zyora-login-form-section">
+            <div className="zyora-login-form-wrapper">
+              <div className="zyora-login-heading">
+                {isLogin ? (
+                  <>
+                    <h1>Welcome back</h1>
 
-              {/* EMAIL */}
-              <div className="zyora-input-group">
-                <label htmlFor="email">Email address</label>
-
-                <div className="zyora-input-wrapper">
-                  <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    autoComplete="email"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* MOBILE */}
-              {!isLogin && (
-                <div className="zyora-input-group">
-                  <label htmlFor="mobile">Mobile number</label>
-
-                  <div className="zyora-input-wrapper">
-                    <input
-                      id="mobile"
-                      type="tel"
-                      name="mobile"
-                      placeholder="10-digit mobile number"
-                      value={formData.mobile}
-                      onChange={handleChange}
-                      autoComplete="tel"
-                      inputMode="numeric"
-                      maxLength={10}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* PASSWORD */}
-              <div className="zyora-input-group">
-                <label htmlFor="password">Password</label>
-
-                <div className="zyora-input-wrapper">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder={
-                      isLogin ? "Enter your password" : "At least 8 characters"
-                    }
-                    value={formData.password}
-                    onChange={handleChange}
-                    autoComplete={isLogin ? "current-password" : "new-password"}
-                    required
-                  />
-
-                  {passwordToggle}
-                </div>
-              </div>
-
-              {/* CONFIRM PASSWORD */}
-              {!isLogin && (
-                <div className="zyora-input-group">
-                  <label htmlFor="confirmPassword">Confirm password</label>
-
-                  <div className="zyora-input-wrapper">
-                    <input
-                      id="confirmPassword"
-                      type={showPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      placeholder="Re-enter your password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      autoComplete="new-password"
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* TERMS */}
-              {!isLogin && (
-                <div className="zyora-terms">
-                  <label className="zyora-checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="termsAccepted"
-                      checked={formData.termsAccepted}
-                      onChange={handleChange}
-                      required
-                    />
-
-                    <span>
-                      I agree to ZYORA's{" "}
+                    <p>
+                      Sign in to your ZYORA account to continue shopping and
+                      manage your orders. Don’t have an account? <br />
                       <button
                         type="button"
                         className="zyora-link"
-                        onClick={() => navigate("/terms-and-conditions")}
+                        onClick={() => switchMode("register")}
                       >
-                        Terms & Conditions
-                      </button>{" "}
-                      and Privacy Policy.
-                    </span>
-                  </label>
-                </div>
-              )}
+                        Create a new account
+                      </button>
+                      — it’s quick, easy, and free!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h1>Create your account</h1>
 
-              {/* FORGOT PASSWORD */}
-              {isLogin && (
-                <div className="zyora-login-options">
-                  <button
-                    type="button"
-                    className="zyora-forgot"
-                    onClick={() =>
-                      toast("Contact the administrator to reset your password")
-                    }
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-
-              {/* SUBMIT */}
-              <button
-                type="submit"
-                className="zyora-login-button"
-                disabled={loading}
-              >
-                {loading
-                  ? isLogin
-                    ? "Signing in…"
-                    : "Creating account…"
-                  : isLogin
-                    ? "Sign in"
-                    : "Create account"}
-              </button>
-              <div className="zyora-login-divider">
-                <span>OR</span>
+                    <p>
+                      Join ZYORA to shop curated finds and track your orders.
+                      <br />
+                      <button
+                        type="button"
+                        className="zyora-link"
+                        onClick={() => switchMode("login")}
+                      >
+                        Already have an account?
+                      </button>
+                    </p>
+                  </>
+                )}
               </div>
-              <button
-                type="button"
-                className="zyora-google-button"
-                onClick={handleGoogleLogin}
-                disabled={loading}
+
+              <form
+                key={mode}
+                className="zyora-login-form"
+                onSubmit={handleSubmit}
               >
-                <img
-                  src="https://img.icons8.com/color/48/google-logo.png"
-                  alt="Google"
-                  className="zyora-google-icon"
-                />
-                Continue with Google
-              </button>
-              <p style={{ fontSize: "12px", opacity: 0.7, textAlign: "center" }}>
-                By continuing with Google you agree to our Terms & Conditions
-                and Privacy Policy.
-              </p>
-            </form>
+                {/* NAME */}
+                {!isLogin && (
+                  <div className="zyora-input-group">
+                    <label htmlFor="name">Full name</label>
 
-            <div className="zyora-login-security">
-              <FiLock aria-hidden="true" />
+                    <div className="zyora-input-wrapper">
+                      <input
+                        id="name"
+                        type="text"
+                        name="name"
+                        placeholder="Your name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        autoComplete="name"
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
 
-              <span>Securely Access Your Account</span>
+                {/* EMAIL */}
+                <div className="zyora-input-group">
+                  <label htmlFor="email">Email address</label>
+
+                  <div className="zyora-input-wrapper">
+                    <input
+                      id="email"
+                      type="email"
+                      name="email"
+                      placeholder="you@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      autoComplete="email"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* MOBILE */}
+                {!isLogin && (
+                  <div className="zyora-input-group">
+                    <label htmlFor="mobile">Mobile number</label>
+
+                    <div className="zyora-input-wrapper">
+                      <input
+                        id="mobile"
+                        type="tel"
+                        name="mobile"
+                        placeholder="10-digit mobile number"
+                        value={formData.mobile}
+                        onChange={handleChange}
+                        autoComplete="tel"
+                        inputMode="numeric"
+                        maxLength={10}
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* PASSWORD */}
+                <div className="zyora-input-group">
+                  <label htmlFor="password">Password</label>
+
+                  <div className="zyora-input-wrapper">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder={
+                        isLogin
+                          ? "Enter your password"
+                          : "At least 8 characters"
+                      }
+                      value={formData.password}
+                      onChange={handleChange}
+                      autoComplete={
+                        isLogin ? "current-password" : "new-password"
+                      }
+                      required
+                    />
+
+                    {passwordToggle}
+                  </div>
+                </div>
+
+                {/* CONFIRM PASSWORD */}
+                {!isLogin && (
+                  <div className="zyora-input-group">
+                    <label htmlFor="confirmPassword">Confirm password</label>
+
+                    <div className="zyora-input-wrapper">
+                      <input
+                        id="confirmPassword"
+                        type={showPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        placeholder="Re-enter your password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        autoComplete="new-password"
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* TERMS */}
+                {!isLogin && (
+                  <div className="zyora-terms">
+                    <label className="zyora-checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="termsAccepted"
+                        checked={formData.termsAccepted}
+                        onChange={handleChange}
+                        required
+                      />
+
+                      <span>
+                        I agree to ZYORA's{" "}
+                        <button
+                          type="button"
+                          className="zyora-link"
+                          onClick={() => navigate("/terms-and-conditions")}
+                        >
+                          Terms & Conditions
+                        </button>{" "}
+                        and Privacy Policy.
+                      </span>
+                    </label>
+                  </div>
+                )}
+
+                {/* FORGOT PASSWORD */}
+                {isLogin && (
+                  <div className="zyora-login-options">
+                    <button
+                      type="button"
+                      className="zyora-forgot"
+                      onClick={() =>
+                        toast(
+                          "Contact the administrator to reset your password",
+                        )
+                      }
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
+
+                {/* SUBMIT */}
+                <button
+                  type="submit"
+                  className="zyora-login-button"
+                  disabled={loading}
+                >
+                  {loading
+                    ? isLogin
+                      ? "Signing in…"
+                      : "Creating account…"
+                    : isLogin
+                      ? "Sign in"
+                      : "Create account"}
+                </button>
+                <div className="zyora-login-divider">
+                  <span>OR</span>
+                </div>
+                <button
+                  type="button"
+                  className="zyora-google-button"
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                >
+                  <img
+                    src="https://img.icons8.com/color/48/google-logo.png"
+                    alt="Google"
+                    className="zyora-google-icon"
+                  />
+                  Continue with Google
+                </button>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.7,
+                    textAlign: "center",
+                  }}
+                >
+                  By continuing with Google you agree to our Terms & Conditions
+                  and Privacy Policy.
+                </p>
+              </form>
+
+              <div className="zyora-login-security">
+                <FiLock aria-hidden="true" />
+
+                <span>Securely Access Your Account</span>
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
-    </main>
+          </section>
+        </div>
+      </main>
+    </>
   );
 };
 
