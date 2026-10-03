@@ -21,6 +21,11 @@ import { RiStockLine } from "react-icons/ri";
 
 const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
+  const [summaryCounts, setSummaryCounts] = useState({
+    orders: null,
+    coupons: null,
+  });
+  const [summaryLoading, setSummaryLoading] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const navigate = useNavigate();
   const navigation = [
@@ -67,6 +72,56 @@ const Dashboard = () => {
     };
     getContactData();
   }, []);
+
+  useEffect(() => {
+    if (activeSection !== "home") return;
+
+    let cancelled = false;
+    const getSummaryCounts = async () => {
+      setSummaryLoading(true);
+      const results = await Promise.allSettled([
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/orders`, {
+          withCredentials: true,
+        }),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/coupons`, {
+          withCredentials: true,
+        }),
+      ]);
+
+      if (cancelled) return;
+
+      const [ordersResult, couponsResult] = results;
+      if (ordersResult.status === "fulfilled") {
+        const orders = ordersResult.value.data.orders;
+        if (Array.isArray(orders)) {
+          setSummaryCounts((current) => ({ ...current, orders: orders.length }));
+        } else {
+          console.error("Unable to load dashboard order count: invalid response");
+        }
+      } else {
+        console.error("Unable to load dashboard order count:", ordersResult.reason);
+      }
+
+      if (couponsResult.status === "fulfilled") {
+        const coupons =
+          couponsResult.value.data.coupons ?? couponsResult.value.data.data;
+        if (Array.isArray(coupons)) {
+          setSummaryCounts((current) => ({ ...current, coupons: coupons.length }));
+        } else {
+          console.error("Unable to load dashboard coupon count: invalid response");
+        }
+      } else {
+        console.error("Unable to load dashboard coupon count:", couponsResult.reason);
+      }
+
+      setSummaryLoading(false);
+    };
+
+    getSummaryCounts();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSection]);
 
   const totalEnquiries = enquiryData.length;
   const today = new Intl.DateTimeFormat("en-IN", {
@@ -130,7 +185,10 @@ const Dashboard = () => {
           <div className="dashboard_content">
             {activeSection === "home" && (
               <Home
+                totalOrders={summaryCounts.orders}
                 totalEnquiries={totalEnquiries}
+                totalCoupons={summaryCounts.coupons}
+                summaryLoading={summaryLoading}
                 onNavigate={setActiveSection}
               />
             )}

@@ -1,10 +1,17 @@
 import "./Dashboard.css";
 import { FiArrowUpRight } from "react-icons/fi";
 import { LuMessageCircleQuestion } from "react-icons/lu";
+import { MdOutlineLocalOffer } from "react-icons/md";
 import { RiStockLine } from "react-icons/ri";
 import { TiShoppingCart } from "react-icons/ti";
 
-const Home = ({ totalEnquiries, onNavigate }) => {
+const Home = ({
+  totalOrders,
+  totalEnquiries,
+  totalCoupons,
+  summaryLoading,
+  onNavigate,
+}) => {
   const shortcuts = [
     {
       id: "orders",
@@ -58,22 +65,23 @@ const Home = ({ totalEnquiries, onNavigate }) => {
         <span className="dashboard-live-indicator"><i /> Overview snapshot</span>
       </div>
       <section className="dashboard_overview-grid" aria-label="Store overview">
-        <article className="dashboard_overview-card dashboard_enquiry-card">
-          <span className="dashboard_overview-icon">
-            <LuMessageCircleQuestion />
-          </span>
+        <article className="dashboard_overview-card">
+          <span className="dashboard_overview-icon"><TiShoppingCart /></span>
+          <span className="dashboard_overview-label">Total orders</span>
+          <strong>{summaryLoading && totalOrders === null ? "…" : totalOrders ?? "—"}</strong>
+          <span className="dashboard_overview-note">Orders placed in your store</span>
+        </article>
+        <article className="dashboard_overview-card">
+          <span className="dashboard_overview-icon"><LuMessageCircleQuestion /></span>
           <span className="dashboard_overview-label">Total enquiries</span>
           <strong>{totalEnquiries}</strong>
           <span className="dashboard_overview-note">Customer messages received</span>
         </article>
-        <article className="dashboard_overview-note-card">
-          <span className="dashboard_overview-icon">
-            <TiShoppingCart />
-          </span>
-          <div>
-            <strong>Thoughtful service,</strong>
-            <p>one order and conversation at a time.</p>
-          </div>
+        <article className="dashboard_overview-card">
+          <span className="dashboard_overview-icon"><MdOutlineLocalOffer /></span>
+          <span className="dashboard_overview-label">Total coupons</span>
+          <strong>{summaryLoading && totalCoupons === null ? "…" : totalCoupons ?? "—"}</strong>
+          <span className="dashboard_overview-note">Coupon codes created</span>
         </article>
       </section>
 

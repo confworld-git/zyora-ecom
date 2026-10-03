@@ -633,7 +633,7 @@
 
 .dashboard_overview-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 0.9fr) minmax(260px, 1.6fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -678,7 +678,7 @@
   color: #35271f;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 34px;
-  font-weight: 500;
+  font-weight: 800;
   line-height: 1;
 }
 
