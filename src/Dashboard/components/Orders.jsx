@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { FiChevronDown } from "react-icons/fi";
-import "./Management.css";
+import "../styles/Management.css";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/admin/orders`;
 const config = { withCredentials: true };

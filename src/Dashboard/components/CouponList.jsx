@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import "./CouponList.css";
+import "../styles/CouponList.css";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/coupons`;
 const cfg = { withCredentials: true };

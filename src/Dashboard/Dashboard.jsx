@@ -1,22 +1,22 @@
-import "./Dashboard.css";
+import "./styles/Dashboard.css";
 import { TiShoppingCart } from "react-icons/ti";
 import { LuMessageCircleQuestion } from "react-icons/lu";
 import { AiOutlineProduct } from "react-icons/ai";
 import { MdOutlinePersonOutline } from "react-icons/md";
 import { RiHome4Line } from "react-icons/ri";
 import { MdOutlineLocalOffer } from "react-icons/md";
-import EnquiryData from "./EnquiryData";
-import Admin from "./Admin";
-import Home from "./Home";
+import EnquiryData from "./components/EnquiryData";
+import Admin from "./components/Admin";
+import Home from "./components/Home";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import AddProduct from "./AddProducts";
+import AddProduct from "./components/AddProducts";
 import { useNavigate } from "react-router-dom";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
-import CouponList from "./CouponList";
-import Orders from "./Orders";
-import StockManagement from "./StockManagement";
+import CouponList from "./components/CouponList";
+import Orders from "./components/Orders";
+import StockManagement from "./components/StockManagement";
 import { RiStockLine } from "react-icons/ri";
 
 const Dashboard = () => {

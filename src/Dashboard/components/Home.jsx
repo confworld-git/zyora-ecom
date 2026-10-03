@@ -1,4 +1,4 @@
-import "./Dashboard.css";
+import "../styles/Dashboard.css";
 import { FiArrowUpRight } from "react-icons/fi";
 import { LuMessageCircleQuestion } from "react-icons/lu";
 import { MdOutlineLocalOffer } from "react-icons/md";

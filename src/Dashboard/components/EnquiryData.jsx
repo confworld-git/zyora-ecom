@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import "./Management.css";
+import "../styles/Management.css";
 
 const EnquiryData = ({ enquiryData }) => {
   const [search, setSearch] = useState("");
