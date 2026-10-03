@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+  Navigate,
+  useParams,
+} from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import {
@@ -594,6 +600,7 @@ const AddressesTab = () => {
 // PROFILE PAGE
 // ============================================================
 const Profile = () => {
+  const { customerId } = useParams();
   const navigate = useNavigate();
   const { customer, refresh, logout } = useAuth();
   const [params, setParams] = useSearchParams();
@@ -609,6 +616,9 @@ const Profile = () => {
   };
 
   if (!customer) return null; // CustomerRoute already guards this page
+  if (customerId !== customer.customerId) {
+    return <Navigate to={`/Profile/${customer.customerId}`} replace />;
+  }
 
   const initials = (customer.name || "?")
     .split(" ")

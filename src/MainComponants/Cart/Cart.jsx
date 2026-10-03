@@ -64,7 +64,7 @@ const Cart = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn } = useAuth();
+  const { customer, isLoggedIn } = useAuth();
   const { refreshProducts } = useProducts();
   const [placingOrder, setPlacingOrder] = useState(false);
 
@@ -345,7 +345,7 @@ const Cart = () => {
 
     const address = addresses[selectedAddressIndex];
     if (!address) {
-      navigate("/Profile?tab=addresses");
+      navigate(`/Profile/${customer.id}?tab=addresses`);
       return;
     }
 
@@ -771,7 +771,13 @@ const Cart = () => {
                   <button
                     type="button"
                     className="add_address_btn"
-                    onClick={() => navigate("/Profile?tab=addresses")}
+                    onClick={() =>
+                      navigate(
+                        customer?.id
+                          ? `/Profile/${customer.id}?tab=addresses`
+                          : "/Login",
+                      )
+                    }
                   >
                     {addresses.length > 0 ? "Manage addresses" : "Add address"}
                   </button>

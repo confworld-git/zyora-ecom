@@ -8,21 +8,25 @@ import Favorites from "./MainComponants/Favorites/Favorites";
 import Category from "./MainComponants/Category/Category.jsx";
 import Dashboard from "./Dashboard/Dashboard.jsx";
 import Login from "./Login/Login.jsx";
-
 import { Toaster } from "react-hot-toast";
-
 import PublicRoute from "./ProtectedRoute/PublicRoute.jsx";
 import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.jsx";
 import Layout from "./ProtectedRoute/Layout.jsx";
-
 import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
 import PaymentSuccess from "./MainComponants/Success/PaymentSuccess.jsx";
 import Jewellery from "./MainComponants/Jewellery/Jewellery.jsx";
 import Profile from "./Profile/Profile.jsx";
-
 import CustomerRoute from "./ProtectedRoute/CustomerRoute.jsx";
-
 import "./index.css";
+
+import { Navigate } from "react-router-dom";
+import { useAuth } from "./Context/AuthContext.jsx";
+
+export const ProfileRedirect = () => {
+  const { customer } = useAuth();
+
+  return <Navigate to={`/Profile/${customer.customerId}`} replace />;
+};
 
 export const AppRoutes = () => {
   return (
@@ -52,6 +56,14 @@ export const AppRoutes = () => {
           <Route path="/Jewellery" element={<Jewellery />} />
           <Route
             path="/Profile"
+            element={
+              <CustomerRoute>
+                <ProfileRedirect />
+              </CustomerRoute>
+            }
+          />
+          <Route
+            path="/Profile/:customerId"
             element={
               <CustomerRoute>
                 <Profile />

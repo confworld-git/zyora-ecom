@@ -10,10 +10,10 @@ const Layout = () => {
   const lenisRef = useRef(null);
   const path = location.pathname.toLowerCase();
 
-  const isAdminPage =
-    path === "/login" || path.startsWith("/dashboard");
+  const isAdminPage = path === "/login" || path.startsWith("/dashboard");
   const isPaymentResultPage = path === "/payment_result";
-  const isProfilePage = path === "/profile";
+  // matches /profile and /profile/<customerId> (path is already lowercase)
+  const isProfilePage = path === "/profile" || path.startsWith("/profile/");
   const hideChrome = isAdminPage || isPaymentResultPage || isProfilePage;
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import "./PaymentSuccess.css";
 import Canferri from "../../Confetti/Confetti";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext.jsx";
 
 const formatDate = (value) =>
   value
@@ -18,6 +19,7 @@ export default function PaymentSuccess({ onDownload, onHome }) {
   const location = useLocation();
   const order = location.state?.order;
   const navigate = useNavigate();
+  const { customer } = useAuth();
 
   const handleHome = () => {
     if (onHome) onHome();
@@ -158,7 +160,13 @@ export default function PaymentSuccess({ onDownload, onHome }) {
             <button
               type="button"
               className="ps-primary"
-              onClick={() => navigate("/Profile?tab=orders")}
+              onClick={() =>
+                navigate(
+                  customer?.id
+                    ? `/Profile/${customer.id}?tab=orders`
+                    : "/Login",
+                )
+              }
             >
               View my orders
             </button>
