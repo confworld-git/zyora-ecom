@@ -24,7 +24,7 @@
 
 .dashboard_secton {
   display: flex;
-  min-height: 100vh;
+  /* height: 111.12vh; */
 }
 
 .dashboard_left_section {
@@ -33,7 +33,7 @@
   display: flex;
   flex: 0 0 252px;
   flex-direction: column;
-  height: 100vh;
+  height: 111.12vh;
   padding: 30px 18px 20px;
   background: #2b211c;
   color: #fffaf4;
