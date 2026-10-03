@@ -133,7 +133,7 @@
 }
 
 .management-table th {
-  padding: 13px 12px;
+  padding: 13px 20px;
   background: #fbf4ed;
   color: #66594e;
   font-size: 10px;
@@ -145,7 +145,7 @@
 
 .management-table td {
   position: relative;
-  padding: 13px 12px;
+  padding: 13px 20px;
   border-top: 1px solid #f1e9e1;
   color: #51483f;
   vertical-align: middle;
@@ -214,6 +214,7 @@
 .management-actions button {
   padding: 7px 9px;
   font-size: 10px;
+  width: 100%;
 }
 
 .management-actions .danger-action {
@@ -352,12 +353,13 @@
   gap: 6px;
   color: #5b5046;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .management-form-grid input,
 .management-form-grid select {
   width: 100%;
+  font-weight: 500;
 }
 
 .management-modal-actions {

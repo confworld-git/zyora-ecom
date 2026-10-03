@@ -14,7 +14,7 @@ const FIELDS = [
   {
     name: "shippingCharge",
     label: "Shipping charge (₹)",
-    hint: "Charged when the subtotal is below the limit.",
+    hint: "Apply when the subtotal is below the limit.",
   },
   {
     name: "platformFee",

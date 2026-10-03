@@ -23,6 +23,17 @@ const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
   const [activeSection, setActiveSection] = useState("home");
   const navigate = useNavigate();
+  const navigation = [
+    { id: "home", label: "Overview", icon: <RiHome4Line /> },
+    { id: "orders", label: "Orders", icon: <TiShoppingCart /> },
+    { id: "stock", label: "Inventory", icon: <RiStockLine /> },
+    { id: "enquiry", label: "Enquiries", icon: <LuMessageCircleQuestion /> },
+    { id: "coupon_code", label: "Coupon codes", icon: <MdOutlineLocalOffer /> },
+    { id: "add_product", label: "Add products", icon: <AiOutlineProduct /> },
+    { id: "admin", label: "Admin settings", icon: <MdOutlinePersonOutline /> },
+  ];
+  const activePage =
+    navigation.find((item) => item.id === activeSection)?.label || "Overview";
 
   const handleLogout = async () => {
     try {
@@ -58,56 +69,81 @@ const Dashboard = () => {
   }, []);
 
   const totalEnquiries = enquiryData.length;
+  const today = new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date());
 
   return (
     <div className="dashboard">
       <section className="dashboard_secton">
-        <div className="dashboard_left_section">
-          <h1>ZYORA</h1>
-          <li className={activeSection === "home" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("home")}>
-            <RiHome4Line />
-            Home
-          </li>
-          <li className={activeSection === "orders" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("orders")}>
-            <TiShoppingCart />
-            Orders
-          </li>
-          <li className={activeSection === "stock" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("stock")}>
-            <RiStockLine />
-            Stock Management
-          </li>
-          <li className={activeSection === "enquiry" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("enquiry")}>
-            <LuMessageCircleQuestion />
-            Enquiry
-          </li>
-          <li className={activeSection === "add_product" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("add_product")}>
-            <AiOutlineProduct />
-            Add Products
-          </li>
-          <li className={activeSection === "coupon_code" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("coupon_code")}>
-            <MdOutlineLocalOffer />
-            Coupon Code
-          </li>
-          <li className={activeSection === "admin" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("admin")}>
-            <MdOutlinePersonOutline />
-            Admin Panel
-          </li>
-          <li onClick={handleLogout}>
-            <RiLogoutCircleLine />
-            Logout
-          </li>
-        </div>
-        <div className="dashboard_right_section">
-          {activeSection === "home" && <Home totalEnquiries={totalEnquiries} />}
-          {activeSection === "orders" && <Orders />}
-          {activeSection === "stock" && <StockManagement />}
-          {activeSection === "enquiry" && (
-            <EnquiryData enquiryData={enquiryData} />
-          )}
-          {activeSection === "add_product" && <AddProduct />}
-          {activeSection === "admin" && <Admin />}
-          {activeSection === "coupon_code" && <CouponList />}
-        </div>
+        <aside className="dashboard_left_section">
+          <div className="dashboard_brand">
+            <span className="dashboard_brand-mark" aria-hidden="true">Z</span>
+            <div>
+              <h1>ZYORA</h1>
+              <span>STORE ADMIN</span>
+            </div>
+          </div>
+          <span className="dashboard_nav-label">WORKSPACE</span>
+          <nav className="dashboard_nav" aria-label="Dashboard navigation">
+            {navigation.map((item) => (
+              <button
+                className={`dashboard-nav-item${activeSection === item.id ? " dashboard-nav-active" : ""}`}
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                type="button"
+                aria-current={activeSection === item.id ? "page" : undefined}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+                {item.id === "enquiry" && totalEnquiries > 0 && (
+                  <span className="dashboard-nav-count">{totalEnquiries}</span>
+                )}
+              </button>
+            ))}
+          </nav>
+          <div className="dashboard_sidebar-footer">
+            <div className="dashboard_store-status">
+              <span className="dashboard_status-dot" />
+              <span>Store management</span>
+            </div>
+            <button className="dashboard-logout" onClick={handleLogout} type="button">
+              <RiLogoutCircleLine />
+              <span>Sign out</span>
+            </button>
+          </div>
+        </aside>
+        <main className="dashboard_right_section">
+          <header className="dashboard_topbar">
+            <div className="dashboard_breadcrumb">
+              <span>ZYORA</span>
+              <span aria-hidden="true">/</span>
+              <strong>{activePage}</strong>
+            </div>
+            <div className="dashboard_topbar-meta">
+              <span className="dashboard_today">{today}</span>
+              <span className="dashboard_admin-avatar" role="img" aria-label="Administrator">A</span>
+            </div>
+          </header>
+          <div className="dashboard_content">
+            {activeSection === "home" && (
+              <Home
+                totalEnquiries={totalEnquiries}
+                onNavigate={setActiveSection}
+              />
+            )}
+            {activeSection === "orders" && <Orders />}
+            {activeSection === "stock" && <StockManagement />}
+            {activeSection === "enquiry" && (
+              <EnquiryData enquiryData={enquiryData} />
+            )}
+            {activeSection === "add_product" && <AddProduct />}
+            {activeSection === "admin" && <Admin />}
+            {activeSection === "coupon_code" && <CouponList />}
+          </div>
+        </main>
       </section>
     </div>
   );

@@ -169,7 +169,7 @@ const CouponList = () => {
   };
 
   return (
-    <div>
+    <main className="coupon-page">
       <div className="page-header">
         <div>
           <span className="page-label">COUPON MANAGEMENT</span>
@@ -201,7 +201,7 @@ const CouponList = () => {
       ) : visible.length === 0 ? (
         <p className="coupon-empty">
           {coupons.length === 0
-            ? "No coupons yet. Create your first one above."
+            ? "No coupon codes yet. Create one in Admin settings."
             : "No coupons match your search."}
         </p>
       ) : (
@@ -371,7 +371,7 @@ const CouponList = () => {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 
