@@ -2,6 +2,7 @@ import "./Dashboard.css";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import PricingSettings from "./PricingSettings";
 
 const Admin = () => {
   const [formData, setFormData] = useState({
@@ -286,7 +287,6 @@ const Admin = () => {
       <div className="admin-settings-card">
         <div className="admin-settings-header">
           <h2>Create Coupon Code</h2>
-
           <p>
             Create discount coupons with custom offers, validity dates, and
             usage limits.
@@ -424,6 +424,8 @@ const Admin = () => {
           </button>
         </form>
       </div>
+
+      <PricingSettings />
     </div>
   );
 };

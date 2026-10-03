@@ -135,7 +135,7 @@ export const CartProvider = ({ children }) => {
         (item, index) => item.quantity !== currentItems[index].quantity,
       )
     ) {
-      toast.warning("Your cart was updated to match available stock.");
+      toast.error("Your cart was updated to match available stock.");
       updateCartItems(() => nextItems);
     }
   }, [getProductById, products, productsLoading, updateCartItems]);
@@ -389,6 +389,7 @@ export const CartProvider = ({ children }) => {
       cancelled = true;
 
       if (
+        customerId &&
         cartSyncingCustomerRef.current ===
         customerId
       ) {
@@ -493,6 +494,7 @@ export const CartProvider = ({ children }) => {
     selectedImage,
   ) => {
     if (
+      customerId &&
       cartSyncingCustomerRef.current ===
       customerId
     ) {
@@ -647,7 +649,7 @@ export const CartProvider = ({ children }) => {
           existingItem.quantity >=
           stockQuantity
         ) {
-          toast.warning(
+          toast.error(
             `Only ${stockQuantity} item(s) available in stock.`,
           );
 
@@ -699,6 +701,7 @@ export const CartProvider = ({ children }) => {
 
   const increaseQuantity = (cartId) => {
     if (
+      customerId &&
       cartSyncingCustomerRef.current ===
       customerId
     ) {
@@ -779,6 +782,7 @@ export const CartProvider = ({ children }) => {
 
   const decreaseQuantity = (cartId) => {
     if (
+      customerId &&
       cartSyncingCustomerRef.current ===
       customerId
     ) {
@@ -809,6 +813,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (cartId) => {
     if (
+      customerId &&
       cartSyncingCustomerRef.current ===
       customerId
     ) {
@@ -833,6 +838,7 @@ export const CartProvider = ({ children }) => {
     value,
   ) => {
     if (
+      customerId &&
       cartSyncingCustomerRef.current ===
       customerId
     ) {

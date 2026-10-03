@@ -15,9 +15,7 @@ import { useProducts } from "../../Context/ProductContext.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
-const FREE_SHIPPING_LIMIT = 1999;
-const SHIPPING_CHARGE = 250;
-const PLATFORM_FEE = 23;
+const PRICING_FIELDS = ["freeShippingLimit", "shippingCharge", "platformFee"];
 
 const getStoredAddresses = () => {
   try {
@@ -67,6 +65,10 @@ const Cart = () => {
   const { customer, isLoggedIn } = useAuth();
   const { refreshProducts } = useProducts();
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [pricing, setPricing] = useState(null);
+  const [pricingLoading, setPricingLoading] = useState(true);
+  const [pricingError, setPricingError] = useState("");
+  const [pricingRetry, setPricingRetry] = useState(0);
 
   const [selectedCartIds, setSelectedCartIds] = useState(
     () => new Set(cartItems.map((item) => item.cartId)),
@@ -85,6 +87,58 @@ const Cart = () => {
   const [couponsError, setCouponsError] = useState("");
 
   const [showPlatformFee, setShowPlatformFee] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPricing = async () => {
+      setPricingLoading(true);
+      setPricingError("");
+
+      try {
+        const response = await axios.get(`${API}/api/config/pricing`);
+        const result = response.data?.pricing;
+
+        if (
+          !response.data?.success ||
+          !result ||
+          !PRICING_FIELDS.every(
+            (field) =>
+              Number.isFinite(Number(result[field])) &&
+              Number(result[field]) >= 0,
+          )
+        ) {
+          throw new Error(
+            response.data?.message || "Invalid pricing settings response",
+          );
+        }
+
+        if (!cancelled) {
+          setPricing(
+            Object.fromEntries(
+              PRICING_FIELDS.map((field) => [field, Number(result[field])]),
+            ),
+          );
+        }
+      } catch (error) {
+        console.error("Get pricing error:", error);
+        if (!cancelled) {
+          setPricing(null);
+          setPricingError(
+            "Unable to load shipping and fee settings. Please try again.",
+          );
+        }
+      } finally {
+        if (!cancelled) setPricingLoading(false);
+      }
+    };
+
+    loadPricing();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pricingRetry]);
 
   // Address state
   const [addresses, setAddresses] = useState(() => getStoredAddresses());
@@ -146,8 +200,11 @@ const Cart = () => {
     0,
   );
 
+  const freeShippingLimit = pricing?.freeShippingLimit ?? 0;
   const shipping =
-    subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_LIMIT ? 0 : SHIPPING_CHARGE;
+    !pricing || subtotal === 0 || subtotal >= freeShippingLimit
+      ? 0
+      : pricing.shippingCharge;
 
   const totalMRP = selectedItems.reduce(
     (sum, item) => sum + (Number(item.mrp) || 0) * (Number(item.quantity) || 0),
@@ -173,7 +230,7 @@ const Cart = () => {
     subtotal +
       shipping -
       couponDiscount +
-      (selectedItems.length > 0 ? PLATFORM_FEE : 0),
+      (selectedItems.length > 0 ? (pricing?.platformFee ?? 0) : 0),
   );
 
   const toggleCartItem = (cartId) => {
@@ -315,11 +372,12 @@ const Cart = () => {
   const [burstKey, setBurstKey] = useState(0);
   const celebrateTimerRef = useRef(null);
   const wasFreeShippingRef = useRef(
-    subtotal >= FREE_SHIPPING_LIMIT && subtotal > 0,
+    Boolean(pricing && subtotal >= freeShippingLimit && subtotal > 0),
   );
 
   useEffect(() => {
-    const isFreeShippingNow = subtotal >= FREE_SHIPPING_LIMIT && subtotal > 0;
+    const isFreeShippingNow =
+      Boolean(pricing) && subtotal >= freeShippingLimit && subtotal > 0;
 
     if (isFreeShippingNow && !wasFreeShippingRef.current) {
       setBurstKey((k) => k + 1);
@@ -329,13 +387,19 @@ const Cart = () => {
     }
 
     wasFreeShippingRef.current = isFreeShippingNow;
-  }, [subtotal]);
+  }, [freeShippingLimit, pricing, subtotal]);
 
   useEffect(() => () => clearTimeout(celebrateTimerRef.current), []);
 
   // ---------- Place order ----------
   const handlePlaceOrder = async () => {
     if (placingOrder) return;
+    if (!pricing) {
+      toast.error(
+        "Shipping and fee settings are unavailable. Please try again.",
+      );
+      return;
+    }
 
     if (!isLoggedIn) {
       toast("Please sign in to place your order");
@@ -345,7 +409,11 @@ const Cart = () => {
 
     const address = addresses[selectedAddressIndex];
     if (!address) {
-      navigate(`/Profile/${customer.id}?tab=addresses`);
+      navigate(
+        customer?.customerId
+          ? `/Profile/${customer.customerId}?tab=addresses`
+          : "/Login",
+      );
       return;
     }
 
@@ -713,7 +781,16 @@ const Cart = () => {
 
                 <strong>
                   <i className="bi bi-currency-rupee"></i>
-                  {PLATFORM_FEE}
+                  {pricing ? pricing.platformFee.toLocaleString("en-IN") : "—"}
+                </strong>
+              </div>
+
+              <div className="summary_row">
+                <span>Free shipping above</span>
+                <strong>
+                  {pricing
+                    ? `₹${pricing.freeShippingLimit.toLocaleString("en-IN")}`
+                    : "—"}
                 </strong>
               </div>
 
@@ -721,7 +798,11 @@ const Cart = () => {
                 <span>Shipping</span>
 
                 <strong>
-                  {shipping === 0 && subtotal > 0 ? (
+                  {pricingLoading ? (
+                    "Loading…"
+                  ) : pricingError ? (
+                    "Unavailable"
+                  ) : shipping === 0 && subtotal > 0 ? (
                     <span className="free_shipping">FREE</span>
                   ) : (
                     <>
@@ -732,15 +813,26 @@ const Cart = () => {
                 </strong>
               </div>
 
-              {subtotal > 0 && subtotal < FREE_SHIPPING_LIMIT && (
+              {pricingError && (
+                <p className="shipping_message" role="alert">
+                  {pricingError}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setPricingRetry((attempt) => attempt + 1)}
+                  >
+                    Retry
+                  </button>
+                </p>
+              )}
+
+              {pricing && subtotal > 0 && subtotal < freeShippingLimit && (
                 <p className="shipping_message">
-                  Add ₹
-                  {(FREE_SHIPPING_LIMIT - subtotal).toLocaleString("en-IN")}{" "}
+                  Add ₹{(freeShippingLimit - subtotal).toLocaleString("en-IN")}{" "}
                   more to get free shipping.
                 </p>
               )}
 
-              {subtotal >= FREE_SHIPPING_LIMIT && (
+              {pricing && subtotal >= freeShippingLimit && subtotal > 0 && (
                 <p
                   className="shipping_message"
                   style={{ position: "relative" }}
@@ -754,7 +846,7 @@ const Cart = () => {
 
                 <strong>
                   <i className="bi bi-currency-rupee"></i>
-                  {total.toLocaleString("en-IN")}
+                  {pricing ? total.toLocaleString("en-IN") : "—"}
                 </strong>
               </div>
 
@@ -773,8 +865,8 @@ const Cart = () => {
                     className="add_address_btn"
                     onClick={() =>
                       navigate(
-                        customer?.id
-                          ? `/Profile/${customer.id}?tab=addresses`
+                        customer?.customerId
+                          ? `/Profile/${customer.customerId}?tab=addresses`
                           : "/Login",
                       )
                     }
@@ -840,7 +932,9 @@ const Cart = () => {
                 type="button"
                 disabled={
                   selectedItems.length === 0 ||
-                  addresses.length === 0 ||
+                  !pricing ||
+                  pricingLoading ||
+                  Boolean(pricingError) ||
                   placingOrder
                 }
                 onClick={handlePlaceOrder}
