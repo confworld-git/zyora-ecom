@@ -4,7 +4,7 @@ import axios from "axios";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { useCart } from "../../Context/CartContext.jsx";
 import Confetti from "../../Confetti/Confetti.jsx";
-import nocart from "../../assets/Videos/nocart.gif";
+import nocart from "../../assets/Images/nocart.gif";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import CouponPopup from "./CouponPopup.jsx";
 import { BiSolidOffer } from "react-icons/bi";
@@ -517,9 +517,7 @@ const Cart = () => {
       {cartItems.length === 0 ? (
         <div className="empty-cart">
           <img src={nocart} alt="" />
-
           <h2>Your cart is empty</h2>
-
           <p>
             Looks like you haven’t added anything yet. Explore our best picks
             and fill your cart with something you’ll love.

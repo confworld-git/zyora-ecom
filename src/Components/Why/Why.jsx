@@ -1,9 +1,9 @@
 import "./why.css";
 import ScrollVideo from "../ScrollVideo.jsx";
-import delivery from "../../assets/Images/delivery.mp4";
-import payment from "../../assets/Images/payment.mp4";
-import returnp from "../../assets/Images/returnp.mp4";
-import secure from "../../assets/Images/secure.mp4";
+import delivery from "../../assets/Videos/delivery.mp4";
+import payment from "../../assets/Videos/payment.mp4";
+import returnp from "../../assets/Videos/returnp.mp4";
+import secure from "../../assets/Videos/secure.mp4";
 
 const items = [
   { src: secure, text: "Quality-Checked Products" },
