@@ -242,6 +242,25 @@ const Cart = () => {
     });
   };
 
+  const openCartProduct = (item) => {
+    const productId = item.productId ?? item.id;
+
+    if (!productId) {
+      console.error("Product ID missing from cart item:", item);
+      return;
+    }
+
+    const slug = (item.name || item.title)
+      ?.toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    navigate(`/Zyora_Category/product/${productId}/${slug}`, {
+      state: { selectedImage: item.image },
+    });
+  };
+
   // ---------- Addresses ----------
   const handleDeleteAddress = (addressIndex) => {
     const next = addresses.filter((_, i) => i !== addressIndex);
@@ -502,7 +521,14 @@ const Cart = () => {
                   aria-label={`Include ${item.name} in price details`}
                 />
 
-                <img src={item.image} alt={item.name} />
+                <button
+                  type="button"
+                  className="cart_product_image_button"
+                  onClick={() => openCartProduct(item)}
+                  aria-label={`View ${item.name}`}
+                >
+                  <img src={item.image} alt="" />
+                </button>
 
                 <div>
                   <div className="cart_item_details">
@@ -629,6 +655,14 @@ const Cart = () => {
                       aria-label={`Remove ${item.name}`}
                     >
                       <HiOutlineTrash />
+                    </button>
+
+                    <button
+                      type="button"
+                      className="cart_move_to_favourites"
+                    >
+                      <i className="bi bi-heart" aria-hidden="true"></i>
+                      <span>Move to favourites</span>
                     </button>
                   </div>
                 </div>

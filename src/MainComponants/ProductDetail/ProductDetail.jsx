@@ -1,6 +1,6 @@
 import "./ProductDetail.css";
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useCart } from "../../Context/CartContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext";
@@ -18,6 +18,7 @@ const ProductDetail = () => {
   } = useWishlist();
   const { loading, error: productsError, getProductById } = useProducts();
   const { productId, slug } = useParams();
+  const location = useLocation();
   const id = productId;
   const product = getProductById(id);
   const [selectionsByProduct, setSelectionsByProduct] = useState({});
@@ -55,7 +56,11 @@ const ProductDetail = () => {
   }));
 
   // Selected image (defaults to first image); colour is derived from it
-  const activeImage = selection.image ?? images[0] ?? null;
+  const activeImage =
+    selection.image ??
+    images.find((image) => image.url === location.state?.selectedImage) ??
+    images[0] ??
+    null;
   const selectedImage = activeImage?.url ?? "";
   const selectedColorOption = colorOptions.find(
     (option) => option.id === activeImage?.id,
