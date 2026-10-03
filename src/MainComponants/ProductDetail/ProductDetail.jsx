@@ -8,14 +8,11 @@ import { useProducts } from "../../Context/ProductContext.jsx";
 import ProductZoom from "./ProductZoom.jsx";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO.jsx";
+import { Helmet } from "react-helmet-async";
 
 const ProductDetail = () => {
   const { addToCart, isCartSyncing } = useCart();
-  const {
-    toggleWishlist,
-    isInWishlist,
-    isWishlistSyncing,
-  } = useWishlist();
+  const { toggleWishlist, isInWishlist, isWishlistSyncing } = useWishlist();
   const { loading, error: productsError, getProductById } = useProducts();
   const { productId, slug } = useParams();
   const location = useLocation();
@@ -111,10 +108,49 @@ const ProductDetail = () => {
     toggleWishlist(id, selectedImage);
   };
 
-  const seoDescription = (product.title || "")
+  const seoDescription = (
+    product.title ||
+    product.about_this_item?.join(". ") ||
+    `${productName} from ${product.brand || "ZYORA"}`
+  )
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 155);
+
+  const frontendUrl = (
+    import.meta.env.VITE_API_DOMAIN || window.location.origin
+  ).replace(/\/$/, "");
+
+  const productUrl = `${frontendUrl}/Zyora_Category/product/${encodeURIComponent(
+    product.id,
+  )}/${encodeURIComponent(slug)}`;
+
+  const productImages = images.map((image) => image.url).filter(Boolean);
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: productName,
+    description: seoDescription,
+    sku: product.id,
+    ...(productImages.length > 0 && {
+      image: productImages,
+    }),
+    brand: {
+      "@type": "Brand",
+      name: product.brand || "ZYORA",
+    },
+    offers: {
+      "@type": "Offer",
+      url: productUrl,
+      priceCurrency: product.price?.currency || "INR",
+      price: String(product.price?.selling_price ?? ""),
+      availability: product.stock?.in_stock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
 
   return (
     <>
@@ -123,6 +159,36 @@ const ProductDetail = () => {
         description={seoDescription}
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Zyora_Category/product/${product.id}/${slug}`}
       />
+      <Helmet>
+        <meta property="og:type" content="product" />
+
+        <meta
+          property="og:title"
+          content={`${productName} | ${product.brand || "ZYORA"} | ZYORA`}
+        />
+
+        <meta property="og:description" content={seoDescription} />
+
+        <meta property="og:url" content={productUrl} />
+
+        {productImages[0] && (
+          <meta property="og:image" content={productImages[0]} />
+        )}
+
+        <meta
+          property="product:price:amount"
+          content={String(product.price?.selling_price ?? "")}
+        />
+
+        <meta
+          property="product:price:currency"
+          content={product.price?.currency || "INR"}
+        />
+
+        <script type="application/ld+json">
+          {JSON.stringify(productJsonLd)}
+        </script>
+      </Helmet>
       <main className="product-detail-page">
         <div id="page_path">
           <p>

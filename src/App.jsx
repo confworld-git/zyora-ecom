@@ -24,7 +24,6 @@ import { useAuth } from "./Context/AuthContext.jsx";
 
 export const ProfileRedirect = () => {
   const { customer } = useAuth();
-
   return <Navigate to={`/Profile/${customer.customerId}`} replace />;
 };
 
