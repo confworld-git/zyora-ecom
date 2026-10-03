@@ -611,9 +611,9 @@ const Profile = () => {
   const tab = TABS.some((t) => t.id === requested) ? requested : "account";
 
   const handleLogout = async () => {
+    navigate("/", { replace: true });
     await logout();
     toast.success("Logged out");
-    navigate("/", { replace: true });
   };
 
   if (!customer) return null; // CustomerRoute already guards this page

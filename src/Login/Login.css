@@ -23,8 +23,8 @@
 }
 
 .zyora-login-page {
-  /* height: auto; */
   width: 100%;
+  height: 111.12vh;
   margin: 0;
   display: flex;
   align-items: center;
@@ -35,7 +35,7 @@
 
 .zyora-login-container {
   width: 100%;
-  /* min-height: 100vh; */
+  height: 111.12vh;
   display: grid;
   grid-template-columns: 58% 42%;
   background: #fff;
@@ -147,9 +147,33 @@
 .zyora-login-form-section {
   min-width: 0;
   padding: 58px 13%;
-  background: #fff;
-  height: 100vh;
+  height: 100%;
   overflow-y: scroll;
+  background: #fff;
+  --sb-track-color: #232e33;
+  --sb-thumb-color: #ffffff;
+  --sb-size: 14px;
+}
+
+.zyora-login-form-section::-webkit-scrollbar {
+  width: var(--sb-size);
+}
+
+.zyora-login-form-section::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 20px;
+}
+
+.zyora-login-form-section::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 20px;
+  border: 3px solid #232e33;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .zyora-login-form-section {
+    scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+  }
 }
 
 .zyora-login-form-wrapper {
