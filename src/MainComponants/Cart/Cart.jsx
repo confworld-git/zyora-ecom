@@ -12,6 +12,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../Context/AuthContext.jsx";
 import { useProducts } from "../../Context/ProductContext.jsx";
+import { useWishlist } from "../../Context/WishlistContext.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -64,6 +65,7 @@ const Cart = () => {
   const location = useLocation();
   const { customer, isLoggedIn } = useAuth();
   const { refreshProducts } = useProducts();
+  const { addToWishlist, isInWishlist, isWishlistSyncing } = useWishlist();
   const [placingOrder, setPlacingOrder] = useState(false);
   const [pricing, setPricing] = useState(null);
   const [pricingLoading, setPricingLoading] = useState(true);
@@ -87,6 +89,21 @@ const Cart = () => {
   const [couponsError, setCouponsError] = useState("");
 
   const [showPlatformFee, setShowPlatformFee] = useState(false);
+
+  const handleAddFav = (event, item) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (isCartSyncing || isWishlistSyncing) return;
+    if (isInWishlist(item.id)) return;
+
+    if (!addToWishlist(item.id, item.image)) {
+      toast.error("Unable to move this item to favourites. Please try again.");
+      return;
+    }
+    
+    toast.success("Moved to favourites");
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -511,7 +528,10 @@ const Cart = () => {
       ) : (
         <section className="cart_section">
           <div className="cart_left_section">
-            {cartItems.map((item) => (
+            {cartItems.map((item) => {
+              const isFavorite = isInWishlist(item.id);
+
+              return (
               <div className="cart_item" key={item.cartId}>
                 <input
                   className="cart_item_checkbox"
@@ -659,15 +679,24 @@ const Cart = () => {
 
                     <button
                       type="button"
-                      className="cart_move_to_favourites"
+                      className={`cart_move_to_favourites${isFavorite ? " is_favorite" : ""}`}
+                      disabled={isCartSyncing || isWishlistSyncing}
+                      onClick={(event) => handleAddFav(event, item)}
+                      aria-pressed={isFavorite}
                     >
-                      <i className="bi bi-heart" aria-hidden="true"></i>
-                      <span>Move to favourites</span>
+                      <i
+                        className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}
+                        aria-hidden="true"
+                      ></i>
+                      <span>
+                        {isFavorite ? "Added to favourites" : "Move to favourites"}
+                      </span>
                     </button>
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="cart_summary_list">

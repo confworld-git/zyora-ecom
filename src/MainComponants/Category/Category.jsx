@@ -695,22 +695,19 @@ const Category = () => {
                       ⭐ {product.rating?.average ?? 0} (
                       {product.rating?.count ?? 0})
                     </p>
-
-                    <small>{product.brand}</small>
-
+                    <span>{product.brand}</span>
+                    <br/>
+                    <small>{product.name}</small>
                     <p className="product_description">{product.title}</p>
-
                     <div className="price">
                       <strong>
                         Rs.
                         {product.price?.selling_price}
                       </strong>
-
                       <del>
                         Rs.
                         {product.price?.mrp}
                       </del>
-
                       <span>({product.price?.discount_percent}% OFF)</span>
                     </div>
 

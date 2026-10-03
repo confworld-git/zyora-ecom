@@ -205,7 +205,7 @@
   content: "";
   height: 100%;
   width: 1px;
-  background-color: #c5c5c5;
+  background-color: #020092;
   z-index: -1;
   position: absolute;
   top: 50%;
@@ -216,8 +216,9 @@
 
 .why_zyora > section > div {
   width: 48%;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   position: relative;
+  box-shadow: rgba(219, 219, 219, 0.096) 0px 8px 24px;
 }
 
 .why_zyora > section > div > h1 {
@@ -228,14 +229,27 @@
 .why_zyora > section > div > p {
   margin: 10px 0px 0px 0px;
   padding: 0;
+  width: 400px;
+  font-family: "poppins", sans-serif;
 }
 
 .why_zyora > section > :nth-child(even) {
   margin-left: auto;
+  background-color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 20px;
 }
 
 .why_zyora > section > :nth-child(odd) {
   text-align: end;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  background-color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 20px;
 }
 
 .why_zyora > section > div > h1 {
@@ -243,18 +257,18 @@
 }
 
 .why_zyora > section > div > p {
-  font-size: 16px;
-  font-weight: 450;
+  font-size: 14px;
+  /* font-weight: 450; */
 }
 
 .why_zyora > section > :nth-child(odd)::after {
   content: "";
   position: absolute;
-  top: 13%;
-  right: -5.2%;
+  top: 20%;
+  right: -5.6%;
   /* transform: translateY(-50%); */
-  height: 12px;
-  width: 12px;
+  height: 15px;
+  width: 15px;
   background-color: #ff4000;
   border-radius: 50%;
   z-index: 2;
@@ -263,11 +277,11 @@
 .why_zyora > section > :nth-child(even)::after {
   content: "";
   position: absolute;
-  top: 13%;
-  left: -5.2%;
+  top: 20%;
+  left: -5.5%;
   /* transform: translateY(-50%); */
-  height: 12px;
-  width: 12px;
+  height: 15px;
+  width: 15px;
   background-color: #ff4000;
   border-radius: 50%;
   z-index: 2;

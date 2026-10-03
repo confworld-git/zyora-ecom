@@ -23,7 +23,7 @@
 }
 
 .zyora-login-page {
-  min-height: 100vh;
+  /* height: auto; */
   width: 100%;
   margin: 0;
   display: flex;
@@ -35,8 +35,7 @@
 
 .zyora-login-container {
   width: 100%;
-  /* max-width: 1440px; */
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: grid;
   grid-template-columns: 58% 42%;
   background: #fff;

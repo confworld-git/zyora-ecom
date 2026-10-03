@@ -382,6 +382,13 @@
   justify-content: center;
 }
 
+.cart_move_to_favourites.is_favorite {
+  border-color: #ff4000;
+  background: #ff4000;
+  color: #fff;
+  cursor: default;
+}
+
 .cart_move_to_favourites:hover {
   border-color: #ff4000;
   background: #ff4000;

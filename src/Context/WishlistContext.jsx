@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -82,6 +83,16 @@ export const WishlistProvider = ({ children }) => {
     wishlistItemsRef.current = wishlistItems;
   }, [wishlistItems]);
 
+  const updateWishlistItems = useCallback((update) => {
+    const nextItems =
+      typeof update === "function"
+        ? update(wishlistItemsRef.current)
+        : update;
+
+    wishlistItemsRef.current = nextItems;
+    setWishlistItems(nextItems);
+  }, []);
+
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -110,7 +121,7 @@ export const WishlistProvider = ({ children }) => {
       if (hasSignedInCache) {
         activeCustomerRef.current = null;
         syncedCustomerRef.current = null;
-        setWishlistItems([]);
+        updateWishlistItems([]);
         try {
           localStorage.removeItem(WISHLIST_STORAGE_KEY);
           localStorage.removeItem(WISHLIST_OWNER_STORAGE_KEY);
@@ -140,7 +151,7 @@ export const WishlistProvider = ({ children }) => {
             : [];
 
         if (storedOwner && storedOwner !== customerId) {
-          setWishlistItems([]);
+          updateWishlistItems([]);
           localStorage.setItem(WISHLIST_STORAGE_KEY, "[]");
         }
 
@@ -190,7 +201,7 @@ export const WishlistProvider = ({ children }) => {
         localStorage.setItem(WISHLIST_OWNER_STORAGE_KEY, customerId);
         syncedCustomerRef.current = customerId;
         setSyncedCustomerId(customerId);
-        setWishlistItems(nextItems);
+        updateWishlistItems(nextItems);
       } catch (error) {
         if (cancelled) return;
         console.error("Failed to sync wishlist with the server:", error);
@@ -219,6 +230,7 @@ export const WishlistProvider = ({ children }) => {
     getProductById,
     isLoggedIn,
     productsLoading,
+    updateWishlistItems,
   ]);
 
   // Persist every signed-in wishlist update in order.
@@ -264,7 +276,7 @@ export const WishlistProvider = ({ children }) => {
   }, [customerId, getProductById, syncedCustomerId, wishlistItems]);
 
   const addToWishlist = (productOrId, selectedImage) => {
-    if (syncingCustomerRef.current === customerId) return false;
+    if (customerId && syncingCustomerRef.current === customerId) return false;
 
     const product =
       typeof productOrId === "object" && productOrId !== null
@@ -275,7 +287,7 @@ export const WishlistProvider = ({ children }) => {
 
     const wishlistItem = createWishlistItem(product, selectedImage);
 
-    setWishlistItems((currentItems) => {
+    updateWishlistItems((currentItems) => {
       if (
         currentItems.some(
           (item) => String(item.id) === String(productId),
@@ -291,18 +303,20 @@ export const WishlistProvider = ({ children }) => {
   };
 
   const removeFromWishlist = (productId) => {
-    if (syncingCustomerRef.current === customerId) return;
+    if (customerId && syncingCustomerRef.current === customerId) return;
 
-    setWishlistItems((items) =>
+    updateWishlistItems((items) =>
       items.filter((item) => String(item.id) !== String(productId)),
     );
   };
 
   const isInWishlist = (productId) =>
-    wishlistItems.some((item) => String(item.id) === String(productId));
+    wishlistItemsRef.current.some(
+      (item) => String(item.id) === String(productId),
+    );
 
   const toggleWishlist = (productOrId, selectedImage) => {
-    if (syncingCustomerRef.current === customerId) return false;
+    if (customerId && syncingCustomerRef.current === customerId) return false;
 
     const productId =
       typeof productOrId === "object" && productOrId !== null
@@ -319,8 +333,8 @@ export const WishlistProvider = ({ children }) => {
   };
 
   const clearWishlist = () => {
-    if (syncingCustomerRef.current === customerId) return;
-    setWishlistItems([]);
+    if (customerId && syncingCustomerRef.current === customerId) return;
+    updateWishlistItems([]);
   };
 
   return (

@@ -524,6 +524,16 @@ export const CartProvider = ({ children }) => {
       product?.sizes ??
       [];
 
+    if (colors.length > 0 && !selectedColor) {
+      toast.error("Please select a color before adding to cart.");
+      return false;
+    }
+
+    if (sizes.length > 0 && !selectedSize) {
+      toast.error("Please select a size before adding to cart.");
+      return false;
+    }
+
     const price =
       Number(
         typeof product.price === "object"
