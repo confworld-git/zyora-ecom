@@ -9,12 +9,12 @@ const FIELDS = [
   {
     name: "freeShippingLimit",
     label: "Free shipping above (₹)",
-    hint: "Orders at or above this subtotal ship free. Use 0 to make all shipping free.",
+    hint: "Use 0 to make all shipping free.",
   },
   {
     name: "shippingCharge",
     label: "Shipping charge (₹)",
-    hint: "Charged when the subtotal is below the free shipping amount.",
+    hint: "Charged when the subtotal is below the limit.",
   },
   {
     name: "platformFee",
