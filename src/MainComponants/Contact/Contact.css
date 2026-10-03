@@ -7,8 +7,24 @@
 
 .contact_main {
   position: relative;
-  background-color: #faf7ef;
-    padding: 60px;
+  /* background-color: #faf7ef; */
+  background:
+    radial-gradient(ellipse at 8% 12%, rgba(2, 0, 146, 0.11), transparent 34%),
+    radial-gradient(
+      ellipse at 92% 38%,
+      rgba(255, 64, 0, 0.09),
+      transparent 31%
+    ),
+    radial-gradient(
+      ellipse at 45% 100%,
+      rgba(2, 0, 146, 0.07),
+      transparent 38%
+    ),
+    linear-gradient(125deg, #d9d5ff 0%, #fff 45%, #ffdac8 72%, #e4e2ff 100%);
+  background-size: 160% 160%;
+  background-attachment: fixed;
+  animation: storefront-background-drift 10s ease-in-out infinite;
+  padding: 60px;
 }
 
 .contact_main > img {
@@ -36,7 +52,7 @@
   position: relative;
 }
 
-.contact_form>img{
+.contact_form > img {
   position: absolute;
   top: 25%;
   left: -150px;
@@ -143,7 +159,7 @@
   flex-direction: column;
   margin-bottom: 15px;
   margin-top: 10px;
-  border-bottom: 2px solid #f5f5f5;
+  border-bottom: 1px solid #dfdfdf;
   padding-bottom: 15px;
 }
 

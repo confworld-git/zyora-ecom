@@ -1,6 +1,6 @@
 .category {
-  padding: 30px;
-  background-color: #faf7ef;
+  padding: 30px 60px;
+  /* background-color: #faf7ef; */
 }
 
 .category > h1 {

@@ -129,7 +129,7 @@ const Featured = () => {
 
                   const productUrl = `/Zyora_Category/product/${productId}/${slug}`;
                   return (
-                    <Link className="product_card" key={index} to={productUrl}>
+                    <Link className="product_card_1" key={index} to={productUrl}>
                       {product.images?.[0]?.url ? (
                         <img
                           src={product.images[0].url}

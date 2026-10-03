@@ -30,11 +30,11 @@
 
 .wl-inner {
   position: relative;
-  max-width: 1240px;
-  margin: 0 auto;
+  /* max-width: 1240px; */
+  /* margin: 0 auto; */
   display: grid;
   grid-template-columns: 1.05fr 1fr;
-  gap: clamp(40px, 6vw, 88px);
+  /* gap: clamp(40px, 6vw, 88px); */
   align-items: center;
 }
 
@@ -92,12 +92,14 @@
 }
 .wl-pillars li {
   padding: 9px 18px;
-  background: #fff;
+  background: #020092;
   border: 1px solid var(--line);
   border-radius: 99px;
   font-size: 13px;
   font-weight: 700;
   transition: all 0.25s;
+  color: white;
+  cursor: pointer;
 }
 .wl-pillars li:hover {
   background: var(--acc);
@@ -107,21 +109,19 @@
 
 .wl-visual {
   position: relative;
-  padding-bottom: 72px;
+  height: 100%;
+  display: flex;
+  margin-bottom: -30px;
+  flex-direction: column;
+  align-items: end;
+  justify-content: end;
   animation: wl-up 0.9s var(--d, 0s) cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .wl-frame {
   position: relative;
-  /* aspect-ratio: 1 / 1; */
-  height: 450px;
-  /* width: 400px; */
+  height: 400px;
   border-radius: 28px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  background: #ffe6d9;
-  box-shadow:
-    0 0 0 8px rgba(255, 64, 0, 0.08),
-    0 40px 80px rgba(255, 64, 0, 0.2);
 }
 .wl-frame::after {
   content: "";
@@ -139,15 +139,16 @@
 }
 
 .wl-goal {
-  position: absolute;
-  left: -28px;
-  bottom: 0;
+  /* position: absolute; */
+  /* left: -28px; */
+  /* bottom: 0; */
+  margin-top: 20px;
   width: min(330px, 82%);
   padding: 24px 26px;
   border-radius: 20px;
   background: var(--acc);
   color: #fff;
-  box-shadow: 0 24px 50px rgba(255, 64, 0, 0.35);
+  /* box-shadow: 0 24px 50px rgba(255, 64, 0, 0.35); */
 }
 .wl-goal small {
   display: block;

@@ -15,6 +15,15 @@ const Layout = () => {
   // matches /profile and /profile/<customerId> (path is already lowercase)
   const isProfilePage = path === "/profile" || path.startsWith("/profile/");
   const hideChrome = isAdminPage || isPaymentResultPage || isProfilePage;
+  const isStorefrontPage =
+    !isAdminPage &&
+    path !== "/jewellery" &&
+    !path.startsWith("/jewellery/");
+
+  useEffect(() => {
+    document.body.classList.toggle("storefront-body", isStorefrontPage);
+    return () => document.body.classList.remove("storefront-body");
+  }, [isStorefrontPage]);
 
   useEffect(() => {
     const reduce = window.matchMedia(
