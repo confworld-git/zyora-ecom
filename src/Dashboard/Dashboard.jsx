@@ -15,6 +15,9 @@ import { useNavigate } from "react-router-dom";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
 import CouponList from "./CouponList";
+import Orders from "./Orders";
+import StockManagement from "./StockManagement";
+import { RiStockLine } from "react-icons/ri";
 
 const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
@@ -61,27 +64,31 @@ const Dashboard = () => {
       <section className="dashboard_secton">
         <div className="dashboard_left_section">
           <h1>ZYORA</h1>
-          <li onClick={() => setActiveSection("home")}>
+          <li className={activeSection === "home" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("home")}>
             <RiHome4Line />
             Home
           </li>
-          <li onClick={() => setActiveSection("orders")}>
+          <li className={activeSection === "orders" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("orders")}>
             <TiShoppingCart />
             Orders
           </li>
-          <li onClick={() => setActiveSection("enquiry")}>
+          <li className={activeSection === "stock" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("stock")}>
+            <RiStockLine />
+            Stock Management
+          </li>
+          <li className={activeSection === "enquiry" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("enquiry")}>
             <LuMessageCircleQuestion />
             Enquiry
           </li>
-          <li onClick={() => setActiveSection("add_product")}>
+          <li className={activeSection === "add_product" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("add_product")}>
             <AiOutlineProduct />
             Add Products
           </li>
-          <li onClick={() => setActiveSection("coupon_code")}>
+          <li className={activeSection === "coupon_code" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("coupon_code")}>
             <MdOutlineLocalOffer />
             Coupon Code
           </li>
-          <li onClick={() => setActiveSection("admin")}>
+          <li className={activeSection === "admin" ? "dashboard-nav-active" : ""} onClick={() => setActiveSection("admin")}>
             <MdOutlinePersonOutline />
             Admin Panel
           </li>
@@ -92,12 +99,8 @@ const Dashboard = () => {
         </div>
         <div className="dashboard_right_section">
           {activeSection === "home" && <Home totalEnquiries={totalEnquiries} />}
-          {activeSection === "orders" && (
-            <div>
-              <h2>Orders</h2>
-              <p>Orders will appear here.</p>
-            </div>
-          )}
+          {activeSection === "orders" && <Orders />}
+          {activeSection === "stock" && <StockManagement />}
           {activeSection === "enquiry" && (
             <EnquiryData enquiryData={enquiryData} />
           )}
