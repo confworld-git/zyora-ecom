@@ -684,7 +684,7 @@ const Category = () => {
 
                     {!hasStock && (
                       <span
-                        className="product-stock-badge"
+                        id="product-stock-badge"
                         aria-label="Out of stock"
                       >
                         Out of stock
