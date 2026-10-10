@@ -117,7 +117,7 @@ const Cart = () => {
       toast.error("Unable to move this item to favourites. Please try again.");
       return;
     }
-    
+
     toast.success("Moved to favourites");
   };
 
@@ -514,7 +514,9 @@ const Cart = () => {
             { withCredentials: true },
           );
           await refreshProducts();
-          toast.error("Payment checkout could not be loaded. Please try again.");
+          toast.error(
+            "Payment checkout could not be loaded. Please try again.",
+          );
           return;
         }
 
@@ -532,7 +534,7 @@ const Cart = () => {
             email: customer?.email || "",
           },
           notes: { orderId: res.data.order.orderId },
-          theme: { color: "#ff4000" },
+          theme: { color: "#010093" },
           handler: async (paymentResponse) => {
             paymentHandled = true;
             try {
@@ -548,7 +550,9 @@ const Cart = () => {
                   "Payment succeeded, but stock could not be refreshed. Reload before shopping again.",
                 );
               }
-              toast.success(`Payment complete! #${verified.data.order.orderId}`);
+              toast.success(
+                `Payment complete! #${verified.data.order.orderId}`,
+              );
               navigate(
                 `/Payment_result?orderId=${encodeURIComponent(verified.data.order.orderId)}`,
                 { state: { order: verified.data.order } },
@@ -610,7 +614,10 @@ const Cart = () => {
                   );
                 }
               } catch (error) {
-                console.error("Payment cancellation status check failed:", error);
+                console.error(
+                  "Payment cancellation status check failed:",
+                  error,
+                );
                 toast.error(
                   "Could not confirm payment status. Check your orders before trying again.",
                 );
@@ -622,7 +629,8 @@ const Cart = () => {
         });
         checkout.on("payment.failed", (failure) => {
           toast.error(
-            failure.error?.description || "Payment attempt failed. You can retry.",
+            failure.error?.description ||
+              "Payment attempt failed. You can retry.",
           );
         });
         checkout.open();
@@ -675,169 +683,171 @@ const Cart = () => {
               const isFavorite = isInWishlist(item.id);
 
               return (
-              <div className="cart_item" key={item.cartId}>
-                <input
-                  className="cart_item_checkbox"
-                  type="checkbox"
-                  checked={selectedCartIds.has(item.cartId)}
-                  onChange={() => toggleCartItem(item.cartId)}
-                  aria-label={`Include ${item.name} in price details`}
-                />
+                <div className="cart_item" key={item.cartId}>
+                  <input
+                    className="cart_item_checkbox"
+                    type="checkbox"
+                    checked={selectedCartIds.has(item.cartId)}
+                    onChange={() => toggleCartItem(item.cartId)}
+                    aria-label={`Include ${item.name} in price details`}
+                  />
 
-                <button
-                  type="button"
-                  className="cart_product_image_button"
-                  onClick={() => openCartProduct(item)}
-                  aria-label={`View ${item.name}`}
-                >
-                  <img src={item.image} alt="" />
-                </button>
+                  <button
+                    type="button"
+                    className="cart_product_image_button"
+                    onClick={() => openCartProduct(item)}
+                    aria-label={`View ${item.name}`}
+                  >
+                    <img src={item.image} alt="" />
+                  </button>
 
-                <div>
-                  <div className="cart_item_details">
-                    <span>{item.brand}</span>
+                  <div>
+                    <div className="cart_item_details">
+                      <span>{item.brand}</span>
 
-                    <h2>{item.name}</h2>
+                      <h2>{item.name}</h2>
 
-                    {item.title && item.title !== item.name && (
-                      <p>{item.title}</p>
-                    )}
+                      {item.title && item.title !== item.name && (
+                        <p>{item.title}</p>
+                      )}
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "50px",
+                        }}
+                      >
+                        <label className="cart_option">
+                          <span>Size:</span>
+
+                          {item.sizes?.length > 0 ? (
+                            <select
+                              value={item.size}
+                              disabled={isCartSyncing}
+                              onChange={(event) =>
+                                updateCartItemOption(
+                                  item.cartId,
+                                  "size",
+                                  event.target.value,
+                                )
+                              }
+                            >
+                              {item.sizes.map((size) => (
+                                <option key={size} value={size}>
+                                  {size}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            item.size
+                          )}
+                        </label>
+
+                        <label className="cart_option">
+                          <span>Color:</span>
+
+                          {item.colors?.length > 0 ? (
+                            <select
+                              value={item.color}
+                              disabled={isCartSyncing}
+                              onChange={(event) =>
+                                updateCartItemOption(
+                                  item.cartId,
+                                  "color",
+                                  event.target.value,
+                                )
+                              }
+                            >
+                              {item.colors.map((color) => (
+                                <option key={color} value={color}>
+                                  {color}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            item.color
+                          )}
+                        </label>
+                      </div>
+
+                      <h3 className="cart_item_price">
+                        <span className="cart_current_price">
+                          <i className="bi bi-currency-rupee"></i>
+                          {Number(item.price).toLocaleString("en-IN")}
+                        </span>
+
+                        <span className="cart_mrp_price">
+                          <i className="bi bi-currency-rupee"></i>
+                          {Number(item.mrp).toLocaleString("en-IN")}
+                        </span>
+
+                        <span className="cart_discount_badge">
+                          {item.discountPercent}% OFF
+                        </span>
+                      </h3>
+                    </div>
 
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "50px",
+                        gap: "20px",
+                        marginTop: "20px",
                       }}
                     >
-                      <label className="cart_option">
-                        <span>Size:</span>
+                      <div className="cart_quantity">
+                        <button
+                          type="button"
+                          disabled={isCartSyncing}
+                          onClick={() => decreaseQuantity(item.cartId)}
+                          aria-label="Decrease quantity"
+                        >
+                          <i className="bi bi-dash"></i>
+                        </button>
 
-                        {item.sizes?.length > 0 ? (
-                          <select
-                            value={item.size}
-                            disabled={isCartSyncing}
-                            onChange={(event) =>
-                              updateCartItemOption(
-                                item.cartId,
-                                "size",
-                                event.target.value,
-                              )
-                            }
-                          >
-                            {item.sizes.map((size) => (
-                              <option key={size} value={size}>
-                                {size}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          item.size
-                        )}
-                      </label>
+                        <span>{item.quantity}</span>
 
-                      <label className="cart_option">
-                        <span>Color:</span>
-
-                        {item.colors?.length > 0 ? (
-                          <select
-                            value={item.color}
-                            disabled={isCartSyncing}
-                            onChange={(event) =>
-                              updateCartItemOption(
-                                item.cartId,
-                                "color",
-                                event.target.value,
-                              )
-                            }
-                          >
-                            {item.colors.map((color) => (
-                              <option key={color} value={color}>
-                                {color}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          item.color
-                        )}
-                      </label>
-                    </div>
-
-                    <h3 className="cart_item_price">
-                      <span className="cart_current_price">
-                        <i className="bi bi-currency-rupee"></i>
-                        {Number(item.price).toLocaleString("en-IN")}
-                      </span>
-
-                      <span className="cart_mrp_price">
-                        <i className="bi bi-currency-rupee"></i>
-                        {Number(item.mrp).toLocaleString("en-IN")}
-                      </span>
-
-                      <span className="cart_discount_badge">
-                        {item.discountPercent}% OFF
-                      </span>
-                    </h3>
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "20px",
-                      marginTop: "20px",
-                    }}
-                  >
-                    <div className="cart_quantity">
-                      <button
-                        type="button"
-                        disabled={isCartSyncing}
-                        onClick={() => decreaseQuantity(item.cartId)}
-                        aria-label="Decrease quantity"
-                      >
-                        <i className="bi bi-dash"></i>
-                      </button>
-
-                      <span>{item.quantity}</span>
+                        <button
+                          type="button"
+                          disabled={isCartSyncing}
+                          onClick={() => increaseQuantity(item.cartId)}
+                          aria-label="Increase quantity"
+                        >
+                          <i className="bi bi-plus"></i>
+                        </button>
+                      </div>
 
                       <button
                         type="button"
+                        className="cart_trash"
                         disabled={isCartSyncing}
-                        onClick={() => increaseQuantity(item.cartId)}
-                        aria-label="Increase quantity"
+                        onClick={() => removeFromCart(item.cartId)}
+                        aria-label={`Remove ${item.name}`}
                       >
-                        <i className="bi bi-plus"></i>
+                        <HiOutlineTrash />
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`cart_move_to_favourites${isFavorite ? " is_favorite" : ""}`}
+                        disabled={isCartSyncing || isWishlistSyncing}
+                        onClick={(event) => handleAddFav(event, item)}
+                        aria-pressed={isFavorite}
+                      >
+                        <i
+                          className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}
+                          aria-hidden="true"
+                        ></i>
+                        <span>
+                          {isFavorite
+                            ? "Added to favourites"
+                            : "Move to favourites"}
+                        </span>
                       </button>
                     </div>
-
-                    <button
-                      type="button"
-                      className="cart_trash"
-                      disabled={isCartSyncing}
-                      onClick={() => removeFromCart(item.cartId)}
-                      aria-label={`Remove ${item.name}`}
-                    >
-                      <HiOutlineTrash />
-                    </button>
-
-                    <button
-                      type="button"
-                      className={`cart_move_to_favourites${isFavorite ? " is_favorite" : ""}`}
-                      disabled={isCartSyncing || isWishlistSyncing}
-                      onClick={(event) => handleAddFav(event, item)}
-                      aria-pressed={isFavorite}
-                    >
-                      <i
-                        className={`bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}`}
-                        aria-hidden="true"
-                      ></i>
-                      <span>
-                        {isFavorite ? "Added to favourites" : "Move to favourites"}
-                      </span>
-                    </button>
                   </div>
                 </div>
-              </div>
               );
             })}
           </div>
