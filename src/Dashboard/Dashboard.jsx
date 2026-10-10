@@ -18,6 +18,7 @@ import CouponList from "./components/CouponList";
 import Orders from "./components/Orders";
 import StockManagement from "./components/StockManagement";
 import { RiStockLine } from "react-icons/ri";
+import ProductList from "./components/ProductList";
 
 const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
@@ -32,6 +33,7 @@ const Dashboard = () => {
     { id: "home", label: "Overview", icon: <RiHome4Line /> },
     { id: "orders", label: "Orders", icon: <TiShoppingCart /> },
     { id: "stock", label: "Inventory", icon: <RiStockLine /> },
+    { id: "products", label: "Products", icon: <AiOutlineProduct /> },
     { id: "enquiry", label: "Enquiries", icon: <LuMessageCircleQuestion /> },
     { id: "coupon_code", label: "Coupon codes", icon: <MdOutlineLocalOffer /> },
     { id: "add_product", label: "Add products", icon: <AiOutlineProduct /> },
@@ -194,6 +196,9 @@ const Dashboard = () => {
             )}
             {activeSection === "orders" && <Orders />}
             {activeSection === "stock" && <StockManagement />}
+            {activeSection === "products" && (
+              <ProductList onAddProduct={() => setActiveSection("add_product")} />
+            )}
             {activeSection === "enquiry" && (
               <EnquiryData enquiryData={enquiryData} />
             )}

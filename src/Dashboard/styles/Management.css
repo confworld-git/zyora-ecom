@@ -417,6 +417,212 @@
   color: #66594e;
 }
 
+.product-list-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-list-add {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #a34c2a;
+  border-radius: 9px;
+  background: #a34c2a;
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.product-list-add:hover {
+  border-color: #883a1e;
+  background: #883a1e;
+}
+
+.product-list-table {
+  min-width: 940px;
+}
+
+.product-list-table th:last-child {
+  width: 150px;
+}
+
+.product-list-table .stock-product {
+  min-width: 200px;
+}
+
+.product-list-table .stock-product > div {
+  min-width: 0;
+}
+
+.product-list-table .stock-product strong {
+  display: block;
+  max-width: 230px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-list-mrp {
+  display: block;
+  margin-top: 4px;
+  color: #81776d;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.product-list-actions {
+  flex-wrap: nowrap;
+}
+
+.product-list-actions button {
+  width: auto;
+}
+
+.product-list-checkbox {
+  min-height: 40px;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 9px !important;
+}
+
+.management-form-grid .product-list-checkbox input {
+  width: 16px;
+  min-height: 16px;
+  margin: 0;
+  accent-color: #a34c2a;
+}
+
+.product-list-page .management-empty p {
+  margin: 0 0 12px;
+}
+
+.product-edit-section {
+  margin-top: 22px;
+  padding-top: 17px;
+  border-top: 1px solid #eee5dc;
+}
+
+.product-edit-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.product-edit-section-heading h3 {
+  margin: 0;
+  color: #302923;
+  font-size: 14px;
+}
+
+.product-edit-section-heading p {
+  margin: 4px 0 0;
+  color: #81776d;
+  font-size: 11px;
+}
+
+.product-image-add,
+.product-edit-add-row,
+.product-image-remove {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid #eadfd4;
+  border-radius: 8px;
+  background: #fff;
+  color: #73432f;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.product-image-add:hover,
+.product-edit-add-row:hover {
+  background: #fbf4ed;
+}
+
+.product-image-add input {
+  display: none;
+}
+
+.product-edit-image,
+.product-edit-information-row,
+.product-edit-list-row {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+  margin-top: 9px;
+}
+
+.product-edit-image {
+  grid-template-columns: 58px minmax(100px, 0.7fr) minmax(160px, 1fr) auto;
+  padding: 10px;
+  border: 1px solid #eee5dc;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.product-edit-image > img {
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  background: #f7eee5;
+  object-fit: cover;
+}
+
+.product-edit-image > label {
+  display: grid;
+  gap: 5px;
+  color: #5b5046;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.product-edit-image input,
+.product-edit-information-row input,
+.product-edit-list-row input,
+.product-edit-list-row textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #e5dbd1;
+  border-radius: 8px;
+  background: #fff;
+  color: #302923;
+  font: inherit;
+  font-size: 11px;
+}
+
+.product-edit-information-row {
+  grid-template-columns: minmax(140px, 0.7fr) minmax(180px, 1.3fr) auto;
+}
+
+.product-edit-list-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.product-edit-list-row textarea {
+  resize: vertical;
+}
+
+.product-image-remove {
+  color: #ad3e32;
+  border-color: #f1d5d0;
+}
+
+.product-image-remove:hover {
+  background: #fff3f1;
+}
+
 .enquiries-table {
   min-width: 620px;
 }
@@ -470,11 +676,38 @@
     min-width: 760px;
   }
 
+  .product-list-table {
+    min-width: 940px;
+  }
+
   .enquiries-table {
     min-width: 620px;
   }
 
   .management-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .product-edit-image {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+  }
+
+  .product-edit-image > img {
+    width: 52px;
+    height: 52px;
+    grid-row: span 2;
+  }
+
+  .product-edit-image > label:nth-of-type(2) {
+    grid-column: 2 / 4;
+  }
+
+  .product-edit-information-row {
+    grid-template-columns: minmax(100px, 0.8fr) minmax(0, 1.2fr);
+  }
+
+  .product-edit-information-row .product-image-remove {
+    grid-column: 2;
+    justify-self: start;
   }
 }
