@@ -10,8 +10,12 @@ import axios from "axios";
 const ProductContext = createContext(null);
 
 export const ProductProvider = ({ children, initialProducts = null }) => {
-  const [products, setProducts] = useState(initialProducts || []);
-  const [loading, setLoading] = useState(!initialProducts);
+  const hasInitialProducts =
+    Array.isArray(initialProducts) && initialProducts.length > 0;
+  const [products, setProducts] = useState(
+    Array.isArray(initialProducts) ? initialProducts : [],
+  );
+  const [loading, setLoading] = useState(!hasInitialProducts);
   const [error, setError] = useState("");
 
   const fetchProducts = useCallback(
@@ -39,7 +43,7 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
 
   useEffect(() => {
     // During SSG, products are already provided.
-    if (initialProducts) {
+    if (hasInitialProducts) {
       return;
     }
 
@@ -63,7 +67,7 @@ export const ProductProvider = ({ children, initialProducts = null }) => {
     return () => {
       cancelled = true;
     };
-  }, [fetchProducts, initialProducts]);
+  }, [fetchProducts, hasInitialProducts]);
 
   const getProductById = (productId) =>
     products.find(

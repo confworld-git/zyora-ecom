@@ -1,5 +1,5 @@
 import "./Category.css";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { useProducts } from "../../Context/ProductContext.jsx";
@@ -17,10 +17,27 @@ const clothingSizeLabels = {
 const Category = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category");
-  const { products } = useProducts();
+  const { products, loading, error, refreshProducts } = useProducts();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
+
+  useEffect(() => {
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        void refreshProducts();
+      }
+    };
+
+    void refreshProducts();
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [refreshProducts]);
 
   // const TILT_MAX = 5;
 
@@ -218,8 +235,7 @@ const Category = () => {
         );
 
       const hasStock =
-        product.stock?.in_stock === true &&
-        Number(product.stock?.quantity) > 0;
+        product.stock?.in_stock === true && Number(product.stock?.quantity) > 0;
       const matchesStock = !filters.inStock || hasStock;
       const matchesRating =
         !filters.rating || (Number(product.rating?.average) || 0) >= 4;
@@ -652,72 +668,83 @@ const Category = () => {
             </div>
 
             <div className="categories_items">
-              {filteredProducts.map((product) => {
-                const productId = product.id || product._id;
-                const hasStock =
-                  product.stock?.in_stock === true &&
-                  Number(product.stock?.quantity) > 0;
-
-                return (
-                  <div
-                    className="product_card"
-                    key={productId}
-                    role="button"
-                    tabIndex={0}
-                    // onMouseMove={handleTiltMove}
-                    onMouseLeave={handleTiltLeave}
-                    onClick={() => openProduct(product)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-
-                        openProduct(product);
-                      }
-                    }}
-                  >
-                    <img
-                      src={product.images?.[0]?.url}
-                      alt={
-                        product.images?.[0]?.alt || product.title || "Product"
-                      }
-                    />
-
-                    {!hasStock && (
-                      <span
-                        id="product-stock-badge"
-                        aria-label="Out of stock"
-                      >
-                        Out of stock
-                      </span>
-                    )}
-
-                    <p className="rating_pre">
-                      ⭐ {product.rating?.average ?? 0} (
-                      {product.rating?.count ?? 0})
-                    </p>
-                    <span>{product.brand}</span>
-                    <br/>
-                    <small>{product.name}</small>
-                    <p className="product_description">{product.title}</p>
-                    <div className="price">
-                      <strong>
-                        Rs.
-                        {product.price?.selling_price}
-                      </strong>
-                      <del>
-                        Rs.
-                        {product.price?.mrp}
-                      </del>
-                      <span>({product.price?.discount_percent}% OFF)</span>
-                    </div>
-
-                    {/* <span>add to fav</span> */}
-                  </div>
-                );
-              })}
-
-              {!filteredProducts.length && (
+              {loading ? (
+                <p className="empty_results" role="status">
+                  Loading products...
+                </p>
+              ) : error ? (
+                <div className="empty_results" role="alert">
+                  <p>{error}</p>
+                  <button type="button" onClick={() => void refreshProducts()}>
+                    Try again
+                  </button>
+                </div>
+              ) : !filteredProducts.length ? (
                 <p className="empty_results">No products available.</p>
+              ) : (
+                filteredProducts.map((product) => {
+                  const productId = product.id || product._id;
+                  const hasStock =
+                    product.stock?.in_stock === true &&
+                    Number(product.stock?.quantity) > 0;
+
+                  return (
+                    <div
+                      className="product_card"
+                      key={productId}
+                      role="button"
+                      tabIndex={0}
+                      // onMouseMove={handleTiltMove}
+                      onMouseLeave={handleTiltLeave}
+                      onClick={() => openProduct(product)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+
+                          openProduct(product);
+                        }
+                      }}
+                    >
+                      <img
+                        src={product.images?.[0]?.url}
+                        alt={
+                          product.images?.[0]?.alt || product.title || "Product"
+                        }
+                      />
+
+                      {!hasStock && (
+                        <span
+                          id="product-stock-badge"
+                          aria-label="Out of stock"
+                        >
+                          Out of stock
+                        </span>
+                      )}
+
+                      <p className="rating_pre">
+                        ⭐ {product.rating?.average ?? 0} (
+                        {product.rating?.count ?? 0})
+                      </p>
+                      <span>{product.brand}</span>
+                      <br />
+                      <small>{product.name}</small>
+                      <p className="product_description">{product.title}</p>
+                      <div className="price">
+                        <strong>
+                          Rs.
+                          {product.price?.selling_price}
+                        </strong>
+                        <del>
+                          Rs.
+                          {product.price?.mrp}
+                        </del>
+                        <span>({product.price?.discount_percent}% OFF)</span>
+                      </div>
+
+                      {/* <span>add to fav</span> */}
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
