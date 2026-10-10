@@ -18,6 +18,21 @@ const API = import.meta.env.VITE_API_BASE_URL;
 
 const PRICING_FIELDS = ["freeShippingLimit", "shippingCharge", "platformFee"];
 
+const loadRazorpayCheckout = () =>
+  new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(Boolean(window.Razorpay));
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+
 const getStoredAddresses = () => {
   try {
     const stored = JSON.parse(localStorage.getItem("addresses") || "null");
@@ -67,6 +82,7 @@ const Cart = () => {
   const { refreshProducts } = useProducts();
   const { addToWishlist, isInWishlist, isWishlistSyncing } = useWishlist();
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const [pricing, setPricing] = useState(null);
   const [pricingLoading, setPricingLoading] = useState(true);
   const [pricingError, setPricingError] = useState("");
@@ -453,6 +469,7 @@ const Cart = () => {
       return;
     }
 
+    let checkoutOpened = false;
     try {
       setPlacingOrder(true);
 
@@ -467,21 +484,149 @@ const Cart = () => {
           })),
           shippingAddress: address,
           couponCode: appliedCoupon?.code || null,
-          paymentMethod: "cod",
+          paymentMethod,
         },
         { withCredentials: true },
       );
 
       if (res.data.success) {
-        selectedItems.forEach((item) => removeFromCart(item.cartId));
-        toast.success(`Order placed! #${res.data.order.orderId}`);
-        const productsRefreshed = await refreshProducts();
-        if (!productsRefreshed) {
-          toast.error(
-            "Order placed, but stock could not be refreshed. Reload before shopping again.",
+        if (paymentMethod === "cod") {
+          selectedItems.forEach((item) => removeFromCart(item.cartId));
+          toast.success(`Order placed! #${res.data.order.orderId}`);
+          const productsRefreshed = await refreshProducts();
+          if (!productsRefreshed) {
+            toast.error(
+              "Order placed, but stock could not be refreshed. Reload before shopping again.",
+            );
+          }
+          navigate(
+            `/Payment_result?orderId=${encodeURIComponent(res.data.order.orderId)}`,
+            { state: { order: res.data.order } },
           );
+          return;
         }
-        navigate("/Payment_result", { state: { order: res.data.order } });
+
+        const checkoutLoaded = await loadRazorpayCheckout();
+        if (!checkoutLoaded) {
+          await axios.post(
+            `${API}/api/orders/${encodeURIComponent(res.data.order.orderId)}/cancel-payment`,
+            {},
+            { withCredentials: true },
+          );
+          await refreshProducts();
+          toast.error("Payment checkout could not be loaded. Please try again.");
+          return;
+        }
+
+        let paymentHandled = false;
+        const checkout = new window.Razorpay({
+          key: res.data.razorpay.keyId,
+          amount: res.data.razorpay.amount,
+          currency: res.data.razorpay.currency,
+          name: "ZYORA",
+          description: `Order ${res.data.order.orderId}`,
+          order_id: res.data.razorpay.orderId,
+          prefill: {
+            name: address.name,
+            contact: address.mobile,
+            email: customer?.email || "",
+          },
+          notes: { orderId: res.data.order.orderId },
+          theme: { color: "#ff4000" },
+          handler: async (paymentResponse) => {
+            paymentHandled = true;
+            try {
+              const verified = await axios.post(
+                `${API}/api/orders/verify-payment`,
+                paymentResponse,
+                { withCredentials: true },
+              );
+              selectedItems.forEach((item) => removeFromCart(item.cartId));
+              const productsRefreshed = await refreshProducts();
+              if (!productsRefreshed) {
+                toast.error(
+                  "Payment succeeded, but stock could not be refreshed. Reload before shopping again.",
+                );
+              }
+              toast.success(`Payment complete! #${verified.data.order.orderId}`);
+              navigate(
+                `/Payment_result?orderId=${encodeURIComponent(verified.data.order.orderId)}`,
+                { state: { order: verified.data.order } },
+              );
+            } catch (error) {
+              const failedOrder = error.response?.data?.order;
+              const productsRefreshed = await refreshProducts();
+              if (!productsRefreshed) {
+                toast.error(
+                  "Unable to refresh stock after payment verification. Reload before shopping again.",
+                );
+              }
+              if (failedOrder) {
+                toast.error(
+                  error.response?.data?.message ||
+                    "Payment status requires attention. Review the order details.",
+                );
+                navigate(
+                  `/Payment_result?orderId=${encodeURIComponent(failedOrder.orderId)}`,
+                  { state: { order: failedOrder } },
+                );
+              } else {
+                toast.error(
+                  error.response?.data?.message ||
+                    "Payment verification is pending. Check your orders before retrying.",
+                );
+                navigate(
+                  `/Payment_result?orderId=${encodeURIComponent(res.data.order.orderId)}`,
+                  { state: { order: res.data.order } },
+                );
+              }
+            } finally {
+              setPlacingOrder(false);
+            }
+          },
+          modal: {
+            ondismiss: async () => {
+              if (paymentHandled) return;
+              paymentHandled = true;
+              try {
+                const cancelled = await axios.post(
+                  `${API}/api/orders/${encodeURIComponent(res.data.order.orderId)}/cancel-payment`,
+                  {},
+                  { withCredentials: true },
+                );
+                const order = cancelled.data.order || res.data.order;
+                await refreshProducts();
+                if (order.paymentStatus === "paid") {
+                  selectedItems.forEach((item) => removeFromCart(item.cartId));
+                  navigate(
+                    `/Payment_result?orderId=${encodeURIComponent(order.orderId)}`,
+                    { state: { order } },
+                  );
+                } else {
+                  toast("Payment cancelled. Your cart is unchanged.");
+                  navigate(
+                    `/Payment_result?orderId=${encodeURIComponent(order.orderId)}`,
+                    { state: { order } },
+                  );
+                }
+              } catch (error) {
+                console.error("Payment cancellation status check failed:", error);
+                toast.error(
+                  "Could not confirm payment status. Check your orders before trying again.",
+                );
+              } finally {
+                setPlacingOrder(false);
+              }
+            },
+          },
+        });
+        checkout.on("payment.failed", (failure) => {
+          toast.error(
+            failure.error?.description || "Payment attempt failed. You can retry.",
+          );
+        });
+        checkout.open();
+        checkoutOpened = true;
       }
     } catch (error) {
       if (error.response?.status === 409) {
@@ -492,7 +637,7 @@ const Cart = () => {
       }
       toast.error(error.response?.data?.message || "Unable to place order");
     } finally {
-      setPlacingOrder(false);
+      if (!checkoutOpened) setPlacingOrder(false);
     }
   };
 
@@ -902,6 +1047,32 @@ const Cart = () => {
                 </p>
               )}
 
+              <fieldset className="cart_payment_method">
+                <legend>Payment method</legend>
+                <label>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cod"
+                    checked={paymentMethod === "cod"}
+                    onChange={() => setPaymentMethod("cod")}
+                    disabled={placingOrder}
+                  />
+                  <span>Cash on delivery</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="online"
+                    checked={paymentMethod === "online"}
+                    onChange={() => setPaymentMethod("online")}
+                    disabled={placingOrder}
+                  />
+                  <span>Pay online (Razorpay)</span>
+                </label>
+              </fieldset>
+
               <div className="summary_total">
                 <span>Total Amount</span>
 
@@ -1000,7 +1171,13 @@ const Cart = () => {
                 }
                 onClick={handlePlaceOrder}
               >
-                {placingOrder ? "PLACING ORDER…" : "PLACE ORDER"}
+                {placingOrder
+                  ? paymentMethod === "online"
+                    ? "OPENING PAYMENT…"
+                    : "PLACING ORDER…"
+                  : paymentMethod === "online"
+                    ? "PAY SECURELY"
+                    : "PLACE ORDER"}
               </button>
 
               <Confetti active={celebrate} burstKey={burstKey} />

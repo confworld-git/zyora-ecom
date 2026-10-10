@@ -7,7 +7,7 @@ import "../styles/Management.css";
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/admin/orders`;
 const config = { withCredentials: true };
 const orderStatuses = ["placed", "confirmed", "shipped", "delivered", "cancelled"];
-const paymentStatuses = ["pending", "paid", "failed", "refunded"];
+const paymentStatuses = ["pending", "paid", "failed", "refunding", "refunded"];
 
 const currency = (amount) =>
   `₹${(Number(amount) || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
@@ -85,6 +85,8 @@ const Orders = () => {
       orderId: order.orderId,
       orderStatus: order.orderStatus,
       paymentStatus: order.paymentStatus,
+      paymentMethod: order.paymentMethod,
+      stockReservationStatus: order.stockReservationStatus,
       shippingAddress: {
         name: order.shippingAddress?.name || "",
         mobile: order.shippingAddress?.mobile || "",
@@ -306,12 +308,12 @@ const Orders = () => {
             </div>
             <div className="management-form-grid">
               <label>Order status
-                <select value={editing.orderStatus} onChange={(event) => setEditing({ ...editing, orderStatus: event.target.value })}>
-                  {orderStatuses.map((status) => <option key={status} value={status}>{titleCase(status)}</option>)}
+                <select value={editing.orderStatus} onChange={(event) => setEditing({ ...editing, orderStatus: event.target.value })} disabled={editing.paymentMethod === "online" && (editing.paymentStatus === "pending" || editing.stockReservationStatus === "released")}>
+                  {orderStatuses.map((status) => <option key={status} value={status} disabled={editing.paymentMethod === "online" && editing.paymentStatus === "paid" && status === "cancelled"}>{titleCase(status)}</option>)}
                 </select>
               </label>
               <label>Payment status
-                <select value={editing.paymentStatus} onChange={(event) => setEditing({ ...editing, paymentStatus: event.target.value })}>
+                <select value={editing.paymentStatus} onChange={(event) => setEditing({ ...editing, paymentStatus: event.target.value })} disabled={editing.paymentMethod === "online"}>
                   {paymentStatuses.map((status) => <option key={status} value={status}>{titleCase(status)}</option>)}
                 </select>
               </label>
