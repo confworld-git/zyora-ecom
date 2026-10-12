@@ -44,7 +44,6 @@ export const AppRoutes = () => {
           },
         }}
       />
-
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Homepage />} />
