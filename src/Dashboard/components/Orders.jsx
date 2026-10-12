@@ -5,6 +5,7 @@ import { FiChevronDown } from "react-icons/fi";
 import "../styles/Management.css";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/admin/orders`;
+const COURIER_API = `${import.meta.env.VITE_API_BASE_URL}/api/admin/couriers`;
 const config = { withCredentials: true };
 const orderStatuses = [
   "placed",
@@ -39,6 +40,20 @@ const Orders = () => {
   const [saving, setSaving] = useState(false);
   const [busyOrder, setBusyOrder] = useState("");
   const [openDetailsId, setOpenDetailsId] = useState("");
+  const [shipmentOrder, setShipmentOrder] = useState(null);
+  const [availableCouriers, setAvailableCouriers] = useState([]);
+  const [selectedCourierId, setSelectedCourierId] = useState("");
+  const [packageDetails, setPackageDetails] = useState({
+    length: "20",
+    breadth: "15",
+    height: "5",
+    weight: "",
+  });
+  const [courierAvailabilityChecked, setCourierAvailabilityChecked] =
+    useState(false);
+  const [loadingCouriers, setLoadingCouriers] = useState(false);
+  const [courierLoadError, setCourierLoadError] = useState("");
+  const [creatingShipment, setCreatingShipment] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -157,6 +172,118 @@ const Orders = () => {
       toast.error(error.response?.data?.message || "Unable to delete order");
     } finally {
       setBusyOrder("");
+    }
+  };
+
+  const openCourierSelection = (order) => {
+    const deliveryPin = String(order.shippingAddress?.pinCode || "").trim();
+    if (!/^\d{6}$/.test(deliveryPin)) {
+      toast.error("This order does not have a valid delivery PIN code.");
+      return;
+    }
+
+    setShipmentOrder(order);
+    setAvailableCouriers([]);
+    setSelectedCourierId("");
+    setPackageDetails({ length: "20", breadth: "15", height: "5", weight: "" });
+    setCourierAvailabilityChecked(false);
+    setCourierLoadError("");
+  };
+
+  const updatePackageDetails = (event) => {
+    const { name, value } = event.target;
+    setPackageDetails((current) => ({ ...current, [name]: value }));
+    setAvailableCouriers([]);
+    setSelectedCourierId("");
+    setCourierAvailabilityChecked(false);
+    setCourierLoadError("");
+  };
+
+  const checkCourierAvailability = async (event) => {
+    event.preventDefault();
+    if (
+      Object.values(packageDetails).some(
+        (value) => !Number.isFinite(Number(value)) || Number(value) <= 0,
+      )
+    ) {
+      toast.error(
+        "Enter a positive value for each package measurement and weight.",
+      );
+      return;
+    }
+
+    try {
+      setCourierAvailabilityChecked(false);
+      setAvailableCouriers([]);
+      setSelectedCourierId("");
+      setCourierLoadError("");
+      setLoadingCouriers(true);
+      const response = await axios.get(`${COURIER_API}/serviceable`, {
+        ...config,
+        params: {
+          delivery: String(shipmentOrder.shippingAddress.pinCode).trim(),
+          weight: Number(packageDetails.weight),
+          cod: shipmentOrder.paymentMethod === "cod" ? 1 : 0,
+        },
+      });
+      const couriers = response.data.couriers;
+      if (!Array.isArray(couriers)) {
+        throw new Error("Courier availability response was invalid");
+      }
+      setCourierAvailabilityChecked(true);
+      setAvailableCouriers(couriers);
+      if (couriers.length === 0) {
+        toast.error("No courier partners serve this delivery PIN code.");
+      }
+    } catch (error) {
+      const message =
+        error.response?.data?.error || "Unable to load serviceable couriers.";
+      setCourierAvailabilityChecked(true);
+      setCourierLoadError(message);
+      toast.error(message);
+    } finally {
+      setLoadingCouriers(false);
+    }
+  };
+
+  const createShipment = async () => {
+    if (!shipmentOrder || !selectedCourierId) {
+      toast.error("Select a courier before creating the shipment.");
+      return;
+    }
+
+    try {
+      setCreatingShipment(true);
+      const response = await axios.post(
+        `${API}/${shipmentOrder._id}/ship`,
+        {
+          courierId: selectedCourierId,
+          length: Number(packageDetails.length),
+          breadth: Number(packageDetails.breadth),
+          height: Number(packageDetails.height),
+          weight: Number(packageDetails.weight),
+        },
+        config,
+      );
+      setOrders((current) =>
+        current.map((order) =>
+          order._id === shipmentOrder._id ? response.data.order : order,
+        ),
+      );
+      setShipmentOrder(null);
+      if (response.data.pickupWarning) {
+        toast(response.data.pickupWarning);
+      } else {
+        toast.success("Shipment created and courier assigned.");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Unable to create shipment.",
+      );
+    } finally {
+      setCreatingShipment(false);
     }
   };
 
@@ -355,8 +482,40 @@ const Orders = () => {
                         </button>
                       </div>
                     </td>
-                    <td>
-                      <button>Choose shipment</button>
+                    <td className="shipment-cell">
+                      {order.shipment?.awb ? (
+                        <div className="shipment-assigned">
+                          <span className="shipment-status-dot" aria-hidden="true" />
+                          <div>
+                            <strong>
+                              {order.shipment.courierName || "Assigned"}
+                            </strong>
+                            <small>AWB: {order.shipment.awb}</small>
+                          </div>
+                        </div>
+                      ) : ["shipped", "delivered", "cancelled"].includes(
+                            order.orderStatus,
+                          ) ? (
+                        <span className="shipment-state shipment-state-muted">
+                          <strong>{titleCase(order.orderStatus)}</strong>
+                          <small>No shipment details recorded</small>
+                        </span>
+                      ) : order.paymentMethod === "online" &&
+                        order.paymentStatus !== "paid" ? (
+                        <span className="shipment-state shipment-state-pending">
+                          <strong>Payment pending</strong>
+                          <small>Confirm payment before shipping</small>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={busyOrder === order._id}
+                          onClick={() => openCourierSelection(order)}
+                          className="shipment-select-button"
+                        >
+                          Choose courier
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
@@ -482,6 +641,227 @@ const Orders = () => {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {shipmentOrder && (
+        <div
+          className="management-modal-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget &&
+              !creatingShipment &&
+              !loadingCouriers
+            ) {
+              setShipmentOrder(null);
+            }
+          }}
+        >
+          <section
+            className="management-modal courier-selection-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="courier-selection-title"
+          >
+            <div className="management-modal-heading">
+              <div className="courier-modal-title">
+                <span className="management-eyebrow">SHIPMENT · STEP 1 OF 2</span>
+                <h2 id="courier-selection-title">Choose a courier</h2>
+                <div className="courier-order-meta">
+                  <span>Order {shipmentOrder.orderId}</span>
+                  <span className="courier-meta-divider" aria-hidden="true" />
+                  <span>
+                    Deliver to <strong>{shipmentOrder.shippingAddress?.pinCode}</strong>
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="courier-modal-close"
+                aria-label="Close"
+                disabled={creatingShipment || loadingCouriers}
+                onClick={() => setShipmentOrder(null)}
+              >
+                ×
+              </button>
+            </div>
+
+            <form
+              className="courier-package-form"
+              onSubmit={checkCourierAvailability}
+            >
+              <div className="courier-package-heading">
+                <div>
+                  <h3>Package details</h3>
+                  <p>Enter the packed parcel size and weight to compare rates.</p>
+                </div>
+                <span className="courier-package-unit">CM · KG</span>
+              </div>
+              <div className="courier-package-grid">
+                {[
+                  ["length", "Length", "cm"],
+                  ["breadth", "Breadth", "cm"],
+                  ["height", "Height", "cm"],
+                  ["weight", "Weight", "kg"],
+                ].map(([name, label, unit]) => (
+                  <label className="courier-package-field" key={name}>
+                    <span>{label}</span>
+                    <span className="courier-input-with-unit">
+                      <input
+                        type="number"
+                        name={name}
+                        min="0.01"
+                        step="any"
+                        value={packageDetails[name]}
+                        onChange={updatePackageDetails}
+                        disabled={loadingCouriers || creatingShipment}
+                        required
+                      />
+                      <span>{unit}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <button
+                type="submit"
+                className="courier-check-button"
+                disabled={loadingCouriers || creatingShipment}
+              >
+                {loadingCouriers
+                  ? "Finding available couriers…"
+                  : "Find available couriers"}
+              </button>
+            </form>
+
+            {loadingCouriers ? (
+              <div className="courier-availability-state" role="status">
+                <span className="courier-state-indicator courier-state-loading" />
+                <div>
+                  <strong>Checking courier rates</strong>
+                  <p>Finding services for this route and package.</p>
+                </div>
+              </div>
+            ) : !courierAvailabilityChecked ? (
+              <div className="courier-availability-state">
+                <span className="courier-state-indicator" />
+                <div>
+                  <strong>Courier options will appear here</strong>
+                  <p>Complete the package details, then check availability.</p>
+                </div>
+              </div>
+            ) : courierLoadError ? (
+              <div
+                className="courier-availability-state courier-state-error"
+                role="alert"
+              >
+                <span className="courier-state-indicator" />
+                <div>
+                  <strong>Could not load courier options</strong>
+                  <p>{courierLoadError}</p>
+                </div>
+              </div>
+            ) : availableCouriers.length === 0 ? (
+              <div className="courier-availability-state courier-state-empty">
+                <span className="courier-state-indicator" />
+                <div>
+                  <strong>No couriers found for this package</strong>
+                  <p>Try checking the delivery PIN or package weight.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="courier-results">
+                <div className="courier-results-heading">
+                  <div>
+                    <h3>Available services</h3>
+                    <p>Select one option to continue.</p>
+                  </div>
+                  <span className="courier-results-count">
+                    {availableCouriers.length}{" "}
+                    {availableCouriers.length === 1 ? "option" : "options"}
+                  </span>
+                </div>
+                <div className="management-table-wrap">
+                  <table className="management-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Select</th>
+                        <th scope="col">Courier partner</th>
+                        <th scope="col">Rate</th>
+                        <th scope="col">Delivery estimate</th>
+                        <th scope="col">Rating</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {availableCouriers.map((courier) => (
+                        <tr
+                          key={courier.id}
+                          className={
+                            String(selectedCourierId) === String(courier.id)
+                              ? "courier-option-selected"
+                              : ""
+                          }
+                          onClick={(event) => {
+                            if (event.target.type !== "radio") {
+                              setSelectedCourierId(String(courier.id));
+                            }
+                          }}
+                        >
+                          <td>
+                            <input
+                              type="radio"
+                              name="selectedCourier"
+                              aria-label={`Select ${courier.name}`}
+                              value={courier.id}
+                              checked={
+                                String(selectedCourierId) === String(courier.id)
+                              }
+                              onChange={() =>
+                                setSelectedCourierId(String(courier.id))
+                              }
+                            />
+                          </td>
+                          <td className="courier-partner-name">
+                            <strong>{courier.name}</strong>
+                          </td>
+                          <td className="courier-rate">
+                            {currency(courier.rate)}
+                          </td>
+                          <td>{courier.etd || "—"}</td>
+                          <td>{courier.rating || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div className="management-modal-actions">
+              <button
+                type="button"
+                className="management-secondary"
+                disabled={creatingShipment || loadingCouriers}
+                onClick={() => setShipmentOrder(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="courier-create-button"
+                disabled={
+                  creatingShipment ||
+                  loadingCouriers ||
+                  !courierAvailabilityChecked ||
+                  !selectedCourierId
+                }
+                onClick={createShipment}
+              >
+                {creatingShipment
+                  ? "Creating shipment…"
+                  : "Continue to shipment"}
+              </button>
+            </div>
+          </section>
         </div>
       )}
     </main>

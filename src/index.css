@@ -1,6 +1,7 @@
 body h1 {
   font-family: "Playfair Display SC", serif;
   letter-spacing: -0.035em;
+  /* color: #01028b; */
 }
 
 body {
@@ -11,6 +12,7 @@ body {
   zoom: 0.9;
   --sb-track-color: #232e33;
   --sb-thumb-color: #ffffff;
+  --primary: #01028b;
   --sb-size: 14px;
 }
 

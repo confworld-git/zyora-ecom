@@ -736,8 +736,6 @@ function AddProduct() {
                 </label>
 
                 <div className="price-input">
-                  <span>₹</span>
-
                   <input
                     type="number"
                     name="mrp"
@@ -759,8 +757,6 @@ function AddProduct() {
                 </label>
 
                 <div className="price-input">
-                  <span>₹</span>
-
                   <input
                     type="number"
                     name="selling_price"

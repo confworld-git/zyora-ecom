@@ -6,6 +6,25 @@ import "../styles/Management.css";
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/admin/couriers`;
 const config = { withCredentials: true };
 
+const callBeforeDelivery = (value) => {
+  if (value === true || value === 1 || value === "1") {
+    return { label: "Yes", className: "courier-feature-yes" };
+  }
+  if (value === false || value === 0 || value === "0") {
+    return { label: "No", className: "courier-feature-no" };
+  }
+
+  const label = String(value ?? "").trim();
+  const normalized = label.toLowerCase();
+  if (["yes", "available", "supported"].includes(normalized)) {
+    return { label, className: "courier-feature-yes" };
+  }
+  if (["no", "unavailable", "not supported"].includes(normalized)) {
+    return { label, className: "courier-feature-no" };
+  }
+  return { label: label || "—", className: "courier-feature-unknown" };
+};
+
 const CourierList = () => {
   const [couriers, setCouriers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,18 +138,27 @@ const CourierList = () => {
               </tr>
             </thead>
             <tbody>
-              {visibleCouriers.map((courier) => (
-                <tr key={courier.id}>
-                  <td>
-                    <strong>{courier.name || "Courier"}</strong>
-                  </td>
-                  <td>{courier.id}</td>
-                  <td>{courier.company || "—"}</td>
-                  <td>{courier.tracking || "—"}</td>
-                  <td>{courier.pod || "—"}</td>
-                  <td>{courier.callBefore || "—"}</td>
-                </tr>
-              ))}
+              {visibleCouriers.map((courier) => {
+                const callBefore = callBeforeDelivery(courier.callBefore);
+                return (
+                  <tr key={courier.id}>
+                    <td>
+                      <strong>{courier.name || "Courier"}</strong>
+                    </td>
+                    <td>{courier.id}</td>
+                    <td>{courier.company || "—"}</td>
+                    <td>{courier.tracking || "—"}</td>
+                    <td>{courier.pod || "—"}</td>
+                    <td>
+                      <span
+                        className={`courier-feature-badge ${callBefore.className}`}
+                      >
+                        {callBefore.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
