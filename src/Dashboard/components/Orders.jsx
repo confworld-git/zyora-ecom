@@ -6,7 +6,13 @@ import "../styles/Management.css";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/admin/orders`;
 const config = { withCredentials: true };
-const orderStatuses = ["placed", "confirmed", "shipped", "delivered", "cancelled"];
+const orderStatuses = [
+  "placed",
+  "confirmed",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
 const paymentStatuses = ["pending", "paid", "failed", "refunding", "refunded"];
 
 const currency = (amount) =>
@@ -75,7 +81,9 @@ const Orders = () => {
         [order.orderId, customer.name, customer.email, customer.mobile]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(query));
-      return matchesSearch && (filter === "all" || order.orderStatus === filter);
+      return (
+        matchesSearch && (filter === "all" || order.orderStatus === filter)
+      );
     });
   }, [orders, search, filter]);
 
@@ -136,7 +144,9 @@ const Orders = () => {
   };
 
   const deleteOrder = async (order) => {
-    if (!window.confirm(`Delete order ${order.orderId}? This cannot be undone.`))
+    if (
+      !window.confirm(`Delete order ${order.orderId}? This cannot be undone.`)
+    )
       return;
     try {
       setBusyOrder(order._id);
@@ -163,17 +173,32 @@ const Orders = () => {
         <div>
           <span className="management-eyebrow">ORDER MANAGEMENT</span>
           <h1>Orders</h1>
-          <p>Review customer orders, update delivery details, and manage status.</p>
+          <p>
+            Review customer orders, update delivery details, and manage status.
+          </p>
         </div>
-        <button className="management-refresh" onClick={fetchOrders} type="button">
+        <button
+          className="management-refresh"
+          onClick={fetchOrders}
+          type="button"
+        >
           Refresh
         </button>
       </header>
 
       <section className="management-stats" aria-label="Order summary">
-        <article><span>Total orders</span><strong>{orders.length}</strong></article>
-        <article><span>Needs attention</span><strong>{pendingCount}</strong></article>
-        <article><span>Order value</span><strong>{currency(salesTotal)}</strong></article>
+        <article>
+          <span>Total orders</span>
+          <strong>{orders.length}</strong>
+        </article>
+        <article>
+          <span>Needs attention</span>
+          <strong>{pendingCount}</strong>
+        </article>
+        <article>
+          <span>Order value</span>
+          <strong>{currency(salesTotal)}</strong>
+        </article>
       </section>
 
       <div className="management-toolbar">
@@ -190,7 +215,9 @@ const Orders = () => {
         >
           <option value="all">All statuses</option>
           {orderStatuses.map((status) => (
-            <option key={status} value={status}>{titleCase(status)}</option>
+            <option key={status} value={status}>
+              {titleCase(status)}
+            </option>
           ))}
         </select>
       </div>
@@ -199,7 +226,9 @@ const Orders = () => {
         <p className="management-empty">Loading orders…</p>
       ) : visibleOrders.length === 0 ? (
         <p className="management-empty">
-          {orders.length ? "No orders match your filters." : "Orders will appear here when customers place them."}
+          {orders.length
+            ? "No orders match your filters."
+            : "Orders will appear here when customers place them."}
         </p>
       ) : (
         <div className="management-table-wrap">
@@ -214,6 +243,7 @@ const Orders = () => {
                 <th>Payment</th>
                 <th>Placed</th>
                 <th>Actions</th>
+                <th>Select Shipment</th>
               </tr>
             </thead>
             <tbody>
@@ -234,51 +264,87 @@ const Orders = () => {
                             )
                           }
                         >
-                          {openDetailsId === order._id ? "Hide details" : "View details"}
+                          {openDetailsId === order._id
+                            ? "Hide details"
+                            : "View details"}
                           <FiChevronDown
-                            className={openDetailsId === order._id ? "order-details-chevron is-open" : "order-details-chevron"}
+                            className={
+                              openDetailsId === order._id
+                                ? "order-details-chevron is-open"
+                                : "order-details-chevron"
+                            }
                             aria-hidden="true"
                           />
                         </button>
                         {openDetailsId === order._id && (
                           <div className="order-detail-popover">
-                          <strong>Delivery address</strong>
-                          <p>
-                            {order.shippingAddress?.name} · {order.shippingAddress?.mobile}<br />
-                            {[
-                              order.shippingAddress?.houseNumber,
-                              order.shippingAddress?.address,
-                              order.shippingAddress?.locality,
-                              order.shippingAddress?.city,
-                              order.shippingAddress?.state,
-                              order.shippingAddress?.pinCode,
-                            ].filter(Boolean).join(", ")}
-                          </p>
-                          <strong>Order items</strong>
-                          {order.items?.map((item, index) => (
-                            <p key={`${item.productId}-${index}`}>
-                              {item.name} × {item.quantity} · {currency(item.price)}
-                              {item.size && ` · ${item.size}`}
-                              {item.color && ` · ${item.color}`}
+                            <strong>Delivery address</strong>
+                            <p>
+                              {order.shippingAddress?.name} ·{" "}
+                              {order.shippingAddress?.mobile}
+                              <br />
+                              {[
+                                order.shippingAddress?.houseNumber,
+                                order.shippingAddress?.address,
+                                order.shippingAddress?.locality,
+                                order.shippingAddress?.city,
+                                order.shippingAddress?.state,
+                                order.shippingAddress?.pinCode,
+                              ]
+                                .filter(Boolean)
+                                .join(", ")}
                             </p>
-                          ))}
-                          <p>Subtotal {currency(order.subtotal)} · Shipping {currency(order.shippingFee)}</p>
+                            <strong>Order items</strong>
+                            {order.items?.map((item, index) => (
+                              <p key={`${item.productId}-${index}`}>
+                                {item.name} × {item.quantity} ·{" "}
+                                {currency(item.price)}
+                                {item.size && ` · ${item.size}`}
+                                {item.color && ` · ${item.color}`}
+                              </p>
+                            ))}
+                            <p>
+                              Subtotal {currency(order.subtotal)} · Shipping{" "}
+                              {currency(order.shippingFee)}
+                            </p>
                           </div>
                         )}
                       </div>
                     </td>
                     <td>
-                      <strong>{customer.name || order.shippingAddress?.name || "Customer"}</strong>
+                      <strong>
+                        {customer.name ||
+                          order.shippingAddress?.name ||
+                          "Customer"}
+                      </strong>
                       <small>{customer.email || customer.mobile || "—"}</small>
                     </td>
-                    <td>{order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0}</td>
-                    <td><strong>{currency(order.total)}</strong></td>
-                    <td><span className={`management-badge status-${order.orderStatus}`}>{titleCase(order.orderStatus)}</span></td>
-                    <td>{titleCase(order.paymentStatus)}<small>{titleCase(order.paymentMethod)}</small></td>
+                    <td>
+                      {order.items?.reduce(
+                        (sum, item) => sum + item.quantity,
+                        0,
+                      ) || 0}
+                    </td>
+                    <td>
+                      <strong>{currency(order.total)}</strong>
+                    </td>
+                    <td>
+                      <span
+                        className={`management-badge status-${order.orderStatus}`}
+                      >
+                        {titleCase(order.orderStatus)}
+                      </span>
+                    </td>
+                    <td>
+                      {titleCase(order.paymentStatus)}
+                      <small>{titleCase(order.paymentMethod)}</small>
+                    </td>
                     <td>{dateLabel(order.createdAt)}</td>
                     <td>
                       <div className="management-actions">
-                        <button type="button" onClick={() => openEditor(order)}>Edit</button>
+                        <button type="button" onClick={() => openEditor(order)}>
+                          Edit
+                        </button>
                         <button
                           type="button"
                           className="danger-action"
@@ -289,6 +355,9 @@ const Orders = () => {
                         </button>
                       </div>
                     </td>
+                    <td>
+                      <button>Choose shipment</button>
+                    </td>
                   </tr>
                 );
               })}
@@ -298,23 +367,73 @@ const Orders = () => {
       )}
 
       {editing && (
-        <div className="management-modal-backdrop" onMouseDown={(event) => {
-          if (event.target === event.currentTarget && !saving) setEditing(null);
-        }}>
+        <div
+          className="management-modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !saving)
+              setEditing(null);
+          }}
+        >
           <form className="management-modal" onSubmit={saveOrder}>
             <div className="management-modal-heading">
-              <div><span className="management-eyebrow">EDIT ORDER</span><h2>{editing.orderId}</h2></div>
-              <button type="button" aria-label="Close" onClick={() => setEditing(null)}>×</button>
+              <div>
+                <span className="management-eyebrow">EDIT ORDER</span>
+                <h2>{editing.orderId}</h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={() => setEditing(null)}
+              >
+                ×
+              </button>
             </div>
             <div className="management-form-grid">
-              <label>Order status
-                <select value={editing.orderStatus} onChange={(event) => setEditing({ ...editing, orderStatus: event.target.value })} disabled={editing.paymentMethod === "online" && (editing.paymentStatus === "pending" || editing.stockReservationStatus === "released")}>
-                  {orderStatuses.map((status) => <option key={status} value={status} disabled={editing.paymentMethod === "online" && editing.paymentStatus === "paid" && status === "cancelled"}>{titleCase(status)}</option>)}
+              <label>
+                Order status
+                <select
+                  value={editing.orderStatus}
+                  onChange={(event) =>
+                    setEditing({ ...editing, orderStatus: event.target.value })
+                  }
+                  disabled={
+                    editing.paymentMethod === "online" &&
+                    (editing.paymentStatus === "pending" ||
+                      editing.stockReservationStatus === "released")
+                  }
+                >
+                  {orderStatuses.map((status) => (
+                    <option
+                      key={status}
+                      value={status}
+                      disabled={
+                        editing.paymentMethod === "online" &&
+                        editing.paymentStatus === "paid" &&
+                        status === "cancelled"
+                      }
+                    >
+                      {titleCase(status)}
+                    </option>
+                  ))}
                 </select>
               </label>
-              <label>Payment status
-                <select value={editing.paymentStatus} onChange={(event) => setEditing({ ...editing, paymentStatus: event.target.value })} disabled={editing.paymentMethod === "online"}>
-                  {paymentStatuses.map((status) => <option key={status} value={status}>{titleCase(status)}</option>)}
+              <label>
+                Payment status
+                <select
+                  value={editing.paymentStatus}
+                  onChange={(event) =>
+                    setEditing({
+                      ...editing,
+                      paymentStatus: event.target.value,
+                    })
+                  }
+                  disabled={editing.paymentMethod === "online"}
+                >
+                  {paymentStatuses.map((status) => (
+                    <option key={status} value={status}>
+                      {titleCase(status)}
+                    </option>
+                  ))}
                 </select>
               </label>
               {[
@@ -327,19 +446,40 @@ const Orders = () => {
                 ["state", "State"],
                 ["pinCode", "PIN code"],
               ].map(([name, label]) => (
-                <label key={name}>{label}
+                <label key={name}>
+                  {label}
                   <input
                     name={name}
                     value={editing.shippingAddress[name]}
                     onChange={updateAddress}
-                    required={["name", "mobile", "address", "city", "state", "pinCode"].includes(name)}
+                    required={[
+                      "name",
+                      "mobile",
+                      "address",
+                      "city",
+                      "state",
+                      "pinCode",
+                    ].includes(name)}
                   />
                 </label>
               ))}
             </div>
             <div className="management-modal-actions">
-              <button type="button" className="management-secondary" onClick={() => setEditing(null)} disabled={saving}>Cancel</button>
-              <button type="submit" className="management-primary" disabled={saving}>{saving ? "Saving…" : "Save order"}</button>
+              <button
+                type="button"
+                className="management-secondary"
+                onClick={() => setEditing(null)}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="management-primary"
+                disabled={saving}
+              >
+                {saving ? "Saving…" : "Save order"}
+              </button>
             </div>
           </form>
         </div>
