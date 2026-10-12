@@ -14,6 +14,8 @@ const formatDate = (value) =>
       })
     : "Unavailable";
 
+
+
 const formatAmount = (value) =>
   `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
