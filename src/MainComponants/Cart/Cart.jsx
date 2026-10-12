@@ -571,7 +571,7 @@ const Cart = () => {
                     "Payment status requires attention. Review the order details.",
                 );
                 navigate(
-                  `/Payment_result?orderId=${encodeURIComponent(failedOrder.orderId)}`,
+                  `/Payment_failure?orderId=${encodeURIComponent(failedOrder.orderId)}`,
                   { state: { order: failedOrder } },
                 );
               } else {
@@ -580,8 +580,13 @@ const Cart = () => {
                     "Payment verification is pending. Check your orders before retrying.",
                 );
                 navigate(
-                  `/Payment_result?orderId=${encodeURIComponent(res.data.order.orderId)}`,
-                  { state: { order: res.data.order } },
+                  `/Payment_failure?orderId=${encodeURIComponent(res.data.order.orderId)}`,
+                  {
+                    state: {
+                      order: res.data.order,
+                      reason: "Payment could not be confirmed yet.",
+                    },
+                  },
                 );
               }
             } finally {
@@ -609,8 +614,13 @@ const Cart = () => {
                 } else {
                   toast("Payment cancelled. Your cart is unchanged.");
                   navigate(
-                    `/Payment_result?orderId=${encodeURIComponent(order.orderId)}`,
-                    { state: { order } },
+                    `/Payment_failure?orderId=${encodeURIComponent(order.orderId)}`,
+                    {
+                      state: {
+                        order,
+                        reason: "You cancelled the payment before it completed.",
+                      },
+                    },
                   );
                 }
               } catch (error) {
@@ -621,17 +631,73 @@ const Cart = () => {
                 toast.error(
                   "Could not confirm payment status. Check your orders before trying again.",
                 );
+                navigate(
+                  `/Payment_failure?orderId=${encodeURIComponent(res.data.order.orderId)}`,
+                  {
+                    state: {
+                      order: res.data.order,
+                      reason:
+                        "The payment was closed, but its final status could not be confirmed.",
+                    },
+                  },
+                );
               } finally {
                 setPlacingOrder(false);
               }
             },
           },
         });
-        checkout.on("payment.failed", (failure) => {
-          toast.error(
+        checkout.on("payment.failed", async (failure) => {
+          if (paymentHandled) return;
+          paymentHandled = true;
+          const reason =
             failure.error?.description ||
-              "Payment attempt failed. You can retry.",
-          );
+            "The payment attempt failed. You can retry.";
+          try {
+            const cancelled = await axios.post(
+              `${API}/api/orders/${encodeURIComponent(res.data.order.orderId)}/cancel-payment`,
+              {},
+              { withCredentials: true },
+            );
+            const order = cancelled.data.order || res.data.order;
+            const productsRefreshed = await refreshProducts();
+            if (!productsRefreshed) {
+              toast.error(
+                "Unable to refresh stock after payment. Reload before shopping again.",
+              );
+            }
+            if (order.paymentStatus === "paid") {
+              selectedItems.forEach((item) => removeFromCart(item.cartId));
+              navigate(
+                `/Payment_result?orderId=${encodeURIComponent(order.orderId)}`,
+                { state: { order } },
+              );
+              return;
+            }
+            toast.error(reason);
+            navigate(
+              `/Payment_failure?orderId=${encodeURIComponent(order.orderId)}`,
+              { state: { order, reason } },
+            );
+          } catch (error) {
+            console.error("Payment failure status check failed:", error);
+            toast.error(
+              error.response?.data?.message ||
+                "Payment could not be confirmed. Check your order status.",
+            );
+            navigate(
+              `/Payment_failure?orderId=${encodeURIComponent(res.data.order.orderId)}`,
+              {
+                state: {
+                  order: res.data.order,
+                  reason:
+                    "The payment provider reported a failure, but the final status could not be confirmed.",
+                },
+              },
+            );
+          } finally {
+            setPlacingOrder(false);
+          }
         });
         checkout.open();
         checkoutOpened = true;

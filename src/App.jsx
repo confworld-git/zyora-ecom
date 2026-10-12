@@ -14,6 +14,7 @@ import ProtectedRoute from "./ProtectedRoute/ProtectedRoute.jsx";
 import Layout from "./ProtectedRoute/Layout.jsx";
 import ProductDetail from "./MainComponants/ProductDetail/ProductDetail.jsx";
 import PaymentSuccess from "./MainComponants/Success/PaymentSuccess.jsx";
+import PaymentFailure from "./MainComponants/Success/PaymentFailure.jsx";
 import Jewellery from "./MainComponants/Jewellery/Jewellery.jsx";
 import Profile from "./Profile/Profile.jsx";
 import CustomerRoute from "./ProtectedRoute/CustomerRoute.jsx";
@@ -74,6 +75,7 @@ export const AppRoutes = () => {
             element={<ProductDetail />}
           />
           <Route path="/Payment_result" element={<PaymentSuccess />} />
+          <Route path="/Payment_failure" element={<PaymentFailure />} />
           <Route
             path="/Dashboard"
             element={

@@ -11,7 +11,8 @@ const Layout = () => {
   const path = location.pathname.toLowerCase();
 
   const isAdminPage = path === "/login" || path.startsWith("/dashboard");
-  const isPaymentResultPage = path === "/payment_result";
+  const isPaymentResultPage =
+    path === "/payment_result" || path === "/payment_failure";
   // matches /profile and /profile/<customerId> (path is already lowercase)
   const isProfilePage = path === "/profile" || path.startsWith("/profile/");
   const hideChrome = isAdminPage || isPaymentResultPage || isProfilePage;
