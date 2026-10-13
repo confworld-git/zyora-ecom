@@ -79,10 +79,10 @@ const Contact = () => {
         <div className="Contact">
           <div className="contact_content">
             <h1>
-              CONTACT <span>US</span>
+              Contact <span>us.</span>
             </h1>
             <p>
-              We'd Love to Hear From You Text: Have a question about your order,
+              We'd love to hear from you. Have a question about your order,
               a product, or just want to say hi? Our team at ZYORA is here to
               help.
             </p>
@@ -112,7 +112,9 @@ const Contact = () => {
           <div className="contact_form">
             <img src={peak} alt="" />
             <p>Send a Message</p>
-            <h1>Tell us about it.</h1>
+            <h1>
+              Tell us <span>about it.</span>
+            </h1>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <label>Name</label>

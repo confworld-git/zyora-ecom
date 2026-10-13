@@ -78,10 +78,10 @@ const About = () => {
           </p>
         </section>
         <div className="standFor">
+          <span>What We Stand For</span>
           <h1>
-            What We <span>Stand For</span>
+            Every product, chosen with <span>purpose.</span>
           </h1>
-          <span>Every product, chosen with purpose.</span>
           <p>
             We handpick every single product that makes it onto ZYORA. No
             filler, no guesswork — just a careful blend of quality,
