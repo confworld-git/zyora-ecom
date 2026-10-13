@@ -1,4 +1,5 @@
 import "./highlights.css";
+import { Link } from "react-router-dom";
 import toy from "../../assets/Videos/toys.mp4";
 import stationery from "../../assets/Videos/stationery.mp4";
 import bag from "../../assets/Videos/bag.mp4";
@@ -34,10 +35,10 @@ const Highlights = () => {
         <h1>
           Category <span>Highlights</span>
         </h1>
-        <p className="explore_category_link">
+        <Link className="explore_category_link" to="/Zyora_Category">
           View products
-          <i className="bi bi-arrow-right"></i>
-        </p>
+          <i className="bi bi-arrow-right" aria-hidden="true"></i>
+        </Link>
       </div>
       <p>Explore our signature pillars of everyday quality</p>
       <section>

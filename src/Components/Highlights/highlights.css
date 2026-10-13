@@ -75,11 +75,28 @@
   font-weight: 500;
 }
 
-.highlights > div > p {
+.highlights > div > .explore_category_link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #006cf8;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
   transition: transform 200ms ease;
 }
 
-.highlights > div > p i {
+.highlights > div > .explore_category_link:hover {
+  transform: translateX(3px);
+}
+
+.highlights > div > .explore_category_link:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.highlights > div > .explore_category_link i {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,7 +198,7 @@
     font-size: 43px;
   }
 
-  .highlights > div:first-child > p {
+  .highlights > div:first-child > .explore_category_link {
     display: flex;
     flex: 0 0 auto;
     margin: 0 0 5px;
