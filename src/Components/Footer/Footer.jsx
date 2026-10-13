@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./Footer.css";
-import logo from "../../assets/Logo/Zyora_logo.jpg";
+import logo from "../../assets/Logo/Zyora_logo.jpeg";
 
 const Footer = () => {
   return (

@@ -5,7 +5,7 @@ import Highlights from "./Highlights/Highlights";
 import Featured from "./Featured/Featured";
 import Why from "./Why/Why";
 import SEO from "../SEO.jsx";
-import logo from "../assets/Logo/Zyora_logo.jpg";
+import logo from "../assets/Logo/Zyora_logo.jpeg";
 
 const Homepage = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
