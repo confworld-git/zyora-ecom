@@ -5,6 +5,7 @@
 .Featured_Collection > h1 {
   margin-bottom: 5px;
   font-size: 40px;
+  color: var(--primary);
 }
 
 .Featured_Collection > p {
@@ -83,7 +84,7 @@
   gap: 20px;
 }
 
-.product_card_1{
+.product_card_1 {
   min-width: 0;
   color: inherit;
   text-decoration: none;
@@ -96,7 +97,6 @@
   object-fit: cover;
   border-radius: 20px;
   border: 1px solid #f3ece5;
- 
 }
 
 .featured_no_image {
@@ -162,7 +162,7 @@
   cursor: pointer;
   text-decoration: none;
   outline: none;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .explore_category_link > i {
@@ -176,6 +176,10 @@
 .featured_status {
   padding: 32px 0;
   text-align: center;
+  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .product_price_row {

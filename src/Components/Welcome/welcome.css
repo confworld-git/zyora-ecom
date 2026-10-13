@@ -63,7 +63,8 @@
   letter-spacing: -0.035em;
   font-weight: 700;
   margin: 0 0 28px;
-  color: black;
+  /* color: black; */
+  color: var(--primary);
 }
 .wl h1 span {
   color: var(--acc);
