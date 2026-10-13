@@ -9,7 +9,7 @@ body {
   margin: 0;
   font-family: "Playfair Display SC", sans-serif;
   background-color: #ffffff;
-  zoom: 0.9;
+  /* zoom: 0.9; */
   --sb-track-color: #232e33;
   --sb-thumb-color: #ffffff;
   --primary: #01028b;

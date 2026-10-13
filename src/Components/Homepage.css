@@ -1,0 +1,114 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Manrope:wght@400;500;600&display=swap");
+
+body:has(.zyora-homepage) {
+  --zyora-orange: #ff4a12;
+  zoom: 1;
+  background: #f6f3ee;
+  color: #0a0a5c;
+  font-family: "Manrope", sans-serif;
+}
+
+.zyora-homepage {
+  --zyora-bg: #f6f3ee;
+  --zyora-navy: #0a0a5c;
+  --zyora-navy-light: #1b1b7a;
+  --zyora-orange: #ff4a12;
+  --zyora-muted: #3e3e7a;
+  --zyora-card: #fff;
+  --zyora-tile-sand: #e8c9a0;
+  --zyora-tile-lilac: #c9d1ff;
+  --zyora-tile-peach: #ffd9cc;
+  --zyora-tile-coral: #ffb199;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--zyora-bg);
+  color: var(--zyora-navy);
+  font-family: "Manrope", sans-serif;
+}
+
+.zyora-homepage *,
+.zyora-homepage *::before,
+.zyora-homepage *::after {
+  box-sizing: border-box;
+}
+
+.zyora-homepage h1,
+.zyora-homepage h2,
+.zyora-homepage h3,
+.navbar,
+.footer {
+  font-family: "Bricolage Grotesque", sans-serif;
+}
+
+.zyora-homepage p,
+.navbar ul,
+.footer {
+  font-family: "Manrope", sans-serif;
+}
+
+.zyora-marquee {
+  overflow: hidden;
+  padding: 15px 0;
+  background: var(--zyora-orange);
+  color: #fff;
+  white-space: nowrap;
+}
+
+.zyora-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: zyora-marquee-scroll 30s linear infinite;
+}
+
+.zyora-marquee-track span {
+  flex: 0 0 auto;
+  padding-right: 28px;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+@keyframes zyora-marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.zyora-homepage button,
+.zyora-homepage a,
+.navbar a,
+.footer a,
+.wl-pillars li {
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+.zyora-homepage button:focus-visible,
+.zyora-homepage a:focus-visible,
+.navbar a:focus-visible,
+.footer a:focus-visible,
+.newsletter-input:focus-visible {
+  outline: 2px solid var(--zyora-orange);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zyora-marquee-track {
+    animation: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .zyora-marquee {
+    padding: 12px 0;
+  }
+
+  .zyora-marquee-track span {
+    font-size: 13px;
+  }
+}

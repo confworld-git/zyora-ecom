@@ -7,19 +7,27 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-grid">
-          <div className="footer-brand">
-            <Link to="/" className="footer-logo">
-              <img src={logo} alt="ZYORA Logo" className="footer-logo-img" />
-            </Link>
-            <p className="footer-description">
-              ZYORA is your one-stop online store for soft toys, home & kitchen
-              products, stationery, and handbags — curated for quality, style,
-              and everyday value.
+          <div>
+            <h4 className="footer-heading">Newsletter</h4>
+
+            <p className="footer-newsletter-text">
+              Get updates on new arrivals and exclusive deals.
             </p>
-            {/* <p className="footer-location">
-              📍Old No.1A, New No.3, Second Floor, Ragavan Street, Perambur,
-              Chennai - 600011, Tamil nadu, India.
-            </p> */}
+
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="newsletter-form"
+            >
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="newsletter-input"
+              />
+
+              <button type="submit" className="newsletter-button">
+                Join
+              </button>
+            </form>
           </div>
           <div>
             <h4 className="footer-heading">Quick Links</h4>
@@ -70,9 +78,17 @@ const Footer = () => {
                 <span className="footer-policy">Privacy Policy</span>
               </li>
             </ul>
-
+          </div>
+          <div className="footer-brand">
+            <Link to="/" className="footer-logo">
+              <img src={logo} alt="ZYORA Logo" className="footer-logo-img" />
+            </Link>
+            <p className="footer-description">
+              ZYORA is your one-stop online store for soft toys, home & kitchen
+              products, stationery, and handbags — curated for quality, style,
+              and everyday value.
+            </p>
             <h5 className="footer-connect-heading">Connect With Us</h5>
-
             <div className="footer-socials">
               <a
                 href="https://instagram.com"
@@ -104,28 +120,6 @@ const Footer = () => {
                 <i className="bi bi-whatsapp"></i>
               </a>
             </div>
-          </div>
-          <div>
-            <h4 className="footer-heading">Newsletter</h4>
-
-            <p className="footer-newsletter-text">
-              Get updates on new arrivals and exclusive deals.
-            </p>
-
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="newsletter-form"
-            >
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="newsletter-input"
-              />
-
-              <button type="submit" className="newsletter-button">
-                Join
-              </button>
-            </form>
           </div>
         </div>
         <div className="footer-bottom">

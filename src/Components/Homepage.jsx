@@ -1,4 +1,5 @@
 import "../index.css";
+import "./Homepage.css";
 import Home from "./Home/Home";
 import Welcome from "./Welcome/Welcome";
 import Highlights from "./Highlights/Highlights";
@@ -37,11 +38,25 @@ const Homepage = () => {
         canonical={import.meta.env.VITE_API_DOMAIN}
         jsonLd={homepageJsonLd}
       />
-      <Home />
-      <Welcome />
-      <Highlights />
-      <Featured />
-      <Why />
+      <main className="zyora-homepage">
+        <Home />
+        <div className="zyora-marquee" aria-label="Shop our categories">
+          <div className="zyora-marquee-track">
+            <span>
+              SOFT TOYS ✦ HOME &amp; KITCHEN ✦ STATIONERY ✦ FASHION ✦ HANDBAGS
+              ✦ JEWELLERY ✦
+            </span>
+            <span aria-hidden="true">
+              SOFT TOYS ✦ HOME &amp; KITCHEN ✦ STATIONERY ✦ FASHION ✦ HANDBAGS
+              ✦ JEWELLERY ✦
+            </span>
+          </div>
+        </div>
+        <Welcome />
+        <Highlights />
+        <Featured />
+        <Why />
+      </main>
     </>
   );
 };
