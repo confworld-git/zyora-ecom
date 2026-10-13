@@ -1,54 +1,94 @@
-.product-image {
+/* wrapper: the zoom panel is positioned against this */
+.product-zoom-wrapper {
   position: relative;
   width: 100%;
-  height: 450px;
-  overflow: hidden;
-  cursor: grab;
+}
+
+.product-image {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 460px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #f6f3ee;
+  cursor: crosshair;
 }
 
 .product-image > img {
+  display: block;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
-  object-fit: contain;
-  object-position: center;
-  display: block;
-}
-
-.product-image > img {
-  width: 100%;
-  height: 450px;
-  border-radius: 16px;
+  border-radius: 24px;
   object-fit: cover;
   object-position: center;
+  user-select: none;
 }
 
 .zoom-lens {
   position: absolute;
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+
+  /* Glass effect */
+  background-color: rgba(255, 255, 255, 0.11);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+
+  /* Subtle border */
+  border: 1px solid rgba(255, 255, 255, 0);
+
+  /* Depth */
+  box-shadow:
+    0 8px 24px rgba(20, 20, 60, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.65);
+
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.2);
-  /* border: 1px solid #aaa; */
   pointer-events: none;
+  z-index: 10;
+
+  /* Smooth movement */
+  transition:
+    border-radius 0.2s ease,
+    box-shadow 0.2s ease;
+
+  will-change: left, top;
 }
 
+/* Premium hover appearance */
+.zoom-lens:hover {
+  border-radius: 18px;
+  box-shadow:
+    0 10px 30px rgba(54, 18, 255, 0.16),
+    inset 0 1px 3px rgba(255, 255, 255, 0.8);
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+  .zoom-lens {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    background-size: 5px 5px;
+  }
+}
+
+/* magnified view, shown to the right of the image (over the summary) */
 .zoom-panel {
   position: absolute;
-  bottom: 50px;
-  right: 50px;
-  z-index: 10;
-  width: 450px;
-  height: 450px;
+  top: 0;
+  left: calc(100% + 16px);
+  z-index: 20;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: white;
-  /* border-radius: 20px;
-  box-shadow:
-    rgba(50, 50, 93, 0.25) 0px 30px 60px -12px,
-    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px; */
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(10, 10, 92, 0.22);
+  pointer-events: none;
 }
 
 .zoom-panel img {
@@ -56,5 +96,30 @@
   width: 200%;
   height: 200%;
   max-width: none;
-  object-fit: contain;
+  object-fit: cover;
+}
+
+/* no hover zoom on touch screens or small screens */
+@media (hover: none), (max-width: 900px) {
+  .zoom-panel,
+  .zoom-lens {
+    display: none;
+  }
+
+  .product-image {
+    cursor: default;
+  }
+}
+
+@media (max-width: 720px) {
+  .product-image {
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-height: 460px;
+    border-radius: 20px;
+  }
+
+  .product-image > img {
+    border-radius: 20px;
+  }
 }

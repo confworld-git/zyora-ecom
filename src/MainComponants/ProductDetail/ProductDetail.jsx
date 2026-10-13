@@ -50,8 +50,8 @@ const ProductDetail = () => {
   // Each image = one colour option (hex from image.color, name from variants.colours by index)
   const colorOptions = images.map((image, index) => ({
     id: image.id,
-    hex: image.color,
-    name: colourNames[index] || image.color,
+    color: image.color,
+    name: colourNames[index] || image.color || `Colour ${index + 1}`,
     image,
   }));
 
@@ -255,7 +255,7 @@ const ProductDetail = () => {
                       type="button"
                       title={option.name}
                       aria-label={`Select ${option.name} color`}
-                      style={{ backgroundColor: option.hex }}
+                      style={{ backgroundColor: option.color }}
                       onClick={() => updateSelection("image", option.image)}
                     />
                   ))
