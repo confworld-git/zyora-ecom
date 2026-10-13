@@ -1160,8 +1160,8 @@ const Cart = () => {
 
               <p className="order_terms">
                 By placing the order, you agree to Zyora's{" "}
-                <a href="/terms">Terms of Use</a> and{" "}
-                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms-and-conditions">Terms of Use</a> and{" "}
+                <a href="/privacy-policy">Privacy Policy</a>
               </p>
 
               <div className="cart_address_section">

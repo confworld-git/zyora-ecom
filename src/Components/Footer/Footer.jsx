@@ -38,22 +38,22 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="footer-link">
+                <Link to="/About_Us" className="footer-link">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/products" className="footer-link">
+                <Link to="/Zyora_Category" className="footer-link">
                   Shop
                 </Link>
               </li>
               <li>
-                <Link to="/orders" className="footer-link">
+                <Link to="/Profile" className="footer-link">
                   Track Order
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="footer-link">
+                <Link to="/Contact_Us" className="footer-link">
                   Contact Us
                 </Link>
               </li>
@@ -64,18 +64,24 @@ const Footer = () => {
 
             <ul className="footer-links">
               <li>
-                <span className="footer-policy">Shipping Policy</span>
+                <Link to="/shipping-policy" className="footer-link footer-policy">
+                  Shipping Policy
+                </Link>
               </li>
               <li>
-                <span className="footer-policy">
+                <Link to="/return-policy" className="footer-link footer-policy">
                   Return & Refund Policy (7 Days)
-                </span>
+                </Link>
               </li>
               <li>
-                <span className="footer-policy">Terms & Conditions</span>
+                <Link to="/terms-and-conditions" className="footer-link footer-policy">
+                  Terms & Conditions
+                </Link>
               </li>
               <li>
-                <span className="footer-policy">Privacy Policy</span>
+                <Link to="/privacy-policy" className="footer-link footer-policy">
+                  Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>
