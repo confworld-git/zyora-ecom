@@ -7,7 +7,8 @@
   --pd-peach: #ffe6d9;
   counter-reset: pd-sec;
   padding: 40px;
-  background-color: #faf7ef;
+  /* background-color: #faf7ef; */
+  background-color: #f6f3ee;
 }
 
 main.product-detail-state {
@@ -66,7 +67,8 @@ main.product-detail-state a:hover {
   margin: 0 0 22px;
   font-size: clamp(20px, 2.4vw, 28px);
   letter-spacing: -0.02em;
-  color: var(--pd-ink);
+  /* color: var(--pd-ink); */
+  color: var(--primary);
 }
 .product-detail-page .product-detail-section h2::before {
   counter-increment: pd-sec;
