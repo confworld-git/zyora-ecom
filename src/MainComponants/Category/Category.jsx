@@ -405,7 +405,7 @@ const Category = () => {
           </p>
         </div>
 
-        <h1>Categories</h1>
+        <h1>Your <span>Era</span>, Your <span>Style</span></h1>
 
         <p>
           Explore our wide range of carefully selected categories, made to bring
