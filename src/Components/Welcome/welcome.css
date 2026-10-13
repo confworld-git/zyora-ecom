@@ -7,7 +7,7 @@
   position: relative;
   overflow: hidden;
   color: var(--ink);
-  padding: 96px 48px;
+  padding: 56px 48px;
 }
 .wl *,
 .wl *::before,

@@ -1,7 +1,7 @@
 .Featured_Collection {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 48px 96px;
+  padding: 0 48px 56px;
 }
 
 .Featured_Collection > h1 {
@@ -30,7 +30,7 @@
   display: flex;
   width: fit-content;
   max-width: 100%;
-  margin: -56px 0 28px auto;
+  margin: -76px 0 28px auto;
   padding: 5px;
   justify-content: flex-end;
   align-items: center;
@@ -213,12 +213,16 @@
 .collections_imgs > .product_card_1 {
   display: flex;
   min-width: 0;
+  width: 270px;
+  box-sizing: border-box;
   flex-direction: column;
+  gap: 0;
+  padding: 8px;
   overflow: hidden;
   border: 1px solid rgba(10, 10, 92, 0.07);
-  border-radius: 28px;
+  border-radius: 20px;
   background: #fff;
-  box-shadow: 0 8px 22px rgba(10, 10, 92, 0.04);
+  box-shadow: 0 5px 16px rgba(10, 10, 92, 0.035);
   transition:
     transform 200ms ease,
     border-color 200ms ease,
@@ -238,12 +242,13 @@
 .collections_imgs > .product_card_1 > img,
 .collections_imgs > .product_card_1 > .featured_no_image {
   display: block;
-  width: 100%;
+  width: 250px;
   height: 250px;
+  /* aspect-ratio: 1.15 / 1; */
   flex: 0 0 auto;
   object-fit: cover;
   border: 0;
-  border-radius: 0;
+  border-radius: 12px;
   background: #f6f3ee;
   transition: transform 350ms ease;
 }
@@ -253,65 +258,73 @@
 }
 
 .collections_imgs > .product_card_1 > .featured_no_image {
-  min-height: 190px;
+  min-height: 0;
   color: #6f6e82;
+  font-size: 12px;
 }
 
 .collections_imgs > .product_card_1 > .product_info {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto;
   flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 16px 17px 18px;
+  align-items: center;
+  padding: 10px 4px 3px;
 }
 
 .collections_imgs > .product_card_1 .featured_brand {
-  margin: 0 0 6px;
+  grid-column: 1 / -1;
+  margin: 0 0 3px;
   color: #3e3e7a;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .collections_imgs > .product_card_1 .product_info > h2 {
   display: -webkit-box;
-  /* min-height: 2.7em; */
-  margin: 0 0 10px;
+  grid-column: 1 / -1;
+  margin: 0 0 7px;
   overflow: hidden;
   color: #0a0a5c;
   font-family: "Bricolage Grotesque", sans-serif;
-  font-size: 16px;
-  font-weight: 650;
-  line-height: 1.35;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.25;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
 }
 
 .collections_imgs > .product_card_1 .product_price_row {
-  min-height: 25px;
+  grid-column: 1;
+  min-width: 0;
+  min-height: 23px;
   flex-wrap: wrap;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
 }
 
 .collections_imgs > .product_card_1 #product_price {
   color: #0a0a5c;
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 900;
 }
 
 .collections_imgs > .product_card_1 .product_mrp {
   color: #89899a;
   font-size: 12px;
+   font-weight: 850;
 }
 
 .collections_imgs > .product_card_1 .product_discount {
-  padding: 4px 7px;
+  padding: 3px 5px;
   border-radius: 999px;
   background: #fff0e9;
   color: #ff4a12;
-  font-size: 10px;
-  font-weight: 750;
+  font-size: 12px;
+  font-weight: 850;
   text-transform: uppercase;
 }
 
@@ -329,9 +342,12 @@
 
 .collections_imgs > .product_card_1 .product_info::after {
   content: "Add +";
-  align-self: flex-end;
-  margin-top: 12px;
-  padding: 7px 14px;
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: end;
+  align-self: center;
+  margin: 0;
+  padding: 8px 12px;
   border-radius: 999px;
   background: #ff4a12;
   color: #fff;
@@ -407,29 +423,29 @@
   }
 
   .collections_imgs > .product_card_1 {
-    border-radius: 20px;
+    padding: 7px;
+    border-radius: 18px;
   }
 
   .collections_imgs > .product_card_1 > img,
   .collections_imgs > .product_card_1 > .featured_no_image {
-    height: 165px;
+    aspect-ratio: 1.08 / 1;
   }
 
   .collections_imgs > .product_card_1 > .product_info {
-    padding: 12px;
+    padding: 9px 3px 2px;
   }
 
   .collections_imgs > .product_card_1 .product_info > h2 {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .collections_imgs > .product_card_1 #product_price {
-    font-size: 15px;
+    font-size: 10px;
   }
 
   .collections_imgs > .product_card_1 .product_info::after {
-    margin-top: 10px;
-    padding: 6px 10px;
-    font-size: 10px;
+    padding: 6px 9px;
+    font-size: 8px;
   }
 }

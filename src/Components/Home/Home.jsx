@@ -2,6 +2,7 @@ import "./Home.css";
 import { HiShoppingBag } from "react-icons/hi2";
 import Confetti from "../../Confetti/Confetti";
 import home_pro1 from "../../assets/Images/home_img.png";
+import toy from "../../assets/Images/toy.png";
 
 const Home = () => {
   return (
@@ -9,9 +10,10 @@ const Home = () => {
       <div className="hero-copy">
         <span className="hero-eyebrow">Destination for E-commerce</span>
         <h1>
-          Welcome to <span>ZYORA</span>{" "}
+          Welcome to <span>ZYORA</span>
           <br />
-          Where Everyday Meets <span className="hero-highlight">Extraordinary</span>
+          Where Everyday Meets{" "}
+          <span className="hero-highlight">Extraordinary</span>
         </h1>
         <p>
           From cuddly soft toys to smart home essentials, handy stationery to
@@ -31,12 +33,13 @@ const Home = () => {
         </div>
         <div className="hero-tile hero-tile--soft-toys">
           <span className="hero-tile-number">02</span>
-          <img src={home_pro1} alt="Soft Toys" className="soft-toys-image" />
+          <img src={toy} alt="Soft Toys" className="soft-toys-image" />
           <h2>Soft Toys</h2>
         </div>
         <div className="hero-tile hero-tile--home">
           <span className="hero-tile-number">03</span>
-          <h2>Home</h2>
+          <img src={home_pro1} alt="Home" className="soft-toys-image" />
+          <h2>Products</h2>
         </div>
         <div className="hero-tile hero-tile--new-drop">
           <div>

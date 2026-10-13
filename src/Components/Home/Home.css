@@ -70,7 +70,9 @@
   border-radius: 999px;
   background: #ff4a12;
   color: #fff;
-  font: 700 13px "Manrope", sans-serif;
+  font:
+    700 13px "Manrope",
+    sans-serif;
   cursor: pointer;
 }
 
@@ -157,12 +159,9 @@
 }
 
 .hero-tile--soft-toys .soft-toys-image {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  opacity: 0.2;
+  object-fit: contain;
 }
 
 .hero-tile--home {

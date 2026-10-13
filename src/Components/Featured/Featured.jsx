@@ -66,8 +66,6 @@ const Featured = () => {
     <div className="Featured_Collection">
       <h1>
         Featured <span>Collections</span>
-        <br />
-        Banner
       </h1>
 
       <p>Handpicked selections tailored to your lifestyle</p>
@@ -172,10 +170,6 @@ const Featured = () => {
                             </p>
                           ) : null}
                         </div>
-
-                        <p className="product_description_clamp">
-                          {product.about_this_item?.[0] || product.title}
-                        </p>
                       </div>
                     </Link>
                   );

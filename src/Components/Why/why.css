@@ -1,14 +1,14 @@
 .why {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 48px 96px;
+  padding: 0 48px 56px;
 }
 
 .why > h1 {
   margin: 0 0 24px;
   color: #0a0a5c;
   font-family: "Bricolage Grotesque", sans-serif;
-  font-size: clamp(42px, 5vw, 64px);
+  font-size: clamp(42px, 5vw, 54px);
   font-weight: 800;
   letter-spacing: -0.05em;
   text-align: left;
@@ -55,11 +55,10 @@
   position: absolute;
   top: 10px;
   right: 8px;
-  width: 46px;
-  height: 46px;
+  width: 86px;
+  height: 86px;
   object-fit: cover;
   border-radius: 50%;
-  opacity: 0.8;
 }
 
 .why > section > div > p {
