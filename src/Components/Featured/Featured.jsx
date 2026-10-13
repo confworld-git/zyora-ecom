@@ -65,7 +65,9 @@ const Featured = () => {
   return (
     <div className="Featured_Collection">
       <h1>
-        Featured <span>Collections</span> Banner
+        Featured <span>Collections</span>
+        <br />
+        Banner
       </h1>
 
       <p>Handpicked selections tailored to your lifestyle</p>
@@ -129,7 +131,11 @@ const Featured = () => {
 
                   const productUrl = `/Zyora_Category/product/${productId}/${slug}`;
                   return (
-                    <Link className="product_card_1" key={index} to={productUrl}>
+                    <Link
+                      className="product_card_1"
+                      key={index}
+                      to={productUrl}
+                    >
                       {product.images?.[0]?.url ? (
                         <img
                           src={product.images[0].url}

@@ -248,9 +248,9 @@
   content: "zyora";
   position: absolute;
   right: 0;
-  bottom: -0.39em;
+  bottom: -60px;
   z-index: 0;
-  color: #ff4a12;
+  color: #ff4912c5;
   font-family: "Bricolage Grotesque", sans-serif;
   font-size: clamp(180px, 29vw, 430px);
   font-weight: 800;
@@ -349,7 +349,9 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  font: 12px "Manrope", sans-serif;
+  font:
+    12px "Manrope",
+    sans-serif;
 }
 
 .newsletter-input::placeholder {
@@ -366,7 +368,9 @@
   border-radius: 999px;
   background: #ff4a12;
   color: #fff;
-  font: 700 12px "Manrope", sans-serif;
+  font:
+    700 12px "Manrope",
+    sans-serif;
   cursor: pointer;
 }
 

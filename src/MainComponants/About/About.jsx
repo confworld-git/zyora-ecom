@@ -4,6 +4,7 @@ import { FaTruck } from "react-icons/fa6";
 import arc from "../../assets/Images/arc.png";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO";
+import home_img from "../../assets/Images/home_img.png";
 
 const About = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
@@ -35,27 +36,47 @@ const About = () => {
           </p>
         </div>
         <div className="about_title">
-          <img src={arc} alt="" />
-          <h1>Who We Are</h1>
-          <p>
-            Shopping should feel personal, joyful, and <br /> effortless <br />
-            that's the whole idea behind ZYORA.
-          </p>
+          <div className="about_hero_copy">
+            <h1>
+              Shopping, made <span>personal</span> again.
+            </h1>
+            <p>
+              Shopping should feel personal, joyful, and effortless that's the
+              whole idea behind ZYORA.
+            </p>
+          </div>
+          <img src={home_img} alt="" />
         </div>
-        <h1>
-          Our <span>Story</span>
-        </h1>
-        <span>Shopping, made personal again.</span>
-        <p>
-          At ZYORA, we believe shopping should feel personal, joyful, and
-          effortless. What started as a simple idea — to bring together the
-          products people genuinely need and love — has grown into a one-stop
-          destination for soft toys, home essentials, stationery, and handbags.
-          We handpick every product with care, blending quality, affordability,
-          and style, so whether you're decorating your kitchen, gearing up for
-          the school year, gifting a loved one, or accessorizing your outfit —
-          ZYORA has something for you.
-        </p>
+        <div className="about_marquee" aria-hidden="true">
+          <div className="about_marquee_track">
+            <span>
+              THOUGHTFULLY CURATED ✦ QUALITY MEETS AFFORDABILITY ✦ MADE FOR
+              EVERYDAY MOMENTS ✦
+            </span>
+            <span>
+              THOUGHTFULLY CURATED ✦ QUALITY MEETS AFFORDABILITY ✦ MADE FOR
+              EVERYDAY MOMENTS ✦
+            </span>
+          </div>
+        </div>
+        <section className="about_story">
+          <div>
+            <span className="about_eyebrow">Our Story</span>
+            <h1>
+              Shopping, made <span>personal again.</span>
+            </h1>
+          </div>
+          <p>
+            At ZYORA, we believe shopping should feel personal, joyful, and
+            effortless. What started as a simple idea — to bring together the
+            products people genuinely need and love — has grown into a one-stop
+            destination for soft toys, home essentials, stationery, and
+            handbags. We handpick every product with care, blending quality,
+            affordability, and style, so whether you're decorating your kitchen,
+            gearing up for the school year, gifting a loved one, or
+            accessorizing your outfit — ZYORA has something for you.
+          </p>
+        </section>
         <div className="standFor">
           <h1>
             What We <span>Stand For</span>
@@ -72,6 +93,7 @@ const About = () => {
           </p>
         </div>
         <div className="why_zyora">
+          <span className="about_eyebrow">The ZYORA difference</span>
           <h1>
             Why <span>ZYORA</span>
           </h1>
@@ -108,11 +130,10 @@ const About = () => {
         </div>
         <section className="Our">
           <div className="promise">
-            <h1>
-              <FaHandsHelping />
-              Our Promise
-            </h1>
-            <p>Built on Trust & Integrity</p>
+            <h1>Our Promise</h1>
+            <p>
+              <FaHandsHelping /> Built on Trust & Integrity
+            </p>
             <div>
               <div>
                 <div style={{ backgroundColor: "#263a69" }}>
