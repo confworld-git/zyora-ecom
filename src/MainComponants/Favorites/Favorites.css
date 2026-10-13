@@ -5,16 +5,19 @@
   --f-bg: #f6f3ee;
   --f-navy: #0a0a5c;
   --f-orange: #ff4a12;
+  --f-orange-d: #e63d06;
   --f-muted: #3e3e7a;
+  --f-soft: #8a8ab0;
   --f-peach: #ffd9cc;
   --f-head: "Bricolage Grotesque", sans-serif;
   --f-body: "Manrope", sans-serif;
   box-sizing: border-box;
-  min-height: 120vh;
+  min-height: 100vh;
   padding: 24px 48px 80px;
   background: var(--f-bg);
   color: var(--f-navy);
   font-family: var(--f-body);
+  font-size: 15px;
 }
 
 .favourites *,
@@ -34,9 +37,9 @@
   gap: 4px;
   margin: 0;
   color: var(--f-muted);
+  font-family: var(--f-body);
   font-size: 13px;
   font-weight: 600;
-  font-family: "Manrope", sans-serif;
 }
 
 .favourites #page_path > p > svg {
@@ -49,7 +52,7 @@
   margin: 0;
   color: var(--f-navy);
   font-family: var(--f-head);
-  font-size: clamp(40px, 5vw, 54px);
+  font-size: clamp(30px, 3.6vw, 44px);
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -63,7 +66,7 @@
 .favourites > p {
   margin: 4px 0 36px;
   color: var(--f-muted);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.6;
 }
@@ -119,10 +122,9 @@
 /* ================= GRID ================= */
 .favourite_products {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 20px;
   align-items: stretch;
-  cursor: pointer;
 }
 
 /* ================= CARD ================= */
@@ -136,6 +138,7 @@
   border-radius: 28px;
   background: #fff;
   overflow: hidden;
+  cursor: pointer;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -148,7 +151,7 @@
 
 .favourite_products > div > img {
   width: 100%;
-  height: 230px;
+  height: 210px;
   border-radius: 20px;
   background: var(--f-bg);
   object-fit: cover;
@@ -175,7 +178,7 @@
   margin: 6px 6px 0;
   overflow: hidden;
   color: var(--f-muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.45;
   -webkit-line-clamp: 2;
@@ -186,16 +189,16 @@
 .favourite_price {
   display: flex;
   align-items: center;
-  margin: 12px 6px 0;
+  margin: 10px 6px 0;
   color: var(--f-navy);
   font-family: var(--f-head);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
 .favourite_price > i {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .favourite_price_details {
@@ -204,12 +207,12 @@
   gap: 8px;
   margin: 4px 6px 0;
   font-family: var(--f-body);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .favourite_price_details > :first-child {
-  color: #8a8ab0;
+  color: var(--f-soft);
 }
 
 .favourite_price_details > :last-child {
@@ -217,7 +220,7 @@
   border-radius: 999px;
   background: var(--f-peach);
   color: #c42e00;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -229,14 +232,14 @@
   z-index: 20;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border: 0;
   border-radius: 50%;
   background: #fff;
   color: var(--f-orange);
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   opacity: 1;
   transform: none;
@@ -252,7 +255,9 @@
   display: none;
 }
 
-.favourite_products > div > button[title="Remove from favorites"]:hover {
+.favourite_products
+  > div
+  > button[title="Remove from favorites"]:hover:not(:disabled) {
   transform: scale(1.08);
   background: var(--f-orange);
   color: #fff;
@@ -264,10 +269,16 @@
 }
 
 /* ================= ADD TO CART ================= */
-.favourite_add_to_cart {
+/* The element right before the button gets the gap, and the button
+   itself sticks to the bottom so all cards line up evenly. */
+.favourite_products > div > :nth-last-child(2) {
+  margin-bottom: 14px;
+}
+
+.favourite_products > div > .favourite_add_to_cart {
   position: static;
   width: 100%;
-  height: 46px;
+  height: 42px;
   margin: auto 0 0;
   padding: 0 16px;
   border: 0;
@@ -275,7 +286,7 @@
   background: var(--f-orange);
   color: #fff;
   font-family: var(--f-body);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0;
   cursor: pointer;
@@ -288,27 +299,17 @@
     transform 0.2s ease;
 }
 
-/* spacing above button (cards have different heights) */
-.favourite_products > div > .favourite_price,
-.favourite_products > div > .favourite_price_details {
-  margin-bottom: 0;
-}
-
-.favourite_products > div > .favourite_add_to_cart {
-  margin-top: 16px;
-}
-
-.favourite_add_to_cart:hover:not(:disabled) {
+.favourite_products > div > .favourite_add_to_cart:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: #e63d06;
+  background: var(--f-orange-d);
   box-shadow: none;
 }
 
-.favourite_add_to_cart:active {
+.favourite_products > div > .favourite_add_to_cart:active {
   transform: translateY(0);
 }
 
-.favourite_add_to_cart:focus-visible,
+.favourite_products > div > .favourite_add_to_cart:focus-visible,
 .favourite_products
   > div
   > button[title="Remove from favorites"]:focus-visible {
@@ -316,7 +317,7 @@
   outline-offset: 3px;
 }
 
-.favourite_add_to_cart:disabled {
+.favourite_products > div > .favourite_add_to_cart:disabled {
   opacity: 0.65;
   cursor: wait;
 }
@@ -328,7 +329,7 @@
   }
 
   .favourite_products {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
 
@@ -364,7 +365,7 @@
 
   .favourite_products > div > h1 {
     margin: 10px 4px 0;
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .fav_title {
@@ -374,11 +375,11 @@
 
   .favourite_price {
     margin: 8px 4px 0;
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .favourite_price > i {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .favourite_price_details {
@@ -388,18 +389,21 @@
     font-size: 12px;
   }
 
+  .favourite_products > div > :nth-last-child(2) {
+    margin-bottom: 10px;
+  }
+
   .favourite_products > div > button[title="Remove from favorites"] {
     top: 14px;
     right: 14px;
-    width: 34px;
-    height: 34px;
-    font-size: 15px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 
   .favourite_products > div > .favourite_add_to_cart {
-    height: 42px;
-    margin-top: 12px;
-    font-size: 14px;
+    height: 40px;
+    font-size: 13px;
   }
 
   .empty_favourites {
@@ -412,7 +416,7 @@
 @media (prefers-reduced-motion: reduce) {
   .favourite_products > div,
   .favourite_products > div > img,
-  .favourite_add_to_cart,
+  .favourite_products > div > .favourite_add_to_cart,
   .favourite_products > div > button[title="Remove from favorites"] {
     transition: none;
   }
