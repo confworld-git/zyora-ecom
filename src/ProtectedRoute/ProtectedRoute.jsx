@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 const ProtectedRoute = ({ children }) => {
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
 
@@ -30,7 +31,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!authenticated) {
-    return <Navigate to="/Login" replace />;
+    return <Navigate to="/Login" replace state={{ from: location }} />;
   }
 
   return children;

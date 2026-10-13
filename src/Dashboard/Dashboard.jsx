@@ -11,7 +11,7 @@ import Home from "./components/Home";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import AddProduct from "./components/AddProducts";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
 import CouponList from "./components/CouponList";
@@ -29,7 +29,11 @@ const Dashboard = () => {
     coupons: null,
   });
   const [summaryLoading, setSummaryLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
+  const [searchParams] = useSearchParams();
+  const [activeSection, setActiveSection] = useState(() =>
+    searchParams.get("section") === "orders" ? "orders" : "home",
+  );
+  const orderIdFromAlert = searchParams.get("orderId") || "";
   const navigate = useNavigate();
   const navigation = [
     { id: "home", label: "Overview", icon: <RiHome4Line /> },
@@ -197,7 +201,9 @@ const Dashboard = () => {
                 onNavigate={setActiveSection}
               />
             )}
-            {activeSection === "orders" && <Orders />}
+            {activeSection === "orders" && (
+              <Orders initialOrderId={orderIdFromAlert} />
+            )}
             {activeSection === "couriers" && <CourierList />}
             {activeSection === "stock" && <StockManagement />}
             {activeSection === "products" && (

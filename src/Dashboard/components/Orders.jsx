@@ -31,10 +31,10 @@ const dateLabel = (value) =>
 const titleCase = (value = "") =>
   value.charAt(0).toUpperCase() + value.slice(1).replaceAll("_", " ");
 
-const Orders = () => {
+const Orders = ({ initialOrderId = "" }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialOrderId);
   const [filter, setFilter] = useState("all");
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);

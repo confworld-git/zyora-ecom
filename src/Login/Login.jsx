@@ -22,8 +22,14 @@ const emptyForm = {
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // page the visitor wanted before being sent to login (set by CustomerRoute)
-  const redirectTo = location.state?.from?.pathname || "/";
+  const requestedLocation = location.state?.from;
+  const redirectTo = requestedLocation
+    ? `${requestedLocation.pathname}${requestedLocation.search || ""}${requestedLocation.hash || ""}`
+    : "/";
+  const adminRedirectTo =
+    requestedLocation?.pathname?.toLowerCase() === "/dashboard"
+      ? redirectTo
+      : "/Dashboard";
   const { isLoggedIn, loading: authLoading, refresh } = useAuth();
 
   // "login" | "register"
@@ -95,7 +101,7 @@ const Login = () => {
 
         if (adminResponse.data.success) {
           toast.success("Admin signed in");
-          navigate("/Dashboard", { replace: true });
+          navigate(adminRedirectTo, { replace: true });
           return;
         }
       } catch (adminError) {
