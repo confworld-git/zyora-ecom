@@ -65,20 +65,23 @@ const Footer = () => {
             <ul className="footer-links">
               <li>
                 <Link
-                  to="/shipping-policy"
+                  to="/policies?policy=shipping"
                   className="footer-link footer-policy"
                 >
                   Shipping Policy
                 </Link>
               </li>
               <li>
-                <Link to="/return-policy" className="footer-link footer-policy">
+                <Link
+                  to="/policies?policy=returns"
+                  className="footer-link footer-policy"
+                >
                   Return & Refund Policy
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/terms-and-conditions"
+                  to="/policies?policy=terms"
                   className="footer-link footer-policy"
                 >
                   Terms & Conditions
@@ -86,7 +89,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/privacy-policy"
+                  to="/policies?policy=privacy"
                   className="footer-link footer-policy"
                 >
                   Privacy Policy
