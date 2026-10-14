@@ -42,7 +42,11 @@ const Contact = () => {
         `${API_URL}/api/contact/Submit-Contact`,
         data,
       );
-      toast.success(res.data.message);
+      if (res.data.emailSent === false) {
+        toast.error(res.data.message);
+      } else {
+        toast.success(res.data.message);
+      }
       reset();
     } catch (error) {
       const errMsg =
