@@ -2,7 +2,7 @@
 
 /* ================= TOKENS & PAGE ================= */
 .favourites {
-  --f-bg: #f6f3ee;
+  --f-bg: #fffdf8;
   --f-navy: #0a0a5c;
   --f-orange: #ff4a12;
   --f-orange-d: #e63d06;
@@ -60,7 +60,7 @@
 
 .favourites > h1 > span {
   color: var(--f-orange);
-  font-style: italic;
+  /* font-style: italic; */
 }
 
 .favourites > p {
@@ -139,6 +139,7 @@
   background: #fff;
   overflow: hidden;
   cursor: pointer;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;

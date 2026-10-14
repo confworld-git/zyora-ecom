@@ -2,7 +2,7 @@
 
 /* ================= TOKENS & PAGE ================= */
 .category {
-  --k-bg: #f6f3ee;
+  --k-bg: #fffdf8;
   --k-navy: #0a0a5c;
   --k-orange: #ff4a12;
   --k-orange-d: #e63d06;
@@ -60,7 +60,7 @@
   line-height: 1;
 }
 
-.category > h1>span{
+.category > h1 > span {
   color: var(--k-orange);
 }
 
@@ -105,6 +105,7 @@
   border-radius: 999px;
   background: #fff;
   transition: border-color 0.2s ease;
+  box-shadow: rgba(149, 157, 165, 0.137) 0px 8px 24px;
 }
 
 .collection_search:focus-within {
@@ -141,6 +142,7 @@
   border: 0;
   border-radius: 28px;
   background: #fff;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .filter_panel fieldset {
@@ -543,6 +545,7 @@
   cursor: pointer;
   appearance: none;
   transition: border-color 0.2s ease;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .sort_row select:focus {
@@ -609,6 +612,7 @@
     transform 0.2s ease,
     box-shadow 0.2s ease;
   will-change: auto;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .categories_items > .product_card:hover,
@@ -716,7 +720,7 @@
   padding: 0;
   overflow: hidden;
   color: var(--k-muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.45;
   -webkit-line-clamp: 2;
