@@ -4,7 +4,12 @@ import { FaTruck } from "react-icons/fa6";
 import arc from "../../assets/Images/arc.png";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO";
-import home_img from "../../assets/Images/home_img.png";
+import {
+  Sparkles,
+  ShoppingBag,
+  BadgeCheck,
+  HeartHandshake,
+} from "lucide-react";
 
 const About = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
@@ -42,7 +47,7 @@ const About = () => {
               WHO <span>WE ARE</span>
             </h1>
             <p>
-              Shopping should feel personal, joyful, and effortless
+              Shopping should feel personal, joyful and effortless
               <br /> that's the whole idea behind ZYORA.
             </p>
           </div>
@@ -64,33 +69,34 @@ const About = () => {
           <div>
             <span className="about_eyebrow">Our Story</span>
             <h1>
-              Shopping made <span>personal again.</span>
+              Shopping made <span>personal again</span>
             </h1>
           </div>
           <p>
-            At ZYORA, we believe shopping should feel personal, joyful, and
-            effortless. What started as a simple idea — to bring together the
-            products people genuinely need and love — has grown into a one-stop
-            destination for soft toys, home essentials, stationery, and
-            handbags. We handpick every product with care, blending quality,
-            affordability, and style, so whether you're decorating your kitchen,
-            gearing up for the school year, gifting a loved one, or
-            accessorizing your outfit — ZYORA has something for you.
+            At ZYORA, we believe shopping should feel personal, joyful and
+            effortless. What started as a simple idea to bring together the
+            products people genuinely need and love. Zyora has grown into a
+            one-stop destination for soft toys, electric toys, fashion, home
+            essentials, stationery and handbags. We handpick every product with
+            care, blending quality, affordability and style, so whether you're
+            decorating your kitchen, gearing up for the school year, gifting a
+            loved one or accessorizing your outfit — ZYORA has something for
+            you.
           </p>
         </section>
         <div className="standFor">
           <span>What We Stand For</span>
           <h1>
-            Every product chosen with <span>purpose.</span>
+            Every product chosen with <span>purpose</span>
           </h1>
           <p>
             We handpick every single product that makes it onto ZYORA. No
             filler, no guesswork — just a careful blend of quality,
-            affordability, and style in everything we offer. Because life
-            doesn't happen in one category. One day you're decorating your
-            kitchen. The next, you're gearing up for the school year, picking
-            out a gift for someone you love, or looking for the perfect handbag
-            to complete an outfit. ZYORA is built to be there for all of it.
+            affordability and style in everything we offer. Because life doesn't
+            happen in one category. One day you're decorating your kitchen. The
+            next, you're gearing up for the school year, picking out a gift for
+            someone you love or looking for the perfect handbag to complete an
+            outfit. ZYORA is built to be there for all of it.
           </p>
         </div>
         <div className="why_zyora">
@@ -100,6 +106,9 @@ const About = () => {
           </h1>
           <section>
             <div>
+              <div className="why-icon">
+                <Sparkles size={25} />
+              </div>
               <h1>Carefully Selected Products</h1>
               <p>
                 We choose every product with care to bring you things you'll
@@ -108,6 +117,9 @@ const About = () => {
             </div>
 
             <div>
+              <div className="why-icon">
+                <ShoppingBag size={25} />
+              </div>
               <h1>Everything in One Place</h1>
               <p>
                 From soft toys and handbags to stationery and home essentials,
@@ -116,6 +128,9 @@ const About = () => {
             </div>
 
             <div>
+              <div className="why-icon">
+                <BadgeCheck size={25} />
+              </div>
               <h1>Good Quality at Good Prices</h1>
               <p>
                 Shop for products that offer good quality at prices you can
@@ -124,10 +139,13 @@ const About = () => {
             </div>
 
             <div>
+              <div className="why-icon">
+                <HeartHandshake size={25} />
+              </div>
               <h1>Made for Everyday Life</h1>
               <p>
                 Whether you're shopping for yourself, decorating your home,
-                studying, or buying gifts, ZYORA has something for you.
+                studying or buying gifts, ZYORA has something for you.
               </p>
             </div>
           </section>

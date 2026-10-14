@@ -2,18 +2,17 @@ import "./Home.css";
 import { HiShoppingBag } from "react-icons/hi2";
 import Confetti from "../../Confetti/Confetti";
 import home_pro1 from "../../assets/Images/home_img.png";
-import toy from "../../assets/Images/toy.png";
 
 const Home = () => {
   return (
     <div className="home-container">
       <div className="hero-copy">
         <img src={home_pro1} alt="" />
-        <h1>
+        {/* <h1>
           Welcome to <span>ZYORA</span>
           <br />
           Where Everyday Meets Extraordinary
-        </h1>
+        </h1> */}
         <span className="hero-eyebrow">Destination for E-commerce</span>
         <p>
           From cuddly soft toys to smart home essentials, handy stationery to

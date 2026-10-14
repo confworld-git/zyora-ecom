@@ -7,7 +7,14 @@ const EnquiryData = ({ enquiryData }) => {
     const query = search.trim().toLowerCase();
     if (!query) return enquiryData;
     return enquiryData.filter((item) =>
-      [item.name, item.email, item.phone, item.message]
+      [
+        item.name,
+        item.email,
+        item.phone,
+        item.enquiryType,
+        item.orderId,
+        item.message,
+      ]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query)),
     );
@@ -37,7 +44,7 @@ const EnquiryData = ({ enquiryData }) => {
       <div className="management-toolbar">
         <input
           aria-label="Search enquiries"
-          placeholder="Search name, email, phone, or message"
+          placeholder="Search name, email, phone, enquiry type, order ID, or message"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
@@ -54,6 +61,8 @@ const EnquiryData = ({ enquiryData }) => {
               <tr>
                 <th>Name</th>
                 <th>Contact</th>
+                <th>Enquiry Type</th>
+                <th>Order ID</th>
                 <th>Message</th>
                 <th>Received</th>
               </tr>
@@ -66,6 +75,8 @@ const EnquiryData = ({ enquiryData }) => {
                     <strong>{item.email || "—"}</strong>
                     <small>{item.phone || "—"}</small>
                   </td>
+                  <td>{item.enquiryType || "—"}</td>
+                  <td>{item.orderId || "—"}</td>
                   <td className="enquiry-message">{item.message || "—"}</td>
                   <td>{item.createdAt ? (
                     <>

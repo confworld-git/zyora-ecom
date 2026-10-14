@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Manrope:wght@400;500;600&display=swap");
 
 .About_us {
-  --about-bg: #f6f3ee;
+  --about-bg: #FAF7EF;
   --about-navy: #0a0a5c;
   --about-navy-light: #1b1b7a;
   --about-orange: #ff4a12;
@@ -178,7 +178,9 @@
 
 .about_story > p {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 550;
+  text-align: justify;
 }
 
 .standFor {
@@ -227,6 +229,7 @@
   grid-column: 2;
   grid-row: 1 / span 2;
   align-self: center;
+  text-align: justify;
   max-width: 54ch;
   margin: 0;
   color: rgba(255, 255, 255, 0.82);
@@ -319,11 +322,25 @@
   width: auto;
   min-height: 156px;
   margin: 0;
-  padding: 24px 26px 24px 76px;
+  padding: 24px 26px 24px 26px;
   border-radius: 28px;
   background: var(--about-sand);
   box-shadow: none;
   text-align: left;
+}
+
+.why-icon{
+  height: 40px;
+  width: 40px;
+  background-color: white;
+  color: #ff4a12;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
 }
 
 .why_zyora > section > div:nth-child(2) {
@@ -337,26 +354,6 @@
 .why_zyora > section > div:nth-child(4) {
   background: var(--about-navy);
   color: #fff;
-}
-
-.why_zyora > section > div::before {
-  content: "0" counter(why-item);
-  counter-increment: why-item;
-  position: absolute;
-  top: 22px;
-  left: 22px;
-  color: var(--about-orange);
-  font-family: "Bricolage Grotesque", sans-serif;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.06em;
-  /* background: white; */
-  /* padding: 6px; */
-  /* border-radius: 50%; */
-  /* display: flex; */
-  /* align-items: center; */
-  /* justify-content: center; */
-  /* flex-shrink: 0; */
 }
 
 .why_zyora > section {
@@ -374,7 +371,7 @@
 }
 
 .why_zyora > section > div:nth-child(even) {
-  padding: 24px 26px 24px 76px;
+  padding: 24px 26px 24px 26px;
   border-radius: 28px;
 }
 

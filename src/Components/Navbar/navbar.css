@@ -85,7 +85,7 @@
 
 .navbar > ul > li {
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;

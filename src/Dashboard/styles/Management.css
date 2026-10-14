@@ -1111,23 +1111,31 @@
 }
 
 .enquiries-table {
-  min-width: 620px;
+  min-width: 900px;
 }
 
 .enquiries-table th:nth-child(1) {
-  width: 17%;
+  width: 12%;
 }
 
 .enquiries-table th:nth-child(2) {
-  width: 23%;
+  width: 18%;
 }
 
 .enquiries-table th:nth-child(3) {
-  width: 42%;
+  width: 16%;
 }
 
 .enquiries-table th:nth-child(4) {
-  width: 18%;
+  width: 13%;
+}
+
+.enquiries-table th:nth-child(5) {
+  width: 27%;
+}
+
+.enquiries-table th:nth-child(6) {
+  width: 14%;
 }
 
 .enquiry-message {
@@ -1168,7 +1176,7 @@
   }
 
   .enquiries-table {
-    min-width: 620px;
+    min-width: 900px;
   }
 
   .management-form-grid {

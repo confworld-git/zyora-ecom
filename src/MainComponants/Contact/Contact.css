@@ -56,7 +56,6 @@
   display: grid;
   width: min(100%, 1200px);
   grid-template-columns: minmax(280px, 0.9fr) minmax(420px, 1.1fr);
-  align-items: center;
   gap: clamp(56px, 9vw, 130px);
   margin: 0 auto;
 }
@@ -195,7 +194,7 @@
 .contact_form > img {
   position: absolute;
   z-index: 0;
-  bottom: 70px;
+  top: 120px;
   left: -139px;
   width: auto;
   height: 230px;
@@ -252,6 +251,10 @@
   grid-column: 1 / -1;
 }
 
+.contact_form > form > div:nth-child(6) {
+  grid-column: 1 / -1;
+}
+
 .contact_form > form > div > label {
   color: var(--c-navy);
   font-size: 11px;
@@ -264,6 +267,7 @@
 /* inputs */
 .contact_form input,
 .contact_form textarea,
+.contact_form select,
 .contact_form .PhoneInput {
   width: 100%;
   min-width: 0;
@@ -278,6 +282,11 @@
   transition:
     border-color 0.18s ease,
     background-color 0.18s ease;
+}
+
+.contact_form select {
+  height: 48px;
+  padding: 0 16px;
 }
 
 .contact_form input {

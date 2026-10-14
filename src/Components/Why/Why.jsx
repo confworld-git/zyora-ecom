@@ -1,15 +1,16 @@
 import "./why.css";
 import delivery from "../../assets/Videos/delivery.mp4";
-import payment from "../../assets/Videos/payment.mp4";
-import returnp from "../../assets/Videos/returnp.mp4";
+import returnp from "../../assets/Videos/return.mp4";
 import secure from "../../assets/Videos/secure.mp4";
+import quality from "../../assets/Videos/quality.mp4";
+import customer from "../../assets/Videos/customer.mp4";
 
 const items = [
-  { src: secure, text: "Quality-Checked Products" },
+  { src: quality, text: "Quality-Checked Products" },
   { src: delivery, text: "Fast & Reliable Delivery" },
-  { src: payment, text: "Secure Payments" },
+  { src: secure, text: "Secure Payments" },
   { src: returnp, text: "Easy 7-Day Returns" },
-  { src: returnp, text: "Friendly Customer Support" },
+  { src: customer, text: "Friendly Customer Support" },
 ];
 
 const Why = () => {

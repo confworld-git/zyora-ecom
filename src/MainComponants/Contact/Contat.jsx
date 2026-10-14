@@ -1,7 +1,6 @@
 import "./Contact.css";
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import PhoneInput from "react-phone-number-input";
+import { useForm } from "react-hook-form";
 import "react-phone-number-input/style.css";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -10,18 +9,30 @@ import peak from "../../assets/Images/peak1.png";
 import SEO from "../../SEO";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
+const ORDER_RELATED_ENQUIRY_TYPES = [
+  "Order Status / Tracking",
+  "Order Cancellation",
+  "Return or Exchange",
+  "Refund Status",
+  "Payment Issue",
+  "Damaged or Defective Product",
+  "Delivery / Shipping Issue",
+];
 
 const Contact = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
   const {
     register,
     handleSubmit,
-    control,
     reset,
+    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({ shouldUnregister: true });
 
   const [loading, setLoading] = useState(false);
+  const isOrderRelated = ORDER_RELATED_ENQUIRY_TYPES.includes(
+    watch("enquiryType"),
+  );
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -79,11 +90,11 @@ const Contact = () => {
         <div className="Contact">
           <div className="contact_content">
             <h1>
-              Contact <span>us.</span>
+              Contact <span>us</span>
             </h1>
             <p>
-              We'd love to hear from you. Have a question about your order,
-              a product, or just want to say hi? Our team at ZYORA is here to
+              We'd love to hear from you. Have a question about your order, a
+              product, or just want to say hi? Our team at ZYORA is here to
               help.
             </p>
             <br />
@@ -92,14 +103,14 @@ const Contact = () => {
                 <i className="bi bi-envelope-open-heart"></i>
                 Email
               </p>
-              <span>support@zyora.com</span>
+              <span>zyoraecommerce@gmail.com</span>
             </li>
             <li>
               <p>
                 <i className="bi bi-whatsapp"></i>
                 Phone / WhatsApp
               </p>
-              <span>+91 9965165261</span>
+              <span>+91 7010423318</span>
             </li>
             <li>
               <p>
@@ -113,11 +124,11 @@ const Contact = () => {
             <img src={peak} alt="" />
             <p>Send a Message</p>
             <h1>
-              Tell us <span>about it.</span>
+              Tell us <span>about it</span>
             </h1>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div>
-                <label>Name</label>
+                <label>Name*</label>
                 <input
                   type="text"
                   placeholder="Enter your name"
@@ -129,7 +140,7 @@ const Contact = () => {
               </div>
 
               <div>
-                <label>Email</label>
+                <label>Email*</label>
                 <input
                   type="email"
                   placeholder="Enter your email"
@@ -145,39 +156,88 @@ const Contact = () => {
               </div>
 
               <div>
-                <label>Phone Number</label>
-                <Controller
-                  name="phone"
-                  control={control}
-                  rules={{ required: "Phone number is required" }}
-                  render={({ field: { onChange, value } }) => (
-                    <PhoneInput
-                      defaultCountry="IN"
-                      value={value}
-                      onChange={onChange}
-                      placeholder="Enter phone number"
-                    />
-                  )}
+                <label>Phone Number*</label>
+                <input
+                  type="number"
+                  placeholder="Enter your mobile number"
+                  {...register("phone", {
+                    required: "Mobile number is required",
+                    pattern: {
+                      value: /^[6-9]\d{9}$/,
+                      message: "Enter a valid 10-digit mobile number",
+                    },
+                  })}
                 />
                 {errors.phone && <span>{errors.phone.message}</span>}
               </div>
 
               <div>
-                <label>Enquiry Type</label>
-                <input
-                  type="text"
-                  placeholder="Enter your enquiry type"
+                <label>Enquiry Type*</label>
+                <select
+                  defaultValue=""
                   {...register("enquiryType", {
-                    required: "Enquiry type is required",
+                    required: "Please select an enquiry type",
                   })}
-                />
+                >
+                  <option value="" disabled>
+                    Select Enquiry Type
+                  </option>
+                  <option value="General Enquiry">General Enquiry</option>
+                  <option value="Product Information">
+                    Product Information
+                  </option>
+                  <option value="Order Status / Tracking">
+                    Order Status / Tracking
+                  </option>
+                  <option value="Order Cancellation">Order Cancellation</option>
+                  <option value="Return or Exchange">Return or Exchange</option>
+                  <option value="Refund Status">Refund Status</option>
+                  <option value="Payment Issue">Payment Issue</option>
+                  <option value="Damaged or Defective Product">
+                    Damaged or Defective Product
+                  </option>
+                  <option value="Delivery / Shipping Issue">
+                    Delivery / Shipping Issue
+                  </option>
+                  <option value="Product Availability">
+                    Product Availability
+                  </option>
+                  <option value="Bulk Order Enquiry">Bulk Order Enquiry</option>
+                  <option value="Business / Wholesale Enquiry">
+                    Business / Wholesale Enquiry
+                  </option>
+                  <option value="Website / Technical Issue">
+                    Website / Technical Issue
+                  </option>
+                  <option value="Feedback or Suggestion">
+                    Feedback or Suggestion
+                  </option>
+                  <option value="Complaint">Complaint</option>
+                  <option value="Other">Other</option>
+                </select>
+
                 {errors.enquiryType && (
                   <span>{errors.enquiryType.message}</span>
                 )}
               </div>
 
+              {isOrderRelated && (
+                <div>
+                  <label htmlFor="contact-order-id">Order ID*</label>
+                  <input
+                    id="contact-order-id"
+                    type="text"
+                    placeholder="Enter your order ID"
+                    {...register("orderId", {
+                      required: "Order ID is required for this enquiry",
+                    })}
+                  />
+                  {errors.orderId && <span>{errors.orderId.message}</span>}
+                </div>
+              )}
+
               <div>
-                <label>Message</label>
+                <label>Message*</label>
                 <textarea
                   placeholder="Write your message..."
                   rows="5"
@@ -192,18 +252,8 @@ const Contact = () => {
                 {errors.message && <span>{errors.message.message}</span>}
               </div>
 
-              {/* {statusMsg && (
-              <p
-                className={
-                  statusMsg.type === "success" ? "success-msg" : "error-msg"
-                }
-              >
-                {statusMsg.text}
-              </p>
-            )} */}
-
               <button type="submit" disabled={loading}>
-                {loading ? "Sending..." : "Send Message"}
+                {loading ? "Sending..." : "Submit"}
               </button>
             </form>
           </div>

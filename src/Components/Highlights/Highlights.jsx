@@ -24,7 +24,7 @@ const categories = [
   {
     src: bag,
     title: "Fashion",
-    text: "Everyday elegance for the modern woman.",
+    text: "Everyday elegance for the modern women.",
   },
 ];
 

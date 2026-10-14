@@ -64,7 +64,10 @@ const Footer = () => {
 
             <ul className="footer-links">
               <li>
-                <Link to="/shipping-policy" className="footer-link footer-policy">
+                <Link
+                  to="/shipping-policy"
+                  className="footer-link footer-policy"
+                >
                   Shipping Policy
                 </Link>
               </li>
@@ -74,12 +77,18 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/terms-and-conditions" className="footer-link footer-policy">
+                <Link
+                  to="/terms-and-conditions"
+                  className="footer-link footer-policy"
+                >
                   Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="footer-link footer-policy">
+                <Link
+                  to="/privacy-policy"
+                  className="footer-link footer-policy"
+                >
                   Privacy Policy
                 </Link>
               </li>
@@ -129,7 +138,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2026 ZYORA. All Rights Reserved.</p>
+          <p>Copyright © 2026 ZYORA. All Rights Reserved.</p>
 
           <div className="footer-badges">
             <span className="footer-badge">Razorpay Verified</span>

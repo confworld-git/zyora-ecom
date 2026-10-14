@@ -36,9 +36,14 @@
   text-align: left;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.why > section > div::before {
+/* .why > section > div::before {
   counter-increment: why-item;
   content: "0" counter(why-item);
   display: block;
@@ -49,16 +54,16 @@
   font-weight: 800;
   letter-spacing: -0.07em;
   line-height: 1;
-}
+} */
 
 .why > section {
   counter-reset: why-item;
 }
 
 .why > section > div > video {
-  position: absolute;
-  top: 10px;
-  right: 8px;
+  /* position: absolute; */
+  /* top: 10px; */
+  /* right: 8px; */
   width: 86px;
   height: 86px;
   object-fit: cover;

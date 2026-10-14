@@ -6,12 +6,11 @@ const Welcome = () => {
   return (
     <section className="wl">
       <div className="wl-glow" aria-hidden="true" />
-
       <div className="wl-inner">
         <div className="wl-copy">
-          <span className="wl-eyebrow" style={{ "--d": "0s" }}>
+          {/* <span className="wl-eyebrow" style={{ "--d": "0s" }}>
             <i /> About us
-          </span>
+          </span> */}
 
           <h1 style={{ "--d": ".08s" }}>
             Welcome to <span>ZYORA</span>
@@ -50,7 +49,7 @@ const Welcome = () => {
             />
           </div>
 
-          <div className="wl-goal">
+          {/* <div className="wl-goal">
             <small>Our mission</small>
             <h2>
               Our goal is <span>simple</span>
@@ -59,7 +58,7 @@ const Welcome = () => {
               To make quality products accessible to everyone, with a shopping
               experience you can trust.
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

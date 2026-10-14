@@ -18,14 +18,14 @@
 }
 
 .hero-copy > img {
-  height: 400px;
+  height: 480px;
 }
 
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
-  margin-bottom: 22px;
+  margin-bottom: 12px;
   padding: 7px 13px;
   border-radius: 999px;
   background: #e73b08;
