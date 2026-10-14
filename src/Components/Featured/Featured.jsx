@@ -2,6 +2,7 @@ import "./Featured.css";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useProducts } from "../../Context/ProductContext";
+import { isImitationJewellery } from "../../utils/productCategory.js";
 
 const FILTERS = [
   {
@@ -30,10 +31,15 @@ const Featured = () => {
   const { products, loading, error } = useProducts();
   const [activeFilter, setActiveFilter] = useState("all");
 
+  const visibleProducts = useMemo(
+    () => products.filter((product) => !isImitationJewellery(product)),
+    [products],
+  );
+
   const filteredProducts = useMemo(() => {
     switch (activeFilter) {
       case "new":
-        return [...products]
+        return [...visibleProducts]
           .sort(
             (first, second) =>
               new Date(second.createdAt || 0) - new Date(first.createdAt || 0),
@@ -41,17 +47,17 @@ const Featured = () => {
           .slice(0, 8);
 
       case "bestseller":
-        return products.filter((product) => product.is_best_seller);
+        return visibleProducts.filter((product) => product.is_best_seller);
 
       case "under499":
-        return products.filter(
+        return visibleProducts.filter(
           (product) => Number(product.price?.selling_price) <= 499,
         );
 
       default:
-        return products;
+        return visibleProducts;
     }
-  }, [activeFilter, products]);
+  }, [activeFilter, visibleProducts]);
 
   const categories = useMemo(
     () => [
