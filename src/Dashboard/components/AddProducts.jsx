@@ -2,6 +2,7 @@ import "../styles/Dashboard.css";
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useProducts } from "../../Context/ProductContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,6 +21,7 @@ const categories = [
 ];
 
 function AddProduct() {
+  const { refreshProducts } = useProducts();
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -29,6 +31,8 @@ function AddProduct() {
 
     mrp: "",
     selling_price: "",
+    ratingAverage: "0",
+    ratingCount: "0",
 
     images: [],
     video: null,
@@ -406,6 +410,25 @@ function AddProduct() {
       newErrors.selling_price = "Selling price must be less than MRP";
     }
 
+    const ratingAverage = Number(formData.ratingAverage);
+    const ratingCount = Number(formData.ratingCount);
+    if (
+      !Number.isFinite(ratingAverage) ||
+      ratingAverage < 0 ||
+      ratingAverage > 5
+    ) {
+      newErrors.ratingAverage = "Enter a rating between 0 and 5";
+    }
+    if (!Number.isInteger(ratingCount) || ratingCount < 0) {
+      newErrors.ratingCount = "Enter a non-negative whole-number review count";
+    }
+    if ((ratingCount === 0) !== (ratingAverage === 0)) {
+      newErrors.ratingAverage =
+        "Use 0 for both fields when there are no reviews";
+      newErrors.ratingCount =
+        "Enter a review count when the average rating is above 0";
+    }
+
     // IMAGE IS REQUIRED
     if (!formData.images || formData.images.length === 0) {
       newErrors.images = "Please upload at least one product image";
@@ -465,6 +488,13 @@ function AddProduct() {
           mrp: Number(formData.mrp),
           selling_price: Number(formData.selling_price),
           discount_percent: discount,
+        }),
+      );
+      data.append(
+        "rating",
+        JSON.stringify({
+          average: Number(formData.ratingAverage),
+          count: Number(formData.ratingCount),
         }),
       );
 
@@ -532,6 +562,9 @@ function AddProduct() {
       });
 
       toast.success(response.data.message);
+      if (!(await refreshProducts())) {
+        toast.error("Product added, but storefront data could not be refreshed.");
+      }
 
       if (videoPreview) URL.revokeObjectURL(videoPreview);
       setFormData({
@@ -542,6 +575,8 @@ function AddProduct() {
         brand: "",
         mrp: "",
         selling_price: "",
+        ratingAverage: "0",
+        ratingCount: "0",
         images: [],
         video: null,
         about_this_item: [""],
@@ -767,7 +802,7 @@ function AddProduct() {
             <div className="section-heading">
               <div>
                 <h2>Pricing</h2>
-                <p>Set the MRP and selling price.</p>
+                <p>Set the MRP, selling price, and customer rating.</p>
               </div>
             </div>
 
@@ -816,6 +851,40 @@ function AddProduct() {
 
                 {errors.selling_price && (
                   <small className="field-error">{errors.selling_price}</small>
+                )}
+              </div>
+            </div>
+
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Average rating (0–5)</label>
+                <input
+                  type="number"
+                  name="ratingAverage"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={formData.ratingAverage}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.ratingAverage && (
+                  <small className="field-error">{errors.ratingAverage}</small>
+                )}
+              </div>
+              <div className="form-group">
+                <label>Review count</label>
+                <input
+                  type="number"
+                  name="ratingCount"
+                  min="0"
+                  step="1"
+                  value={formData.ratingCount}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.ratingCount && (
+                  <small className="field-error">{errors.ratingCount}</small>
                 )}
               </div>
             </div>

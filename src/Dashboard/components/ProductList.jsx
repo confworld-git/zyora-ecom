@@ -29,6 +29,8 @@ const createEditForm = (product) => ({
   brand: product.brand || "",
   mrp: String(product.price?.mrp ?? ""),
   sellingPrice: String(product.price?.selling_price ?? ""),
+  ratingAverage: String(product.rating?.average ?? 0),
+  ratingCount: String(product.rating?.count ?? 0),
   quantity: String(product.stock?.quantity ?? 0),
   inStock: product.stock?.in_stock === true,
   isBestSeller: product.is_best_seller === true,
@@ -359,6 +361,21 @@ const ProductList = ({ onAddProduct }) => {
       toast.error("Stock quantity must be a non-negative whole number.");
       return;
     }
+    const ratingAverage = Number(form.ratingAverage);
+    const ratingCount = Number(form.ratingCount);
+    if (
+      !Number.isFinite(ratingAverage) ||
+      ratingAverage < 0 ||
+      ratingAverage > 5 ||
+      !Number.isInteger(ratingCount) ||
+      ratingCount < 0 ||
+      (ratingCount === 0) !== (ratingAverage === 0)
+    ) {
+      toast.error(
+        "Rating must be between 0 and 5 with a whole-number review count.",
+      );
+      return;
+    }
     if (form.images.length === 0) {
       toast.error("A product must have at least one image.");
       return;
@@ -384,6 +401,10 @@ const ProductList = ({ onAddProduct }) => {
           mrp,
           selling_price: sellingPrice,
         }),
+      );
+      data.append(
+        "rating",
+        JSON.stringify({ average: ratingAverage, count: ratingCount }),
       );
       data.append(
         "stock",
@@ -757,6 +778,31 @@ const ProductList = ({ onAddProduct }) => {
                   min="0.01"
                   step="0.01"
                   value={editing.form.sellingPrice}
+                  onChange={updateForm}
+                  required
+                />
+              </label>
+              <label>
+                Average rating (0–5)
+                <input
+                  name="ratingAverage"
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={editing.form.ratingAverage}
+                  onChange={updateForm}
+                  required
+                />
+              </label>
+              <label>
+                Review count
+                <input
+                  name="ratingCount"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={editing.form.ratingCount}
                   onChange={updateForm}
                   required
                 />

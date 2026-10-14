@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import SEO from "../../SEO.jsx";
+import { normalizeProductRating } from "../../utils/productRating.js";
 
 const clothingSizeLabels = {
   S: "S - Small",
@@ -237,8 +238,9 @@ const Category = () => {
       const hasStock =
         product.stock?.in_stock === true && Number(product.stock?.quantity) > 0;
       const matchesStock = !filters.inStock || hasStock;
+      const rating = normalizeProductRating(product.rating);
       const matchesRating =
-        !filters.rating || (Number(product.rating?.average) || 0) >= 4;
+        !filters.rating || (rating.count > 0 && rating.average >= 4);
 
       const matchesProductPrice =
         price >= (filters.priceMin ?? SLIDER_MIN_PRICE) &&
@@ -594,7 +596,7 @@ const Category = () => {
 
                 <label>
                   <input
-                    type="radio"
+                    type="checkbox"
                     name="availability"
                     checked={filters.inStock}
                     onChange={(event) =>
@@ -614,7 +616,7 @@ const Category = () => {
 
                 <label>
                   <input
-                    type="radio"
+                    type="checkbox"
                     name="rating"
                     checked={filters.rating}
                     onChange={(event) =>
@@ -684,6 +686,7 @@ const Category = () => {
               ) : (
                 filteredProducts.map((product) => {
                   const productId = product.id || product._id;
+                  const rating = normalizeProductRating(product.rating);
                   const hasStock =
                     product.stock?.in_stock === true &&
                     Number(product.stock?.quantity) > 0;
@@ -722,8 +725,9 @@ const Category = () => {
                       )}
 
                       <p className="rating_pre">
-                        ⭐ {product.rating?.average ?? 0} (
-                        {product.rating?.count ?? 0})
+                        {rating.count > 0
+                          ? `⭐ ${rating.average.toFixed(1)} (${rating.count})`
+                          : "No ratings"}
                       </p>
                       <span>{product.brand}</span>
                       <br />

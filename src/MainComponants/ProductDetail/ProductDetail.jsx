@@ -9,6 +9,7 @@ import ProductZoom from "./ProductZoom.jsx";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO.jsx";
 import { Helmet } from "react-helmet-async";
+import { normalizeProductRating } from "../../utils/productRating.js";
 
 const ProductDetail = () => {
   const { addToCart, isCartSyncing } = useCart();
@@ -78,7 +79,8 @@ const ProductDetail = () => {
   };
 
   const productName = product.name || product.title;
-  const ratingAverage = product.rating?.average ?? 0;
+  const { average: ratingAverage, count: ratingCount } =
+    normalizeProductRating(product.rating);
   const displayedRating = Math.round(ratingAverage * 2) / 2;
   const information = product.product_information || {};
   const details = [
@@ -398,7 +400,13 @@ const ProductDetail = () => {
             <h2>Rating</h2>
             <div
               className="rating-display"
-              aria-label={`${ratingAverage} out of 5 stars`}
+              aria-label={
+                ratingCount > 0
+                  ? `${ratingAverage.toFixed(1)} out of 5 stars, ${ratingCount} ${
+                      ratingCount === 1 ? "review" : "reviews"
+                    }`
+                  : "No ratings yet"
+              }
             >
               <span className="rating-stars" aria-hidden="true">
                 {Array.from({ length: 5 }, (_, index) => (
@@ -417,7 +425,11 @@ const ProductDetail = () => {
                 ))}
               </span>
               <span>
-                {ratingAverage} / 5 ({product.rating?.count ?? 0} reviews)
+                {ratingCount > 0
+                  ? `${ratingAverage.toFixed(1)} / 5 (${ratingCount} ${
+                      ratingCount === 1 ? "review" : "reviews"
+                    })`
+                  : "No ratings yet"}
               </span>
             </div>
           </div>
