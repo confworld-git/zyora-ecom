@@ -396,43 +396,39 @@ const ProductDetail = () => {
               </span>
             </p>
           </div>
-          <div>
-            <h2>Rating</h2>
-            <div
-              className="rating-display"
-              aria-label={
-                ratingCount > 0
-                  ? `${ratingAverage.toFixed(1)} out of 5 stars, ${ratingCount} ${
-                      ratingCount === 1 ? "review" : "reviews"
-                    }`
-                  : "No ratings yet"
-              }
-            >
-              <span className="rating-stars" aria-hidden="true">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <span
-                    className={
-                      displayedRating >= index + 1
-                        ? "full"
-                        : displayedRating >= index + 0.5
-                          ? "half"
-                          : "empty"
-                    }
-                    key={index}
-                  >
-                    ★
-                  </span>
-                ))}
-              </span>
-              <span>
-                {ratingCount > 0
-                  ? `${ratingAverage.toFixed(1)} / 5 (${ratingCount} ${
-                      ratingCount === 1 ? "review" : "reviews"
-                    })`
-                  : "No ratings yet"}
-              </span>
+          {ratingCount > 0 && (
+            <div>
+              <h2>Rating</h2>
+              <div
+                className="rating-display"
+                aria-label={`${ratingAverage.toFixed(1)} out of 5 stars, ${ratingCount} ${
+                  ratingCount === 1 ? "review" : "reviews"
+                }`}
+              >
+                <span className="rating-stars" aria-hidden="true">
+                  {Array.from({ length: 5 }, (_, index) => (
+                    <span
+                      className={
+                        displayedRating >= index + 1
+                          ? "full"
+                          : displayedRating >= index + 0.5
+                            ? "half"
+                            : "empty"
+                      }
+                      key={index}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </span>
+                <span>
+                  {`${ratingAverage.toFixed(1)} / 5 (${ratingCount} ${
+                    ratingCount === 1 ? "review" : "reviews"
+                  })`}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         {details.some(
