@@ -39,6 +39,12 @@ const createEditForm = (product) => ({
     alt: image.alt || "",
     file: null,
   })),
+  videoUrl:
+    typeof product.video === "string" ? product.video : product.video?.url || "",
+  videoPreview:
+    typeof product.video === "string" ? product.video : product.video?.url || "",
+  videoFile: null,
+  videoRemoved: false,
   aboutThisItem: product.about_this_item?.length
     ? [...product.about_this_item]
     : [""],
@@ -127,6 +133,9 @@ const ProductList = ({ onAddProduct }) => {
     editing?.form.images.forEach((image) => {
       if (image.file) URL.revokeObjectURL(image.url);
     });
+    if (editing?.form.videoFile) {
+      URL.revokeObjectURL(editing.form.videoPreview);
+    }
     setEditing(null);
   };
 
@@ -224,10 +233,10 @@ const ProductList = ({ onAddProduct }) => {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
-    const availableSlots = 5 - editing.form.images.length;
+    const availableSlots = Math.max(0, 4 - editing.form.images.length);
     const selectedFiles = files.slice(0, availableSlots);
     if (selectedFiles.length < files.length) {
-      toast.error("A product can have up to five images.");
+      toast.error("A product can have up to four images.");
     }
 
     setEditing((current) => ({
@@ -249,6 +258,56 @@ const ProductList = ({ onAddProduct }) => {
       },
     }));
     event.target.value = "";
+  };
+
+  const updateVideo = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!["video/mp4", "video/webm", "video/ogg"].includes(file.type)) {
+      toast.error("Choose an MP4, WebM, or Ogg video.");
+      return;
+    }
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error("The video must be 100 MB or smaller.");
+      return;
+    }
+
+    const preview = URL.createObjectURL(file);
+    if (editing.form.videoFile) {
+      URL.revokeObjectURL(editing.form.videoPreview);
+    }
+    setEditing((current) => {
+      return {
+        ...current,
+        form: {
+          ...current.form,
+          videoUrl: "",
+          videoPreview: preview,
+          videoFile: file,
+          videoRemoved: false,
+        },
+      };
+    });
+  };
+
+  const removeVideo = () => {
+    if (editing.form.videoFile) {
+      URL.revokeObjectURL(editing.form.videoPreview);
+    }
+    setEditing((current) => {
+      return {
+        ...current,
+        form: {
+          ...current.form,
+          videoUrl: "",
+          videoPreview: "",
+          videoFile: null,
+          videoRemoved: true,
+        },
+      };
+    });
   };
 
   const removeImage = (index) => {
@@ -302,6 +361,10 @@ const ProductList = ({ onAddProduct }) => {
     }
     if (form.images.length === 0) {
       toast.error("A product must have at least one image.");
+      return;
+    }
+    if (form.images.length > 4) {
+      toast.error("A product can have up to four images.");
       return;
     }
 
@@ -369,6 +432,10 @@ const ProductList = ({ onAddProduct }) => {
           uploadedImages.map(({ id, color, alt }) => ({ id, color, alt })),
         ),
       );
+      if (form.videoFile) {
+        data.append("video", form.videoFile);
+      }
+      data.append("remove_video", String(form.videoRemoved));
 
       const response = await axios.patch(
         `${API}/${encodeURIComponent(productId)}`,
@@ -386,6 +453,7 @@ const ProductList = ({ onAddProduct }) => {
       form.images.forEach((image) => {
         if (image.file) URL.revokeObjectURL(image.url);
       });
+      if (form.videoFile) URL.revokeObjectURL(form.videoPreview);
       setEditing(null);
       toast.success(response.data.message || "Product updated successfully.");
       if (!(await refreshProducts())) {
@@ -729,7 +797,7 @@ const ProductList = ({ onAddProduct }) => {
               <div className="product-edit-section-heading">
                 <div>
                   <h3>Product images</h3>
-                  <p>Keep, remove, or add up to five images.</p>
+                  <p>Keep, remove, or add up to four images.</p>
                 </div>
                 <label className="product-image-add">
                   Add images
@@ -738,7 +806,7 @@ const ProductList = ({ onAddProduct }) => {
                     accept="image/*"
                     multiple
                     onChange={addImages}
-                    disabled={editing.form.images.length >= 5}
+                    disabled={editing.form.images.length >= 4}
                   />
                 </label>
               </div>
@@ -773,6 +841,39 @@ const ProductList = ({ onAddProduct }) => {
                   </button>
                 </div>
               ))}
+            </section>
+
+            <section className="product-edit-section">
+              <div className="product-edit-section-heading">
+                <div>
+                  <h3>Product video</h3>
+                  <p>Upload one MP4, WebM, or Ogg video (maximum 100 MB).</p>
+                </div>
+                <label className="product-image-add">
+                  {editing.form.videoPreview ? "Replace video" : "Add video"}
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/ogg"
+                    onChange={updateVideo}
+                  />
+                </label>
+              </div>
+              {editing.form.videoPreview && (
+                <div className="product-edit-video">
+                  <video
+                    src={editing.form.videoPreview}
+                    controls
+                    preload="metadata"
+                  />
+                  <button
+                    className="product-image-remove"
+                    type="button"
+                    onClick={removeVideo}
+                  >
+                    Remove video
+                  </button>
+                </div>
+              )}
             </section>
 
             <section className="product-edit-section">

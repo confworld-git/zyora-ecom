@@ -16,6 +16,7 @@ const categories = [
   "Stationery",
   "Handbags",
   "Soft Toys",
+  "Immitation Jewellery",
 ];
 
 function AddProduct() {
@@ -30,6 +31,7 @@ function AddProduct() {
     selling_price: "",
 
     images: [],
+    video: null,
 
     about_this_item: [""],
 
@@ -48,6 +50,7 @@ function AddProduct() {
   });
 
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [videoPreview, setVideoPreview] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -137,8 +140,11 @@ function AddProduct() {
 
     if (files.length === 0) return;
 
-    const remainingSlots = 5 - formData.images.length;
+    const remainingSlots = 4 - formData.images.length;
     const selectedFiles = files.slice(0, remainingSlots);
+    if (selectedFiles.length < files.length) {
+      toast.error("A product can have up to four images.");
+    }
 
     const newImages = selectedFiles.map((file, index) => {
       const imageNumber = formData.images.length + index + 1;
@@ -158,8 +164,43 @@ function AddProduct() {
     }));
 
     setImagePreviews((prev) => [...prev, ...newImages]);
+    setErrors((prev) => ({ ...prev, images: "" }));
 
     e.target.value = "";
+  };
+
+  const handleVideoUpload = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!["video/mp4", "video/webm", "video/ogg"].includes(file.type)) {
+      setErrors((prev) => ({
+        ...prev,
+        video: "Choose an MP4, WebM, or Ogg video.",
+      }));
+      return;
+    }
+
+    if (file.size > 100 * 1024 * 1024) {
+      setErrors((prev) => ({
+        ...prev,
+        video: "The video must be 100 MB or smaller.",
+      }));
+      return;
+    }
+
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
+    setFormData((prev) => ({ ...prev, video: file }));
+    setVideoPreview(URL.createObjectURL(file));
+    setErrors((prev) => ({ ...prev, video: "" }));
+  };
+
+  const removeVideo = () => {
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
+    setVideoPreview("");
+    setFormData((prev) => ({ ...prev, video: null }));
+    setErrors((prev) => ({ ...prev, video: "" }));
   };
 
   const handleImageColorChange = (index, color) => {
@@ -467,6 +508,9 @@ function AddProduct() {
       formData.images.forEach((image) => {
         data.append("images", image.file);
       });
+      if (formData.video) {
+        data.append("video", formData.video);
+      }
 
       // SEND IMAGE METADATA
       data.append(
@@ -489,6 +533,7 @@ function AddProduct() {
 
       toast.success(response.data.message);
 
+      if (videoPreview) URL.revokeObjectURL(videoPreview);
       setFormData({
         id: "",
         name: "",
@@ -498,6 +543,7 @@ function AddProduct() {
         mrp: "",
         selling_price: "",
         images: [],
+        video: null,
         about_this_item: [""],
         features_specs: [{ key: "", value: "" }],
         style: [{ key: "", value: "" }],
@@ -512,6 +558,7 @@ function AddProduct() {
       });
 
       setImagePreviews([]);
+      setVideoPreview("");
       setErrors({});
     } catch (error) {
       console.error("Add product error:", error);
@@ -794,7 +841,7 @@ function AddProduct() {
             <div className="section-heading">
               <div>
                 <h2>Product Images</h2>
-                <p>Upload up to 5 product images.</p>
+                <p>Upload up to 4 product images.</p>
               </div>
             </div>
 
@@ -804,14 +851,14 @@ function AddProduct() {
                 accept="image/*"
                 multiple
                 onChange={handleImageUpload}
-                disabled={formData.images.length >= 5}
+                disabled={formData.images.length >= 4}
               />
 
               <div className="upload-icon">＋</div>
 
               <strong>Click to upload images</strong>
 
-              <span>PNG, JPG or WEBP • Maximum 5 images</span>
+              <span>PNG, JPG or WEBP • Maximum 4 images</span>
             </label>
 
             {errors.images && (
@@ -849,6 +896,41 @@ function AddProduct() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </section>
+
+          <section className="product-section">
+            <div className="section-heading">
+              <div>
+                <h2>Product Video</h2>
+                <p>Upload one MP4, WebM, or Ogg video (maximum 100 MB).</p>
+              </div>
+            </div>
+            <label className="upload-box">
+              <input
+                type="file"
+                accept="video/mp4,video/webm,video/ogg"
+                onChange={handleVideoUpload}
+              />
+              <div className="upload-icon">▶</div>
+              <strong>{videoPreview ? "Replace product video" : "Click to upload a video"}</strong>
+              <span>One video per product</span>
+            </label>
+            {errors.video && (
+              <small className="field-error">{errors.video}</small>
+            )}
+            {videoPreview && (
+              <div className="product-video-preview">
+                <video src={videoPreview} controls preload="metadata" />
+                <button
+                  type="button"
+                  className="remove-image-btn"
+                  onClick={removeVideo}
+                  aria-label="Remove product video"
+                >
+                  ×
+                </button>
               </div>
             )}
           </section>

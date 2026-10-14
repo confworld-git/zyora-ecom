@@ -45,6 +45,9 @@ const ProductDetail = () => {
   const isOutOfStock =
     product.stock?.in_stock !== true || stockQuantity <= 0;
   const images = product.images || [];
+  const videoUrl =
+    typeof product.video === "string" ? product.video : product.video?.url || "";
+  const isVideoSelected = selection.showVideo === true && Boolean(videoUrl);
   const colourNames = product.variants?.colours || [];
 
   // Each image = one colour option (hex from image.color, name from variants.colours by index)
@@ -67,6 +70,12 @@ const ProductDetail = () => {
   );
   const selectedColor = selectedColorOption?.name ?? "";
   const selectedSize = selection.size ?? "";
+  const selectImage = (image) => {
+    setSelectionsByProduct((current) => ({
+      ...current,
+      [id]: { ...current[id], image, showVideo: false },
+    }));
+  };
 
   const productName = product.name || product.title;
   const ratingAverage = product.rating?.average ?? 0;
@@ -206,16 +215,41 @@ const ProductDetail = () => {
                   src={image.url}
                   alt={image.alt || productName}
                   className={activeImage?.id === image.id ? "selected" : ""}
-                  onClick={() => updateSelection("image", image)}
+                  onClick={() => selectImage(image)}
                 />
               ))
             ) : (
               <div className="no-image">No image available</div>
             )}
+            {videoUrl && (
+              <button
+                className={`product-video-thumbnail ${isVideoSelected ? "selected" : ""}`}
+                type="button"
+                aria-label={`Play ${productName} video`}
+                aria-pressed={isVideoSelected}
+                onClick={() => updateSelection("showVideo", true)}
+              >
+                <span aria-hidden="true">▶</span>
+                <small>Video</small>
+              </button>
+            )}
           </div>
 
-          <div>
-            <ProductZoom image={selectedImage} />
+          <div className="product-detail-main-media">
+            {isVideoSelected ? (
+              <video
+                className="product-detail-video-player"
+                src={videoUrl}
+                poster={images[0]?.url}
+                controls
+                playsInline
+                preload="metadata"
+              >
+                Your browser does not support embedded videos.
+              </video>
+            ) : (
+              <ProductZoom image={selectedImage} />
+            )}
           </div>
 
           <div className="product-detail-summary">
@@ -256,7 +290,7 @@ const ProductDetail = () => {
                       title={option.name}
                       aria-label={`Select ${option.name} color`}
                       style={{ backgroundColor: option.color }}
-                      onClick={() => updateSelection("image", option.image)}
+                      onClick={() => selectImage(option.image)}
                     />
                   ))
                 ) : (
