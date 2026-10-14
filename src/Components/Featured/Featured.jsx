@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { useProducts } from "../../Context/ProductContext";
 import { isImitationJewellery } from "../../utils/productCategory.js";
 
+const PRODUCTS_PER_CATEGORY = 4;
+
 const FILTERS = [
   {
     id: "all",
@@ -31,35 +33,30 @@ const Featured = () => {
   const { products, loading, error } = useProducts();
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const visibleProducts = useMemo(
-    () => products.filter((product) => !isImitationJewellery(product)),
-    [products],
-  );
+  const visibleProducts = useMemo(() => {
+    const list = Array.isArray(products) ? products : [];
+    return list.filter((product) => product && !isImitationJewellery(product));
+  }, [products]);
 
-  const PRODUCT_LIMIT = 5;
-
+  // No slicing here. The limit is applied per category below.
   const filteredProducts = useMemo(() => {
     switch (activeFilter) {
       case "new":
-        return [...visibleProducts]
-          .sort(
-            (first, second) =>
-              new Date(second.createdAt || 0) - new Date(first.createdAt || 0),
-          )
-          .slice(0, PRODUCT_LIMIT);
+        return [...visibleProducts].sort(
+          (first, second) =>
+            new Date(second.createdAt || 0) - new Date(first.createdAt || 0),
+        );
 
       case "bestseller":
-        return visibleProducts
-          .filter((product) => product.is_best_seller)
-          .slice(0, PRODUCT_LIMIT);
+        return visibleProducts.filter((product) => product.is_best_seller);
 
       case "under499":
-        return visibleProducts
-          .filter((product) => Number(product.price?.selling_price) <= 499)
-          .slice(0, PRODUCT_LIMIT);
+        return visibleProducts.filter(
+          (product) => Number(product.price?.selling_price) <= 499,
+        );
 
       default:
-        return visibleProducts.slice(0, PRODUCT_LIMIT);
+        return visibleProducts;
     }
   }, [activeFilter, visibleProducts]);
 
@@ -109,9 +106,10 @@ const Featured = () => {
         </p>
       ) : (
         categories.map((category) => {
+          // Max 4 per category, for every filter
           const categoryProducts = filteredProducts
             .filter((product) => product.category === category)
-            .slice(0, PRODUCT_LIMIT);
+            .slice(0, PRODUCTS_PER_CATEGORY);
 
           return (
             <div className="category_section" key={category}>
@@ -129,7 +127,7 @@ const Featured = () => {
               </div>
 
               <div className="collections_imgs">
-                {categoryProducts.map((product, index) => {
+                {categoryProducts.map((product) => {
                   const productId = product.id || product._id;
                   const slug = (product.name || product.title)
                     ?.toLowerCase()
@@ -138,10 +136,11 @@ const Featured = () => {
                     .replace(/^-+|-+$/g, "");
 
                   const productUrl = `/Zyora_Category/product/${productId}/${slug}`;
+
                   return (
                     <Link
                       className="product_card_1"
-                      key={index}
+                      key={productId}
                       to={productUrl}
                     >
                       {product.images?.[0]?.url ? (
