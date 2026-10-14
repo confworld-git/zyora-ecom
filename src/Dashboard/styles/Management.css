@@ -167,15 +167,15 @@
   margin-top: 5px;
   color: #81776d;
   font-size: 10px;
-}
+}                                          
 
-.orders-table th:last-child {
+/* .orders-table th:last-child {
   min-width: 190px;
 }
 
 .orders-table .shipment-cell {
   min-width: 190px;
-}
+} */
 
 .shipment-select-button {
   display: inline-flex;

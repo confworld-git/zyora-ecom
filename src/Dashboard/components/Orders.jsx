@@ -13,6 +13,7 @@ const orderStatuses = [
   "shipped",
   "delivered",
   "cancelled",
+  "refunded",
 ];
 const paymentStatuses = ["pending", "paid", "failed", "refunding", "refunded"];
 
@@ -291,7 +292,9 @@ const Orders = ({ initialOrderId = "" }) => {
     ["placed", "confirmed"].includes(order.orderStatus),
   ).length;
   const salesTotal = orders
-    .filter((order) => order.orderStatus !== "cancelled")
+    .filter(
+      (order) => !["cancelled", "refunded"].includes(order.orderStatus),
+    )
     .reduce((sum, order) => sum + (Number(order.total) || 0), 0);
 
   return (
@@ -493,7 +496,12 @@ const Orders = ({ initialOrderId = "" }) => {
                             <small>AWB: {order.shipment.awb}</small>
                           </div>
                         </div>
-                      ) : ["shipped", "delivered", "cancelled"].includes(
+                      ) : [
+                            "shipped",
+                            "delivered",
+                            "cancelled",
+                            "refunded",
+                          ].includes(
                             order.orderStatus,
                           ) ? (
                         <span className="shipment-state shipment-state-muted">
