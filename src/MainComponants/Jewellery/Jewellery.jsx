@@ -1,6 +1,5 @@
 import "./Jewellery.css";
 import ParticleBackground from "./ParticleBackground";
-import { IoIosArrowDown } from "react-icons/io";
 import SEO from "../../SEO";
 import JewelleryList from "./JewelleryList";
 
@@ -52,14 +51,11 @@ const Jewellery = () => {
                 <p key={category}>{category}</p>
               ))}
             </div>
-            <button className="shop-now-button-jew">
-              <IoIosArrowDown />
-            </button>
           </div>
+          <section>
+            <JewelleryList />
+          </section>
         </div>
-        <section>
-          <JewelleryList />
-        </section>
       </div>
     </>
   );

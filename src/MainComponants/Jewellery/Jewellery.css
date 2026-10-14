@@ -1,9 +1,9 @@
 .jewellery-container {
   position: relative;
   z-index: 10;
-  height: 100vh;
   width: 100%;
 }
+
 .jewellery-container > div {
   position: relative;
   display: flex;
@@ -11,9 +11,236 @@
   justify-content: center;
   align-items: center;
   color: white;
-  height: 100%;
+  /* height: 100%; */
   z-index: 10;
 }
+
+.zyora-jewellery-collection {
+  --jewellery-ink: #241b16;
+  --jewellery-muted: #82746a;
+  --jewellery-gold: #a77a3f;
+  --jewellery-line: rgba(71, 52, 35, 0.12);
+  width: min(1440px, calc(100% - 96px));
+  margin: 0 auto;
+  padding: 76px 0 112px;
+  color: var(--jewellery-ink);
+}
+
+.zyora-jewellery-heading {
+  max-width: 760px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.zyora-jewellery-eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--jewellery-gold);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+
+.zyora-jewellery-heading > h2 {
+  margin: 0;
+  color: var(--jewellery-ink);
+  font-family: "Bricolage Grotesque", Georgia, serif;
+  font-size: clamp(38px, 5.5vw, 68px);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 1.04;
+}
+
+.zyora-jewellery-heading > h2 > span {
+  color: var(--jewellery-gold);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.045em;
+}
+
+.zyora-jewellery-heading > p {
+  max-width: 480px;
+  margin: 18px auto 0;
+  color: var(--jewellery-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.zyora-jewellery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px 20px;
+}
+
+.zyora-jewellery-card {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  background: #fff;
+  padding: 10px 10px 20px 10px;
+  box-sizing: border-box;
+  border-radius: 25px;
+}
+
+.zyora-jewellery-image-wrap {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border-radius: 20px;
+}
+
+.zyora-jewellery-image,
+.zyora-jewellery-image-placeholder {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+  transition: transform 550ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.zyora-jewellery-image-placeholder {
+  place-items: center;
+  color: var(--jewellery-muted);
+  font-size: 13px;
+  border-radius: 20px;
+}
+
+.zyora-jewellery-card:hover .zyora-jewellery-image,
+.zyora-jewellery-card:focus-visible .zyora-jewellery-image {
+  transform: scale(1.045);
+  border-radius: 20px;
+}
+
+.zyora-jewellery-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 7px 10px;
+  background: rgba(255, 253, 248, 0.94);
+  color: #72512b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.zyora-jewellery-card-cta {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 15px;
+  background: rgba(255, 253, 248, 0.96);
+  color: var(--jewellery-ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.zyora-jewellery-card-cta > span {
+  color: var(--jewellery-gold);
+  font-size: 17px;
+}
+
+.zyora-jewellery-card:hover .zyora-jewellery-card-cta,
+.zyora-jewellery-card:focus-visible .zyora-jewellery-card-cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.zyora-jewellery-card:focus-visible {
+  outline: 2px solid var(--jewellery-gold);
+  outline-offset: 4px;
+}
+
+.zyora-jewellery-card-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 1px 0;
+}
+
+.zyora-jewellery-card-title {
+  min-width: 0;
+}
+
+.zyora-jewellery-brand {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--jewellery-gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.zyora-jewellery-card-title > h3 {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--jewellery-ink);
+  font-family: "Bricolage Grotesque", Georgia, serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.zyora-jewellery-price {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  font-family: "Bricolage Grotesque", Georgia, serif;
+  gap: 5px 8px;
+  padding-top: 1px;
+}
+
+.zyora-jewellery-selling-price {
+  color: var(--jewellery-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.zyora-jewellery-mrp {
+  color: #9a9189;
+  font-size: 11px;
+  text-decoration: line-through;
+}
+
+.zyora-jewellery-discount {
+  flex-basis: 100%;
+  color: #796044;
+  font-size: 10px;
+  text-align: right;
+}
+
+.zyora-jewellery-state {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  margin: 0;
+  border-top: 1px solid var(--jewellery-line);
+  border-bottom: 1px solid var(--jewellery-line);
+  color: var(--jewellery-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
 .jewellery-container > div > div {
   width: 80%;
   text-align: center;
@@ -21,7 +248,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  /* height: 60vh; */
+  padding: 40px 0px 0px 0px;
 }
+
 .jewellery-container > div > div > h1 {
   font-size: 100px;
   margin: 0;
@@ -117,5 +347,77 @@
 
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@media (max-width: 1000px) {
+  .zyora-jewellery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .zyora-jewellery-collection {
+    width: min(100% - 40px, 560px);
+    padding: 54px 0 72px;
+  }
+
+  .zyora-jewellery-heading {
+    margin-bottom: 32px;
+  }
+
+  .zyora-jewellery-heading > p {
+    max-width: 360px;
+    font-size: 13px;
+  }
+
+  .zyora-jewellery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 12px;
+  }
+
+  .zyora-jewellery-card-info {
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  .zyora-jewellery-price {
+    justify-content: flex-start;
+  }
+
+  .zyora-jewellery-discount {
+    flex-basis: auto;
+    text-align: left;
+  }
+}
+
+@media (max-width: 420px) {
+  .zyora-jewellery-collection {
+    width: calc(100% - 28px);
+  }
+
+  .zyora-jewellery-grid {
+    gap: 18px 10px;
+  }
+
+  .zyora-jewellery-card-title > h3 {
+    font-size: 14px;
+  }
+
+  .zyora-jewellery-card-cta {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    padding: 10px;
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zyora-jewellery-image,
+  .zyora-jewellery-card-cta {
+    transition: none;
   }
 }

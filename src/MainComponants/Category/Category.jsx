@@ -5,6 +5,7 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import SEO from "../../SEO.jsx";
 import { normalizeProductRating } from "../../utils/productRating.js";
+import { isImitationJewellery } from "../../utils/productCategory.js";
 
 const clothingSizeLabels = {
   S: "S - Small",
@@ -22,6 +23,10 @@ const Category = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
+  const categoryProducts = useMemo(
+    () => products.filter((product) => !isImitationJewellery(product)),
+    [products],
+  );
 
   useEffect(() => {
     const refreshWhenVisible = () => {
@@ -64,14 +69,14 @@ const Category = () => {
   };
 
   const MIN_PRODUCT_PRICE = useMemo(() => {
-    const sellingPrices = products
+    const sellingPrices = categoryProducts
       .map((product) => product.price?.selling_price)
       .filter((price) => price !== undefined && price !== null && price !== "")
       .map(Number)
       .filter(Number.isFinite);
 
     return sellingPrices.length ? Math.min(...sellingPrices) : 0;
-  }, [products]);
+  }, [categoryProducts]);
 
   const [filters, setFilters] = useState({
     categories: selectedCategory ? [selectedCategory] : [],
@@ -90,19 +95,21 @@ const Category = () => {
 
   const categoryOptions = useMemo(() => {
     return [
-      ...new Set(products.map((product) => product.category).filter(Boolean)),
+      ...new Set(
+        categoryProducts.map((product) => product.category).filter(Boolean),
+      ),
     ].sort();
-  }, [products]);
+  }, [categoryProducts]);
 
   const maxProductPrice = useMemo(() => {
-    const highestPrice = products.reduce(
+    const highestPrice = categoryProducts.reduce(
       (highest, product) =>
         Math.max(highest, Number(product.price?.selling_price) || 0),
       0,
     );
 
     return Math.max(MIN_PRODUCT_PRICE, Math.ceil(highestPrice / 500) * 500);
-  }, [products, MIN_PRODUCT_PRICE]);
+  }, [categoryProducts, MIN_PRODUCT_PRICE]);
 
   const SLIDER_MIN_PRICE = useMemo(() => {
     return Math.floor(MIN_PRODUCT_PRICE / 50) * 50;
@@ -117,7 +124,7 @@ const Category = () => {
   const availableProducts = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
 
-    return products.filter((product) => {
+    return categoryProducts.filter((product) => {
       const title = product.title || "";
       const brand = product.brand || "";
       const category = product.category || "";
@@ -136,7 +143,7 @@ const Category = () => {
 
       return matchesSearch && matchesCategory;
     });
-  }, [products, searchTerm, filters.categories]);
+  }, [categoryProducts, searchTerm, filters.categories]);
 
   const colorOptions = useMemo(() => {
     const colors = availableProducts.flatMap(
@@ -198,7 +205,7 @@ const Category = () => {
   const filteredProducts = useMemo(() => {
     const search = searchTerm.trim().toLowerCase();
 
-    const result = products.filter((product) => {
+    const result = categoryProducts.filter((product) => {
       const price = Number(product.price?.selling_price) || 0;
       const title = product.title || "";
       const brand = product.brand || "";
@@ -277,7 +284,7 @@ const Category = () => {
   }, [
     activeColors,
     activeSizes,
-    products,
+    categoryProducts,
     searchTerm,
     filters,
     SLIDER_MIN_PRICE,
