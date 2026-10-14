@@ -16,7 +16,12 @@ import { useWishlist } from "../../Context/WishlistContext.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
-const PRICING_FIELDS = ["freeShippingLimit", "shippingCharge", "platformFee"];
+const PRICING_FIELDS = [
+  "freeShippingLimit",
+  "shippingCharge",
+  "shippingChargeforCOD",
+  "platformFee",
+];
 
 const loadRazorpayCheckout = () =>
   new Promise((resolve) => {
@@ -234,10 +239,14 @@ const Cart = () => {
   );
 
   const freeShippingLimit = pricing?.freeShippingLimit ?? 0;
+  const shippingCharge =
+    paymentMethod === "cod"
+      ? pricing?.shippingChargeforCOD
+      : pricing?.shippingCharge;
   const shipping =
     !pricing || subtotal === 0 || subtotal >= freeShippingLimit
       ? 0
-      : pricing.shippingCharge;
+      : shippingCharge;
 
   const totalMRP = selectedItems.reduce(
     (sum, item) => sum + (Number(item.mrp) || 0) * (Number(item.quantity) || 0),
@@ -1077,7 +1086,13 @@ const Cart = () => {
               </div>
 
               <div className="summary_row">
-                <span>Shipping</span>
+                <span>
+                  Shipping (
+                  {paymentMethod === "cod"
+                    ? "Cash on delivery"
+                    : "Online payment"}
+                  )
+                </span>
 
                 <strong>
                   {pricingLoading ? (

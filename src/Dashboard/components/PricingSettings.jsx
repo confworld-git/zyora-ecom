@@ -13,8 +13,13 @@ const FIELDS = [
   },
   {
     name: "shippingCharge",
-    label: "Shipping charge (₹)",
-    hint: "Apply when the subtotal is below the limit.",
+    label: "Shipping charge for online (₹)",
+    hint: "Apply to online-payment orders",
+  },
+  {
+    name: "shippingChargeforCOD",
+    label: "Shipping charge for COD (₹)",
+    hint: "Apply to cash-on-delivery orders",
   },
   {
     name: "platformFee",
@@ -27,6 +32,7 @@ const PricingSettings = () => {
   const [values, setValues] = useState({
     freeShippingLimit: "",
     shippingCharge: "",
+    shippingChargeforCOD: "",
     platformFee: "",
   });
   const [saved, setSaved] = useState(null);
@@ -46,6 +52,7 @@ const PricingSettings = () => {
           setValues({
             freeShippingLimit: String(res.data.pricing.freeShippingLimit),
             shippingCharge: String(res.data.pricing.shippingCharge),
+            shippingChargeforCOD: String(res.data.pricing.shippingChargeforCOD),
             platformFee: String(res.data.pricing.platformFee),
           });
         } else if (!cancelled) {
@@ -54,7 +61,9 @@ const PricingSettings = () => {
       } catch (error) {
         console.error("Load pricing error:", error);
         if (!cancelled) {
-          setLoadError("Unable to load saved pricing settings. You can still enter all values and save.");
+          setLoadError(
+            "Unable to load saved pricing settings. You can still enter all values and save.",
+          );
           toast.error("Unable to load pricing settings");
         }
       } finally {
@@ -70,7 +79,12 @@ const PricingSettings = () => {
   const validValues = FIELDS.every(({ name }) => {
     const raw = values[name];
     const number = Number(raw);
-    return raw !== "" && Number.isFinite(number) && number >= 0 && number <= MAX_VALUE;
+    return (
+      raw !== "" &&
+      Number.isFinite(number) &&
+      number >= 0 &&
+      number <= MAX_VALUE
+    );
   });
   const changed = saved
     ? FIELDS.some(({ name }) => Number(values[name]) !== saved[name])
@@ -98,7 +112,9 @@ const PricingSettings = () => {
         number < 0 ||
         number > MAX_VALUE
       ) {
-        toast.error(`Enter an amount between ₹0 and ₹${MAX_VALUE} for "${label}"`);
+        toast.error(
+          `Enter an amount between ₹0 and ₹${MAX_VALUE} for "${label}"`,
+        );
         return;
       }
 
@@ -120,13 +136,16 @@ const PricingSettings = () => {
       setValues({
         freeShippingLimit: String(res.data.pricing.freeShippingLimit),
         shippingCharge: String(res.data.pricing.shippingCharge),
+        shippingChargeforCOD: String(res.data.pricing.shippingChargeforCOD),
         platformFee: String(res.data.pricing.platformFee),
       });
       setLoadError("");
       toast.success("Pricing updated");
     } catch (error) {
       toast.error(
-        error.response?.data?.message || error.message || "Unable to save pricing",
+        error.response?.data?.message ||
+          error.message ||
+          "Unable to save pricing",
       );
     } finally {
       setSaving(false);
