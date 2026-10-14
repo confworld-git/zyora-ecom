@@ -2,6 +2,7 @@ import "./Jewellery.css";
 import ParticleBackground from "./ParticleBackground";
 import { IoIosArrowDown } from "react-icons/io";
 import SEO from "../../SEO";
+import JewelleryList from "./JewelleryList";
 
 const Jewellery = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
@@ -56,6 +57,9 @@ const Jewellery = () => {
             </button>
           </div>
         </div>
+        <section>
+          <JewelleryList />
+        </section>
       </div>
     </>
   );

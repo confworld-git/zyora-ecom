@@ -1,8 +1,35 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import "./Footer.css";
 import logo from "../../assets/Logo/Zyora_logo.jpeg";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleNewsletterSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/newsletter/join`,
+        { email },
+      );
+      toast.success(response.data.message);
+      setEmail("");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Unable to join the newsletter. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -14,18 +41,25 @@ const Footer = () => {
               Get updates on new arrivals and exclusive deals.
             </p>
 
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="newsletter-form"
-            >
+            <form onSubmit={handleNewsletterSubmit} className="newsletter-form">
               <input
                 type="email"
+                name="email"
                 placeholder="Enter your email"
                 className="newsletter-input"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                maxLength={254}
+                autoComplete="email"
+                required
               />
 
-              <button type="submit" className="newsletter-button">
-                Join
+              <button
+                type="submit"
+                className="newsletter-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Joining..." : "Join"}
               </button>
             </form>
           </div>
