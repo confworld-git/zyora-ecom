@@ -731,11 +731,11 @@ const Category = () => {
                         </span>
                       )}
 
-                      <p className="rating_pre">
-                        {rating.count > 0
-                          ? `⭐ ${rating.average.toFixed(1)} (${rating.count})`
-                          : "No ratings"}
-                      </p>
+                      {rating.count > 0 && (
+                        <p className="rating_pre">
+                          ⭐ {rating.average.toFixed(1)} ({rating.count})
+                        </p>
+                      )}
                       <span>{product.brand}</span>
                       <br />
                       <small>{product.name}</small>

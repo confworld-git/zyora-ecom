@@ -109,11 +109,11 @@ const JewelleryList = () => {
                           ₹{mrp.toLocaleString("en-IN")}
                         </span>
                       )}
-                    {product.price?.discount_percent ? (
+                    {/* {product.price?.discount_percent ? (
                       <span className="zyora-jewellery-discount">
                         Save {product.price.discount_percent}%
                       </span>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 </div>
               </Link>
