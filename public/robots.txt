@@ -5,4 +5,4 @@ Disallow: /Cart
 Disallow: /Favorites
 Disallow: /Payment_result
 
-Sitemap: https://zyora-ecom.vercel.app/sitemap.xml
+Sitemap: www.zyoraecom.in/sitemap.xml

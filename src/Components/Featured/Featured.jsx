@@ -36,6 +36,8 @@ const Featured = () => {
     [products],
   );
 
+  const PRODUCT_LIMIT = 5;
+
   const filteredProducts = useMemo(() => {
     switch (activeFilter) {
       case "new":
@@ -44,18 +46,20 @@ const Featured = () => {
             (first, second) =>
               new Date(second.createdAt || 0) - new Date(first.createdAt || 0),
           )
-          .slice(0, 8);
+          .slice(0, PRODUCT_LIMIT);
 
       case "bestseller":
-        return visibleProducts.filter((product) => product.is_best_seller);
+        return visibleProducts
+          .filter((product) => product.is_best_seller)
+          .slice(0, PRODUCT_LIMIT);
 
       case "under499":
-        return visibleProducts.filter(
-          (product) => Number(product.price?.selling_price) <= 499,
-        );
+        return visibleProducts
+          .filter((product) => Number(product.price?.selling_price) <= 499)
+          .slice(0, PRODUCT_LIMIT);
 
       default:
-        return visibleProducts;
+        return visibleProducts.slice(0, PRODUCT_LIMIT);
     }
   }, [activeFilter, visibleProducts]);
 
@@ -105,9 +109,9 @@ const Featured = () => {
         </p>
       ) : (
         categories.map((category) => {
-          const categoryProducts = filteredProducts.filter(
-            (product) => product.category === category,
-          );
+          const categoryProducts = filteredProducts
+            .filter((product) => product.category === category)
+            .slice(0, PRODUCT_LIMIT);
 
           return (
             <div className="category_section" key={category}>
