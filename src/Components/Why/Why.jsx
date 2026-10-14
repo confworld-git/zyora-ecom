@@ -1,5 +1,4 @@
 import "./why.css";
-import ScrollVideo from "../ScrollVideo.jsx";
 import delivery from "../../assets/Videos/delivery.mp4";
 import payment from "../../assets/Videos/payment.mp4";
 import returnp from "../../assets/Videos/returnp.mp4";
@@ -22,7 +21,7 @@ const Why = () => {
       <section>
         {items.map((item) => (
           <div key={item.text}>
-            <ScrollVideo src={item.src} />
+            <video src={item.src} autoPlay muted loop playsInline preload="metadata" />
             <p>{item.text}</p>
           </div>
         ))}

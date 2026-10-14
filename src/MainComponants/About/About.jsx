@@ -36,18 +36,19 @@ const About = () => {
           </p>
         </div>
         <div className="about_title">
+          <img src={arc} alt="" />
           <div className="about_hero_copy">
             <h1>
-              Shopping, made <span>personal</span> again.
+              WHO <span>WE ARE</span>
             </h1>
             <p>
-              Shopping should feel personal, joyful, and effortless that's the
-              whole idea behind ZYORA.
+              Shopping should feel personal, joyful, and effortless
+              <br /> that's the whole idea behind ZYORA.
             </p>
           </div>
-          <img src={home_img} alt="" />
+          {/* <img src={home_img} alt="" /> */}
         </div>
-        <div className="about_marquee" aria-hidden="true">
+        {/* <div className="about_marquee" aria-hidden="true">
           <div className="about_marquee_track">
             <span>
               THOUGHTFULLY CURATED ✦ QUALITY MEETS AFFORDABILITY ✦ MADE FOR
@@ -58,12 +59,12 @@ const About = () => {
               EVERYDAY MOMENTS ✦
             </span>
           </div>
-        </div>
+        </div> */}
         <section className="about_story">
           <div>
             <span className="about_eyebrow">Our Story</span>
             <h1>
-              Shopping, made <span>personal again.</span>
+              Shopping made <span>personal again.</span>
             </h1>
           </div>
           <p>
@@ -80,7 +81,7 @@ const About = () => {
         <div className="standFor">
           <span>What We Stand For</span>
           <h1>
-            Every product, chosen with <span>purpose.</span>
+            Every product chosen with <span>purpose.</span>
           </h1>
           <p>
             We handpick every single product that makes it onto ZYORA. No
@@ -99,31 +100,34 @@ const About = () => {
           </h1>
           <section>
             <div>
-              <h1>Thoughtfully Curated</h1>
+              <h1>Carefully Selected Products</h1>
               <p>
-                Every product is handpicked — not mass-added — so you always
-                find things worth keeping.
+                We choose every product with care to bring you things you'll
+                love.
               </p>
             </div>
+
             <div>
-              <h1>Something for Every Part of Life</h1>
+              <h1>Everything in One Place</h1>
               <p>
-                From soft toys to home essentials, stationery to handbags —
-                ZYORA brings it all together in one place.
+                From soft toys and handbags to stationery and home essentials,
+                find what you need at ZYORA.
               </p>
             </div>
+
             <div>
-              <h1>Quality Meets Affordability</h1>
+              <h1>Good Quality at Good Prices</h1>
               <p>
-                We believe style and good pricing shouldn't be a trade-off — you
-                get both, always.
+                Shop for products that offer good quality at prices you can
+                afford.
               </p>
             </div>
+
             <div>
-              <h1>Made for Real, Everyday Moments</h1>
+              <h1>Made for Everyday Life</h1>
               <p>
-                Whether you're decorating, gifting, studying, or accessorizing —
-                ZYORA fits right into your life.
+                Whether you're shopping for yourself, decorating your home,
+                studying, or buying gifts, ZYORA has something for you.
               </p>
             </div>
           </section>

@@ -58,7 +58,7 @@
   color: var(--about-orange);
 }
 
-.about_title {
+/* .about_title {
   position: relative;
   display: grid;
   width: min(100%, 1280px);
@@ -68,43 +68,48 @@
   gap: clamp(32px, 7vw, 100px);
   margin: 22px auto 0;
   text-align: left;
-}
+} */
 
 .about_hero_copy {
   position: relative;
   z-index: 1;
-  max-width: 590px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 700px;
 }
 
 .about_title > img {
-  position: relative;
-  top: auto;
-  left: auto;
+  position: absolute;
+  top: 70px;
+  height: 700px;
   width: 100%;
-  height: 360px;
-  transform: none;
-  object-fit: cover;
-  border-radius: 32px;
-  background: var(--about-peach);
+  left: 0%;
+  object-fit: contain;
 }
 
 .about_hero_copy > h1 {
-  max-width: 8ch;
   margin: 0 0 16px;
   color: var(--about-navy);
-  font-size: clamp(64px, 8vw, 100px);
+  font-size: clamp(64px, 8vw, 70px);
   font-weight: 800;
   letter-spacing: -0.065em;
   line-height: 0.9;
+  width: 100%;
+  text-align: center;
 }
 
 .about_hero_copy > p {
-  max-width: 44ch;
   margin: 0;
+  width: 100%;
   color: var(--about-muted);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.8;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
 }
 
 .about_marquee {
@@ -143,7 +148,7 @@
   grid-template-columns: 0.85fr 1.15fr;
   align-items: center;
   gap: clamp(40px, 8vw, 120px);
-  margin: 76px auto 88px;
+  margin: 6px auto 68px;
 }
 
 .about_eyebrow {
@@ -225,8 +230,8 @@
   max-width: 54ch;
   margin: 0;
   color: rgba(255, 255, 255, 0.82);
-  font-size: 11px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.65;
 }
 
@@ -282,7 +287,7 @@
 
 .why_zyora {
   width: min(100%, 1280px);
-  margin: 82px auto 88px;
+  margin: 42px auto 48px;
 }
 
 .why_zyora > h1 {
@@ -342,9 +347,16 @@
   left: 22px;
   color: var(--about-orange);
   font-family: "Bricolage Grotesque", sans-serif;
-  font-size: 31px;
+  font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.06em;
+  /* background: white; */
+  /* padding: 6px; */
+  /* border-radius: 50%; */
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* flex-shrink: 0; */
 }
 
 .why_zyora > section {

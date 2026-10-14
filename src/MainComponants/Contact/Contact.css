@@ -12,7 +12,8 @@
   box-sizing: border-box;
   min-height: 650px;
   padding: 24px 48px 72px;
-  background: var(--c-bg);
+  /* background: var(--c-bg); */
+  background-color: white;
   color: var(--c-navy);
   font-family: "Manrope", sans-serif;
 }

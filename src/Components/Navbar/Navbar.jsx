@@ -7,6 +7,7 @@ import { TiShoppingCart } from "react-icons/ti";
 import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { useAuth } from "../../Context/AuthContext.jsx";
 import { AiOutlineLogin } from "react-icons/ai";
+import Zyora_logo from "../../assets/Logo/logo.jpg";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -29,11 +30,12 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`navbar ${isScrolled ? "navbar-scrolled" : ""}`}>
-      <h1>
-        <Link to="/">ZYORA</Link>
-      </h1>
+    <nav className={`navbar`}>
+      <Link to="/">
+        <img src={Zyora_logo} alt="Zyora Logo" className="zyora-logo" />
+      </Link>
 
+      {/* <img src={Zyora_logo} alt="Zyora Logo" className="zyora-logo" /> */}
       <ul>
         <li>
           <Link to="/About_Us">About Us</Link>

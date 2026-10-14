@@ -8,6 +8,7 @@
   overflow: hidden;
   color: var(--ink);
   padding: 56px 48px;
+  background: white;      
 }
 .wl *,
 .wl *::before,
@@ -100,25 +101,25 @@
   cursor: pointer;
 }
 .wl-pillars li:hover {
-  background: #1b1b7a;
-  border-color: #1b1b7a;
+  background: #ff4a12;
+  border-color: #ff4a12;
   color: #fff;
   transform: translateY(-2px);
 }
 
 .wl-visual {
   position: relative;
-  min-height: 430px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
+  gap: 14px;
   animation: wl-up 0.9s var(--d, 0s) cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .wl-frame {
   position: relative;
   width: 100%;
-  height: 360px;
+  height: 300px;
   border-radius: 32px;
   overflow: hidden;
 }
@@ -138,9 +139,6 @@
 }
 
 .wl-goal {
-  position: absolute;
-  left: -30px;
-  bottom: 0;
   width: min(390px, 90%);
   padding: 27px 29px;
   border-radius: 28px;

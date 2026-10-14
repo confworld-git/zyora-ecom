@@ -70,7 +70,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/return-policy" className="footer-link footer-policy">
-                  Return & Refund Policy (7 Days)
+                  Return & Refund Policy
                 </Link>
               </li>
               <li>

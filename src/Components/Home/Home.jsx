@@ -8,13 +8,13 @@ const Home = () => {
   return (
     <div className="home-container">
       <div className="hero-copy">
-        <span className="hero-eyebrow">Destination for E-commerce</span>
+        <img src={home_pro1} alt="" />
         <h1>
           Welcome to <span>ZYORA</span>
           <br />
-          Where Everyday Meets{" "}
-          <span className="hero-highlight">Extraordinary</span>
+          Where Everyday Meets Extraordinary
         </h1>
+        <span className="hero-eyebrow">Destination for E-commerce</span>
         <p>
           From cuddly soft toys to smart home essentials, handy stationery to
           stylish handbags discover products that make everyday life a little
@@ -24,7 +24,7 @@ const Home = () => {
           Shop Now <HiShoppingBag />
         </button>
       </div>
-      <div className="hero-grid" aria-label="Featured categories">
+      {/* <div className="hero-grid" aria-label="Featured categories">
         <div className="hero-tile hero-tile--handbags">
           <span className="hero-tile-number">01</span>
           <div>
@@ -48,7 +48,7 @@ const Home = () => {
           </div>
           <span aria-hidden="true">↗</span>
         </div>
-      </div>
+      </div> */}
       <Confetti active={true} />
     </div>
   );

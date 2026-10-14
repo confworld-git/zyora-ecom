@@ -3,7 +3,8 @@
 body:has(.zyora-homepage) {
   --zyora-orange: #ff4a12;
   zoom: 1;
-  background: #f6f3ee;
+  /* background: #f6f3ee; */
+  background-color: white;
   color: #0a0a5c;
   font-family: "Manrope", sans-serif;
 }
@@ -21,7 +22,7 @@ body:has(.zyora-homepage) {
   --zyora-tile-coral: #ffb199;
   min-height: 100vh;
   overflow: hidden;
-  background: var(--zyora-bg);
+    background-color: white;
   color: var(--zyora-navy);
   font-family: "Manrope", sans-serif;
 }
@@ -50,7 +51,8 @@ body:has(.zyora-homepage) {
   overflow: hidden;
   padding: 15px 0;
   background: var(--zyora-orange);
-  color: #fff;
+  /* color: #fff; */
+  color: var(--zyora-navy);
   white-space: nowrap;
 }
 

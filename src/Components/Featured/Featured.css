@@ -1,7 +1,8 @@
 .Featured_Collection {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 48px 56px;
+  background: white;
+  padding: 0 48px 46px;
 }
 
 .Featured_Collection > h1 {
