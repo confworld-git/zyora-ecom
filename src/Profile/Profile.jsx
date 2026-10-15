@@ -654,24 +654,41 @@ const Profile = () => {
             </div>
 
             <div className="zyora-profile-header-actions">
-              <Link to="/" className="zyora-profile-btn outline">
-                <TiHomeOutline aria-hidden="true" /> Home
+              <Link
+                to="/"
+                className="zyora-profile-btn outline"
+                aria-label="Home"
+              >
+                <TiHomeOutline aria-hidden="true" />
+                <span className="zyora-profile-btn-label">Home</span>
               </Link>
 
-              <Link to="/Cart" className="zyora-profile-btn outline">
-                <BsCart4 aria-hidden="true" /> Cart
+              <Link
+                to="/Cart"
+                className="zyora-profile-btn outline"
+                aria-label="Cart"
+              >
+                <BsCart4 aria-hidden="true" />
+                <span className="zyora-profile-btn-label">Cart</span>
               </Link>
 
-              <Link to="/Favorites" className="zyora-profile-btn outline">
-                <FiHeart aria-hidden="true" /> Favorites
+              <Link
+                to="/Favorites"
+                className="zyora-profile-btn outline"
+                aria-label="Favorites"
+              >
+                <FiHeart aria-hidden="true" />
+                <span className="zyora-profile-btn-label">Favorites</span>
               </Link>
 
               <button
                 type="button"
                 className="zyora-profile-btn outline danger"
                 onClick={handleLogout}
+                aria-label="Logout"
               >
-                <FiLogOut aria-hidden="true" /> Logout
+                <FiLogOut aria-hidden="true" />
+                <span className="zyora-profile-btn-label">Logout</span>
               </button>
             </div>
           </header>

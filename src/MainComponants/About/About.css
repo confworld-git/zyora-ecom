@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Manrope:wght@400;500;600&display=swap");
 
 .About_us {
-  --about-bg: #FAF7EF;
+  --about-bg: #faf7ef;
   --about-navy: #0a0a5c;
   --about-navy-light: #1b1b7a;
   --about-orange: #ff4a12;
@@ -58,36 +58,35 @@
   color: var(--about-orange);
 }
 
-/* .about_title {
+.about_title {
   position: relative;
-  display: grid;
+  display: flex;
   width: min(100%, 1280px);
-  min-height: 460px;
-  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: clamp(32px, 7vw, 100px);
+  justify-content: center;
+  aspect-ratio: 1.85;
   margin: 22px auto 0;
-  text-align: left;
-} */
+  isolation: isolate;
+}
 
 .about_hero_copy {
   position: relative;
   z-index: 1;
-  width: 100%;
+  width: min(100%, 680px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  height: 700px;
+  padding: 24px;
 }
 
 .about_title > img {
   position: absolute;
-  top: 70px;
-  height: 700px;
+  inset: 0;
+  z-index: -1;
+  height: 100%;
   width: 100%;
-  left: 0%;
   object-fit: contain;
 }
 
@@ -329,7 +328,7 @@
   text-align: left;
 }
 
-.why-icon{
+.why-icon {
   height: 40px;
   width: 40px;
   background-color: white;
@@ -558,12 +557,14 @@
   }
 
   .about_title {
-    min-height: 380px;
-    gap: 30px;
+    aspect-ratio: auto;
+    min-height: clamp(360px, 52vw, 480px);
+    margin-top: 18px;
   }
 
-  .about_title > img {
-    height: 300px;
+  .about_hero_copy {
+    width: min(100%, 620px);
+    padding: 28px;
   }
 
   .about_hero_copy > h1 {
@@ -586,16 +587,44 @@
   }
 
   .about_title {
-    min-height: 0;
-    grid-template-columns: 1fr;
-    gap: 25px;
-    margin: 24px auto 30px;
+    min-height: 100px;
+    /* margin: 18px auto 26px; */
+    /* overflow: hidden; */
+    margin-bottom: 80px;
+  }
+
+  .about_title > img {
+    object-fit: cover;
+    height: 300px;
+    object-position: center -20px;
+    z-index: -10;
+  }
+
+  .about_title > div {
+    margin-top: 80px;
+  }
+
+  .about_title > div > h1 {
+    font-size: 35px;
+  }
+
+  .about_title > div > p{
+    font-size: 12px;
+  }
+
+  .about_story{
+    position: relative;
+    z-index: 3;
+  }
+
+  .about_hero_copy {
+    padding: 20px 6px;
   }
 
   .about_hero_copy > h1 {
     max-width: none;
-    margin-bottom: 13px;
-    font-size: clamp(60px, 17vw, 76px);
+    margin-bottom: 12px;
+    font-size: clamp(40px, 12vw, 58px);
   }
 
   .about_hero_copy > p {
@@ -603,9 +632,8 @@
     font-size: 14px;
   }
 
-  .about_title > img {
-    height: clamp(220px, 66vw, 310px);
-    border-radius: 26px;
+  .about_hero_copy > p br {
+    display: none;
   }
 
   .about_marquee {

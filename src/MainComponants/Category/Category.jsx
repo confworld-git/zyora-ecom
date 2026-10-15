@@ -1,7 +1,11 @@
 import "./Category.css";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MdKeyboardArrowRight } from "react-icons/md";
+import {
+  MdClose,
+  MdFilterList,
+  MdKeyboardArrowRight,
+} from "react-icons/md";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import SEO from "../../SEO.jsx";
 import { normalizeProductRating } from "../../utils/productRating.js";
@@ -23,6 +27,7 @@ const Category = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sizeSliderSize, setSizeSliderSize] = useState("");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const categoryProducts = useMemo(
     () => products.filter((product) => !isImitationJewellery(product)),
     [products],
@@ -44,6 +49,27 @@ const Category = () => {
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
   }, [refreshProducts]);
+
+  useEffect(() => {
+    if (!mobileFiltersOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setMobileFiltersOpen(false);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileFiltersOpen]);
 
   // const TILT_MAX = 5;
 
@@ -434,7 +460,47 @@ const Category = () => {
               />
             </div>
 
-            <div className="filter_panel">
+            <button
+              className="mobile_filter_button"
+              type="button"
+              aria-expanded={mobileFiltersOpen}
+              aria-controls="category-filter-panel"
+              onClick={() => setMobileFiltersOpen(true)}
+            >
+              <MdFilterList aria-hidden="true" />
+              Filter
+            </button>
+
+            {mobileFiltersOpen && (
+              <button
+                className="filter_backdrop"
+                type="button"
+                aria-label="Close filters"
+                onClick={() => setMobileFiltersOpen(false)}
+              />
+            )}
+
+            <div
+              id="category-filter-panel"
+              className={`filter_panel${mobileFiltersOpen ? " is_open" : ""}`}
+              role={mobileFiltersOpen ? "dialog" : undefined}
+              aria-modal={mobileFiltersOpen ? "true" : undefined}
+              aria-labelledby={
+                mobileFiltersOpen ? "mobile-filter-title" : undefined
+              }
+            >
+              <div className="mobile_filter_header">
+                <h2 id="mobile-filter-title">Filters</h2>
+                <button
+                  className="mobile_filter_close"
+                  type="button"
+                  aria-label="Close filters"
+                  onClick={() => setMobileFiltersOpen(false)}
+                >
+                  <MdClose aria-hidden="true" />
+                </button>
+              </div>
+
               <fieldset>
                 <legend>Category</legend>
 
@@ -644,6 +710,15 @@ const Category = () => {
                 onClick={clearFilters}
               >
                 Clear All
+              </button>
+
+              <button
+                className="mobile_filter_apply"
+                type="button"
+                onClick={() => setMobileFiltersOpen(false)}
+              >
+                Show {filteredProducts.length}{" "}
+                {filteredProducts.length === 1 ? "product" : "products"}
               </button>
             </div>
           </div>
