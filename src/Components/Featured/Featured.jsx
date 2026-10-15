@@ -1,4 +1,5 @@
 import "./Featured.css";
+import ScrollReveal from "../ScrollReveal.jsx";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useProducts } from "../../Context/ProductContext";
@@ -70,7 +71,7 @@ const Featured = () => {
   );
 
   return (
-    <div className="Featured_Collection">
+    <ScrollReveal className="Featured_Collection">
       <h1>
         Featured <span>Collections</span>
       </h1>
@@ -127,7 +128,7 @@ const Featured = () => {
               </div>
 
               <div className="collections_imgs">
-                {categoryProducts.map((product) => {
+                {categoryProducts.map((product, index) => {
                   const productId = product.id || product._id;
                   const slug = (product.name || product.title)
                     ?.toLowerCase()
@@ -141,6 +142,7 @@ const Featured = () => {
                     <Link
                       className="product_card_1"
                       key={productId}
+                      style={{ "--card-index": Math.min(index, 8) }}
                       to={productUrl}
                     >
                       {product.images?.[0]?.url ? (
@@ -188,7 +190,7 @@ const Featured = () => {
           );
         })
       )}
-    </div>
+    </ScrollReveal>
   );
 };
 

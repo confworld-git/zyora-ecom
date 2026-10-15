@@ -4,6 +4,7 @@ import { FaTruck } from "react-icons/fa6";
 import arc from "../../assets/Images/arc.png";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import {
   Sparkles,
   ShoppingBag,
@@ -65,7 +66,7 @@ const About = () => {
             </span>
           </div>
         </div> */}
-        <section className="about_story">
+        <ScrollReveal as="section" className="about_story">
           <div>
             <span className="about_eyebrow">Our Story</span>
             <h1>
@@ -83,8 +84,8 @@ const About = () => {
             loved one or accessorizing your outfit — ZYORA has something for
             you.
           </p>
-        </section>
-        <div className="standFor">
+        </ScrollReveal>
+        <ScrollReveal className="standFor">
           <span>What We Stand For</span>
           <h1>
             Every product chosen with <span>purpose</span>
@@ -98,8 +99,8 @@ const About = () => {
             someone you love or looking for the perfect handbag to complete an
             outfit. ZYORA is built to be there for all of it.
           </p>
-        </div>
-        <div className="why_zyora">
+        </ScrollReveal>
+        <ScrollReveal className="why_zyora">
           <span className="about_eyebrow">The ZYORA difference</span>
           <h1>
             Why <span>ZYORA</span>
@@ -149,8 +150,8 @@ const About = () => {
               </p>
             </div>
           </section>
-        </div>
-        <section className="Our">
+        </ScrollReveal>
+        <ScrollReveal as="section" className="Our">
           <div className="promise">
             <h1>Our Promise</h1>
             <p>
@@ -200,7 +201,7 @@ const About = () => {
               </div>
             </div>
           </div>
-        </section>
+        </ScrollReveal>
       </div>
     </>
   );

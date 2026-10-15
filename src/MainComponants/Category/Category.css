@@ -615,17 +615,19 @@
   cursor: pointer;
   transform: none;
   transform-style: flat;
+  animation: zyora-card-reveal 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 55ms);
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 350ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: auto;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .categories_items > .product_card:hover,
 .categories_items > .product_card:focus-visible {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 34px rgba(10, 10, 92, 0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 38px rgba(10, 10, 92, 0.14);
 }
 
 .categories_items > .product_card:focus-visible {
@@ -1091,5 +1093,9 @@
   .collection_search,
   .sort_row select {
     transition: none;
+  }
+
+  .categories_items > .product_card {
+    animation: none;
   }
 }

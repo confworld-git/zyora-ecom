@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import peak from "../../assets/Images/peak1.png";
 import SEO from "../../SEO";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 const ORDER_RELATED_ENQUIRY_TYPES = [
@@ -91,7 +92,7 @@ const Contact = () => {
             Home <MdKeyboardArrowRight /> Contact Us
           </p>
         </div>
-        <div className="Contact">
+        <ScrollReveal className="Contact">
           <div className="contact_content">
             <h1>
               Contact <span>us</span>
@@ -123,7 +124,7 @@ const Contact = () => {
               </p>
               <span>Monday-Saturday, 10 AM - 7 PM</span>
             </li>
-          </div>
+        </div>
           <div className="contact_form">
             <img src={peak} alt="" />
             <p>Send a Message</p>
@@ -261,7 +262,7 @@ const Contact = () => {
               </button>
             </form>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </>
   );

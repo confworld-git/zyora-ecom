@@ -7,6 +7,7 @@ import { useAuth } from "../Context/AuthContext.jsx";
 import ParticleEffect from "../Components/ParticleEffect.jsx";
 import "./Login.css";
 import SEO from "../SEO.jsx";
+import ScrollReveal from "../Components/ScrollReveal.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -241,7 +242,7 @@ const Login = () => {
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Login`}
         noindex
       />
-      <main className="zyora-login-page">
+      <ScrollReveal as="main" className="zyora-login-page">
         <div className="zyora-login-container">
           {/* LEFT BRAND SECTION */}
           <section className="zyora-login-brand" aria-label="ZYORA">
@@ -508,7 +509,7 @@ const Login = () => {
             </div>
           </section>
         </div>
-      </main>
+      </ScrollReveal>
     </>
   );
 };

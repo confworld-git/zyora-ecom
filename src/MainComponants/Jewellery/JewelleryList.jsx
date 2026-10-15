@@ -40,7 +40,7 @@ const JewelleryList = () => {
         </p>
       ) : (
         <div className="zyora-jewellery-grid">
-          {jewelleryProducts.map((product) => {
+          {jewelleryProducts.map((product, index) => {
             const productId = product.id || product._id;
             const productName = product.name || product.title;
             const slug = (productName || "product")
@@ -58,6 +58,7 @@ const JewelleryList = () => {
               <Link
                 className="zyora-jewellery-card"
                 key={productId}
+                style={{ "--card-index": Math.min(index, 8) }}
                 to={`/Zyora_Category/product/${encodeURIComponent(productId)}/${encodeURIComponent(slug)}`}
               >
                 <div className="zyora-jewellery-image-wrap">

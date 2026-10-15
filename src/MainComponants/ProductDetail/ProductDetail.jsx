@@ -8,6 +8,7 @@ import { useProducts } from "../../Context/ProductContext.jsx";
 import ProductZoom from "./ProductZoom.jsx";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO.jsx";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import { Helmet } from "react-helmet-async";
 import { normalizeProductRating } from "../../utils/productRating.js";
 
@@ -201,14 +202,14 @@ const ProductDetail = () => {
         />
 
       </Helmet>
-      <main className="product-detail-page">
+      <ScrollReveal as="main" className="product-detail-page">
         <div id="page_path">
           <p>
             Home <MdKeyboardArrowRight /> Categories <MdKeyboardArrowRight />{" "}
             {slug}
           </p>
         </div>
-        <section className="product-detail-hero">
+        <ScrollReveal as="section" className="product-detail-hero">
           <div className="product-detail-gallery">
             {images.length > 0 ? (
               images.map((image) => (
@@ -353,9 +354,9 @@ const ProductDetail = () => {
               </button>
             </div>
           </div>
-        </section>
+        </ScrollReveal>
 
-        <section className="product-detail-section">
+        <ScrollReveal as="section" className="product-detail-section">
           <h2>About This Item</h2>
           {product.about_this_item?.length > 0 ? (
             <ul>
@@ -366,9 +367,9 @@ const ProductDetail = () => {
           ) : (
             <p>No description available.</p>
           )}
-        </section>
+        </ScrollReveal>
 
-        <section className="product-detail-section detail-grid">
+        <ScrollReveal as="section" className="product-detail-section detail-grid">
           <div>
             <h2>Variants</h2>
             <div className="variant-colours">
@@ -429,12 +430,12 @@ const ProductDetail = () => {
               </div>
             </div>
           )}
-        </section>
+        </ScrollReveal>
 
         {details.some(
           ([, values]) => values && Object.keys(values).length > 0,
         ) && (
-          <section className="product-detail-section">
+          <ScrollReveal as="section" className="product-detail-section">
             <h2>Product Information</h2>
             <div className="information-grid">
               {details.map(([heading, values]) =>
@@ -450,9 +451,9 @@ const ProductDetail = () => {
                 ) : null,
               )}
             </div>
-          </section>
+          </ScrollReveal>
         )}
-      </main>
+      </ScrollReveal>
     </>
   );
 };

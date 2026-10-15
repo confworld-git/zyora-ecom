@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import "./Policies.css";
+import ScrollReveal from "../ScrollReveal.jsx";
 
 const policies = [
   {
@@ -427,7 +428,7 @@ const Policies = () => {
   };
 
   return (
-    <main className="policies-page">
+    <ScrollReveal as="main" className="policies-page">
       <header className="policies-heading">
         <p className="policies-eyebrow">ZYORA CUSTOMER CARE</p>
         <h1>Policies</h1>
@@ -455,7 +456,7 @@ const Policies = () => {
           ))}
         </nav>
 
-        <article className="policy-document" aria-live="polite">
+        <ScrollReveal as="article" className="policy-document" aria-live="polite">
           <div className="policy-document-heading">
             <p>ZYORA POLICIES</p>
             <h2>{selectedPolicy.title}</h2>
@@ -463,9 +464,9 @@ const Policies = () => {
           <div className="policy-document-content">
             {renderPolicyContent(selectedPolicy.content)}
           </div>
-        </article>
+        </ScrollReveal>
       </div>
-    </main>
+    </ScrollReveal>
   );
 };
 

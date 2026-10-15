@@ -5,6 +5,7 @@ import { useProducts } from "../../Context/ProductContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import toast from "react-hot-toast";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 
 const Favorites = () => {
   const {
@@ -90,7 +91,7 @@ const Favorites = () => {
   };
 
   return (
-    <div className="favourites">
+    <ScrollReveal className="favourites">
       <div id="page_path">
         <p>
           Home <MdKeyboardArrowRight /> Favourites
@@ -113,7 +114,7 @@ const Favorites = () => {
           </p>
         </div>
       ) : (
-        <section className="favourite_products">
+        <ScrollReveal as="section" className="favourite_products">
           {wishlistItems.map((product) => {
             const productId = product.id || product._id;
             return (
@@ -159,9 +160,9 @@ const Favorites = () => {
               </div>
             );
           })}
-        </section>
+        </ScrollReveal>
       )}
-    </div>
+    </ScrollReveal>
   );
 };
 export default Favorites;

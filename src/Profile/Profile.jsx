@@ -22,6 +22,7 @@ import { BsCart4 } from "react-icons/bs";
 import { useAuth } from "../Context/AuthContext.jsx";
 import "./Profile.css";
 import SEO from "../SEO.jsx";
+import ScrollReveal from "../Components/ScrollReveal.jsx";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -631,7 +632,7 @@ const Profile = () => {
   return (
     <>
       <SEO title="My Account | ZYORA" noindex />
-      <main className="zyora-profile-page">
+      <ScrollReveal as="main" className="zyora-profile-page">
         <div className="zyora-profile-wrap">
           {/* Header card */}
           <header className="zyora-profile-header">
@@ -720,7 +721,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
-      </main>
+      </ScrollReveal>
     </>
   );
 };

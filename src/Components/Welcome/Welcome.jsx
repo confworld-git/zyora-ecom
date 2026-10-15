@@ -1,10 +1,11 @@
 import "./welcome.css";
+import ScrollReveal from "../ScrollReveal.jsx";
 
 const pillars = ["Quality", "Functionality", "Style", "Affordability"];
 
 const Welcome = () => {
   return (
-    <section className="wl">
+    <ScrollReveal as="section" className="wl">
       <div className="wl-glow" aria-hidden="true" />
       <div className="wl-inner">
         <div className="wl-copy">
@@ -61,7 +62,7 @@ const Welcome = () => {
           </div> */}
         </div>
       </div>
-    </section>
+    </ScrollReveal>
   );
 };
 

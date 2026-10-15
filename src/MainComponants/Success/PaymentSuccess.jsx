@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext.jsx";
 import axios from "axios";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 
 const formatDate = (value) =>
   value
@@ -99,7 +100,7 @@ export default function PaymentSuccess({ onDownload, onHome }) {
   const canRefreshStatus = isProcessing || isRefunding;
 
   return (
-    <div className="ps-page">
+    <ScrollReveal className="ps-page">
       {loading ? (
         <main className="ps-wrap" role="status">
           <h1>Checking <span>your order</span></h1>
@@ -314,6 +315,6 @@ export default function PaymentSuccess({ onDownload, onHome }) {
         </main>
       )}
       <Canferri active={Boolean(order) && paymentComplete} />
-    </div>
+    </ScrollReveal>
   );
 }

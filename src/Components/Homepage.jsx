@@ -7,6 +7,7 @@ import Featured from "./Featured/Featured";
 import Why from "./Why/Why";
 import SEO from "../SEO.jsx";
 import logo from "../assets/Logo/Zyora_logo.jpeg";
+import ScrollReveal from "./ScrollReveal.jsx";
 
 const Homepage = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
@@ -40,7 +41,10 @@ const Homepage = () => {
       />
       <main className="zyora-homepage">
         <Home />
-        <div className="zyora-marquee" aria-label="Shop our categories">
+        <ScrollReveal
+          className="zyora-marquee"
+          aria-label="Shop our categories"
+        >
           <div className="zyora-marquee-track">
             <span>
               SOFT TOYS ✦ HOME &amp; KITCHEN ✦ STATIONERY ✦ FASHION ✦ HANDBAGS
@@ -51,7 +55,7 @@ const Homepage = () => {
               ✦ JEWELLERY ✦
             </span>
           </div>
-        </div>
+        </ScrollReveal>
         <Welcome />
         <Highlights />
         <Featured />

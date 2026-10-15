@@ -9,6 +9,7 @@ import {
 import { useProducts } from "../../Context/ProductContext.jsx";
 import SEO from "../../SEO.jsx";
 import { normalizeProductRating } from "../../utils/productRating.js";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import { isImitationJewellery } from "../../utils/productCategory.js";
 
 const clothingSizeLabels = {
@@ -431,7 +432,7 @@ const Category = () => {
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Zyora_Category`}
         jsonLd={categoryJsonLd}
       />
-      <div className="category">
+      <ScrollReveal className="category">
         <div id="page_path">
           <p>
             Home
@@ -447,7 +448,7 @@ const Category = () => {
           style, comfort, and convenience to your everyday life.
         </p>
 
-        <section>
+        <ScrollReveal as="section">
           <div className="categories_list">
             <div className="collection_search">
               <i className="bi bi-search"></i>
@@ -766,7 +767,7 @@ const Category = () => {
               ) : !filteredProducts.length ? (
                 <p className="empty_results">No products available.</p>
               ) : (
-                filteredProducts.map((product) => {
+                filteredProducts.map((product, index) => {
                   const productId = product.id || product._id;
                   const rating = normalizeProductRating(product.rating);
                   const hasStock =
@@ -777,6 +778,7 @@ const Category = () => {
                     <div
                       className="product_card"
                       key={productId}
+                      style={{ "--card-index": Math.min(index, 8) }}
                       role="button"
                       tabIndex={0}
                       // onMouseMove={handleTiltMove}
@@ -834,8 +836,8 @@ const Category = () => {
               )}
             </div>
           </div>
-        </section>
-      </div>
+        </ScrollReveal>
+      </ScrollReveal>
     </>
   );
 };

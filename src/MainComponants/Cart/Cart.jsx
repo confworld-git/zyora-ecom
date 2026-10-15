@@ -7,6 +7,7 @@ import Confetti from "../../Confetti/Confetti.jsx";
 import nocart from "../../assets/Images/nocart.gif";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import CouponPopup from "./CouponPopup.jsx";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import { BiSolidOffer } from "react-icons/bi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -725,7 +726,7 @@ const Cart = () => {
   };
 
   return (
-    <div className="cart">
+    <ScrollReveal className="cart">
       <div id="page_path">
         <p>
           Home <MdKeyboardArrowRight /> Cart
@@ -752,7 +753,7 @@ const Cart = () => {
           </p>
         </div>
       ) : (
-        <section className="cart_section">
+        <ScrollReveal as="section" className="cart_section">
           <div className="cart_left_section">
             {cartItems.map((item) => {
               const isFavorite = isInWishlist(item.id);
@@ -1274,7 +1275,7 @@ const Cart = () => {
               <Confetti active={celebrate} burstKey={burstKey} />
             </aside>
           </div>
-        </section>
+        </ScrollReveal>
       )}
 
       {/* Platform fee popup (outside the aside so it isn't clipped) */}
@@ -1390,7 +1391,7 @@ const Cart = () => {
         message={couponMessage}
         onApply={applyCoupon}
       />
-    </div>
+    </ScrollReveal>
   );
 };
 

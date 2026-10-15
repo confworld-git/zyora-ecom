@@ -4,6 +4,7 @@ import toy from "../../assets/Videos/toys.mp4";
 import stationery from "../../assets/Videos/stationery.mp4";
 import bag from "../../assets/Videos/bag.mp4";
 import home from "../../assets/Videos/home.mp4";
+import ScrollReveal from "../ScrollReveal.jsx";
 
 const categories = [
   {
@@ -30,7 +31,7 @@ const categories = [
 
 const Highlights = () => {
   return (
-    <div className="highlights">
+    <ScrollReveal className="highlights">
       <div>
         <h1>
           Category <span>Highlights</span>
@@ -52,7 +53,7 @@ const Highlights = () => {
           </div>
         ))}
       </section>
-    </div>
+    </ScrollReveal>
   );
 };
 

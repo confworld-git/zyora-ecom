@@ -4,6 +4,7 @@ import returnp from "../../assets/Videos/return.mp4";
 import secure from "../../assets/Videos/secure.mp4";
 import quality from "../../assets/Videos/quality.mp4";
 import customer from "../../assets/Videos/customer.mp4";
+import ScrollReveal from "../ScrollReveal.jsx";
 
 const items = [
   { src: quality, text: "Quality-Checked Products" },
@@ -15,7 +16,7 @@ const items = [
 
 const Why = () => {
   return (
-    <div className="why">
+    <ScrollReveal className="why">
       <h1>
         Why Shop With <span>ZYORA</span>
       </h1>
@@ -27,7 +28,7 @@ const Why = () => {
           </div>
         ))}
       </section>
-    </div>
+    </ScrollReveal>
   );
 };
 

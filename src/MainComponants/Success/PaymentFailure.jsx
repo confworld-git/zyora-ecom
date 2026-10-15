@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../Context/AuthContext.jsx";
+import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import "./PaymentSuccess.css";
 import "./PaymentFailure.css";
 
@@ -98,7 +99,7 @@ export default function PaymentFailure() {
     );
 
   return (
-    <div className="ps-page pf-page">
+    <ScrollReveal className="ps-page pf-page">
       {loading ? (
         <main className="ps-wrap" role="status">
           <h1>
@@ -256,6 +257,6 @@ export default function PaymentFailure() {
           </div>
         </main>
       )}
-    </div>
+    </ScrollReveal>
   );
 }
