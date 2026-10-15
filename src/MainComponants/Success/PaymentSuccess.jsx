@@ -253,11 +253,11 @@ export default function PaymentSuccess({ onDownload, onHome }) {
                 Return to cart
               </button>
             )}
-            {paymentComplete && (
+            {/* {paymentComplete && (
               <button type="button" className="ps-primary" onClick={onDownload}>
                 Download receipt
               </button>
-            )}
+            )} */}
             {canRefreshStatus && orderId && (
               <button
                 type="button"

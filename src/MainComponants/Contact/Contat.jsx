@@ -228,7 +228,7 @@ const Contact = () => {
 
               {isOrderRelated && (
                 <div>
-                  <label htmlFor="contact-order-id">Order ID*</label>
+                  <label htmlFor="contact-order-id">Order ID</label>
                   <input
                     id="contact-order-id"
                     type="text"

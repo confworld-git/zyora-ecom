@@ -225,7 +225,7 @@ We may update these terms to reflect changes in our services, business operation
   {
     id: "privacy",
     title: "Privacy Policy",
-    content: `Last Updated: 14 October 2026
+    content: `
 
 ZYORA respects your privacy and aims to handle your personal information responsibly. This Privacy Policy explains what information we collect, how we use it, when we share it and the choices available to you when you visit [www.zyoraecom.in](https://www.zyoraecom.in) or place an order.
 

@@ -74,6 +74,8 @@
   letter-spacing: -0.04em;
   line-height: 0.95;
   text-transform: capitalize;
+  display: flex;
+  gap: 10px;
 }
 
 .contact_content > h1 > span {
