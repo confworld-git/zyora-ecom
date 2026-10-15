@@ -244,19 +244,21 @@
 }
 
 .jewellery-container > div > div {
-  width: 80%;
+  width: min(80%, 1100px);
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   /* height: 60vh; */
-  padding: 40px 0px 0px 0px;
+  padding: 40px 0 0;
+  box-sizing: border-box;
 }
 
 .jewellery-container > div > div > h1 {
-  font-size: 100px;
+  font-size: clamp(2.75rem, 8vw, 6.25rem);
   margin: 0;
+  line-height: 1.08;
   background: linear-gradient(
     135deg,
     #fff8c7 0%,
@@ -277,9 +279,10 @@
 }
 
 .jewellery-container > div > div > p {
-  width: 50%;
-  margin-top: 0px;
+  width: min(100%, 650px);
+  margin-top: 12px;
   margin-bottom: 20px;
+  line-height: 1.6;
 }
 
 .shop-now-button-jew {
@@ -306,14 +309,15 @@
 
 .jewellery-categories {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 20px;
+  max-width: 100%;
 }
 
 .jewellery-categories > p {
   font-family: "poppins", sans-serif;
-  color: white;
   color: rgb(119, 58, 0);
   font-size: 18px;
   border: 2px solid rgb(255, 217, 0);
@@ -357,9 +361,44 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px 16px;
   }
+
+  .zyora-jewellery-card-info {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .zyora-jewellery-price {
+    flex: initial;
+    justify-content: flex-start;
+  }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 767px) {
+  .jewellery-container > div > div {
+    width: calc(100% - 36px);
+    padding-top: 32px;
+  }
+
+  .jewellery-container > div > div > h1 {
+    font-size: clamp(2.5rem, 10vw, 4.5rem);
+  }
+
+  .jewellery-container > div > div > p {
+    margin-top: 10px;
+    margin-bottom: 16px;
+  }
+
+  .jewellery-categories {
+    gap: 10px;
+  }
+
+  .jewellery-categories > p {
+    padding: 6px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+
   .zyora-jewellery-collection {
     width: min(100% - 40px, 560px);
     padding: 54px 0 72px;
@@ -380,7 +419,6 @@
   }
 
   .zyora-jewellery-card-info {
-    flex-direction: column;
     gap: 8px;
     padding-top: 12px;
   }
@@ -414,6 +452,13 @@
     left: 8px;
     padding: 10px;
     font-size: 9px;
+  }
+}
+
+@media (hover: none) {
+  .zyora-jewellery-card-cta {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
