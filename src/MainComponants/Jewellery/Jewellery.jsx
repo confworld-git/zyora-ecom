@@ -2,7 +2,6 @@ import "./Jewellery.css";
 import ParticleBackground from "./ParticleBackground";
 import SEO from "../../SEO";
 import JewelleryList from "./JewelleryList";
-import ScrollReveal from "../../Components/ScrollReveal.jsx";
 
 const Jewellery = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
@@ -38,7 +37,7 @@ const Jewellery = () => {
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Jewellery`}
         jsonLd={jewelleryJsonLd}
       />
-      <ScrollReveal className="jewellery-container">
+      <div className="jewellery-container">
         <ParticleBackground />
         <div>
           <div>
@@ -57,7 +56,7 @@ const Jewellery = () => {
             <JewelleryList />
           </section>
         </div>
-      </ScrollReveal>
+      </div>
     </>
   );
 };

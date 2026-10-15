@@ -1,5 +1,6 @@
 import "./Category.css";
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   MdClose,
@@ -424,6 +425,232 @@ const Category = () => {
     navigate(`/Zyora_Category/product/${productId}/${slug}`);
   };
 
+  const filterPanel = (
+    <div
+      id="category-filter-panel"
+      className={`filter_panel${mobileFiltersOpen ? " is_open" : ""}`}
+      role={mobileFiltersOpen ? "dialog" : undefined}
+      aria-modal={mobileFiltersOpen ? "true" : undefined}
+      aria-labelledby={mobileFiltersOpen ? "mobile-filter-title" : undefined}
+    >
+      <div className="mobile_filter_header">
+        <h2 id="mobile-filter-title">Filters</h2>
+        <button
+          className="mobile_filter_close"
+          type="button"
+          aria-label="Close filters"
+          onClick={() => setMobileFiltersOpen(false)}
+        >
+          <MdClose aria-hidden="true" />
+        </button>
+      </div>
+
+      <fieldset>
+        <legend>Category</legend>
+
+        {categoryOptions.map((category) => (
+          <label key={category}>
+            <input
+              type="radio"
+              name="category"
+              checked={
+                String(filters.categories[0] || "").toLowerCase() ===
+                String(category).toLowerCase()
+              }
+              onChange={() =>
+                setFilters((current) => ({
+                  ...current,
+                  categories: [category],
+                }))
+              }
+            />
+
+            {category}
+          </label>
+        ))}
+      </fieldset>
+
+      <fieldset className="price_filter">
+        <legend>Price</legend>
+
+        <div className="price_range_values">
+          <span>₹{priceMin.toLocaleString("en-IN")}</span>
+
+          <span>₹{currentPriceMax.toLocaleString("en-IN")}</span>
+        </div>
+
+        <div
+          className="price_slider"
+          style={{
+            "--range-start": `${Math.max(0, Math.min(100, priceStartPercent))}%`,
+            "--range-end": `${Math.max(0, Math.min(100, priceEndPercent))}%`,
+          }}
+        >
+          <div className="price_slider_track" />
+          <input
+            aria-label="Minimum price"
+            className="price_range price_range_min"
+            type="range"
+            min={SLIDER_MIN_PRICE}
+            max={SLIDER_MAX_PRICE}
+            step={50}
+            value={priceMin}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+
+              setFilters((current) => ({
+                ...current,
+                priceMin: Math.min(
+                  value,
+                  current.priceMax ?? SLIDER_MAX_PRICE,
+                ),
+              }));
+            }}
+          />
+
+          <input
+            aria-label="Maximum price"
+            className="price_range price_range_max"
+            type="range"
+            min={SLIDER_MIN_PRICE}
+            max={SLIDER_MAX_PRICE}
+            step={50}
+            value={currentPriceMax}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+
+              setFilters((current) => ({
+                ...current,
+                priceMax: Math.max(
+                  value,
+                  current.priceMin ?? SLIDER_MIN_PRICE,
+                ),
+              }));
+            }}
+          />
+        </div>
+
+        <small className="price_range_hint">
+          Drag either handle to refine
+        </small>
+      </fieldset>
+
+      {showVariantFilters && (
+        <>
+          <FilterGroup
+            title="Color"
+            options={colorOptions}
+            selected={filters.colors}
+            inputType="radio"
+            name="color"
+            onToggle={(value) => selectSingleFilter("colors", value)}
+            getLabel={getColorLabel}
+          />
+
+          <fieldset className="size_filter">
+            <legend>Size</legend>
+
+            <div className="size_slider">
+              <div
+                className={`size_range_value${
+                  sizeSliderValue === 0
+                    ? " is_start"
+                    : sizeSliderValue === sizeSliderMax
+                      ? " is_end"
+                      : ""
+                }`}
+                style={{
+                  left: `${sizeSliderPosition}%`,
+                }}
+              >
+                {sizeSliderIndex >= 0
+                  ? getSizeLabel(sizeOptions[sizeSliderIndex])
+                  : "Any size"}
+              </div>
+
+              <div
+                className="price_slider_track"
+                style={{
+                  "--range-start": "0%",
+                  "--range-end": `${sizeSliderPosition}%`,
+                }}
+              />
+
+              <input
+                aria-label="Size"
+                className="size_range"
+                type="range"
+                min="0"
+                max={sizeSliderMax}
+                step="1"
+                value={sizeSliderValue}
+                disabled={!sizeOptions.length}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+
+                  setSizeSliderSize(
+                    value === 0 ? "" : String(sizeOptions[value - 1]),
+                  );
+                }}
+              />
+            </div>
+          </fieldset>
+        </>
+      )}
+
+      <fieldset>
+        <legend>Availability</legend>
+
+        <label>
+          <input
+            type="checkbox"
+            name="availability"
+            checked={filters.inStock}
+            onChange={(event) =>
+              setFilters((current) => ({
+                ...current,
+                inStock: event.target.checked,
+              }))
+            }
+          />
+          In Stock
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Rating</legend>
+
+        <label>
+          <input
+            type="checkbox"
+            name="rating"
+            checked={filters.rating}
+            onChange={(event) =>
+              setFilters((current) => ({
+                ...current,
+                rating: event.target.checked,
+              }))
+            }
+          />
+          ⭐ 4 & above
+        </label>
+      </fieldset>
+
+      <button className="clear_filters" type="button" onClick={clearFilters}>
+        Clear All
+      </button>
+
+      <button
+        className="mobile_filter_apply"
+        type="button"
+        onClick={() => setMobileFiltersOpen(false)}
+      >
+        Show {filteredProducts.length}{" "}
+        {filteredProducts.length === 1 ? "product" : "products"}
+      </button>
+    </div>
+  );
+
   return (
     <>
       <SEO
@@ -472,256 +699,20 @@ const Category = () => {
               Filter
             </button>
 
-            {mobileFiltersOpen && (
-              <button
-                className="filter_backdrop"
-                type="button"
-                aria-label="Close filters"
-                onClick={() => setMobileFiltersOpen(false)}
-              />
-            )}
-
-            <div
-              id="category-filter-panel"
-              className={`filter_panel${mobileFiltersOpen ? " is_open" : ""}`}
-              role={mobileFiltersOpen ? "dialog" : undefined}
-              aria-modal={mobileFiltersOpen ? "true" : undefined}
-              aria-labelledby={
-                mobileFiltersOpen ? "mobile-filter-title" : undefined
-              }
-            >
-              <div className="mobile_filter_header">
-                <h2 id="mobile-filter-title">Filters</h2>
-                <button
-                  className="mobile_filter_close"
-                  type="button"
-                  aria-label="Close filters"
-                  onClick={() => setMobileFiltersOpen(false)}
-                >
-                  <MdClose aria-hidden="true" />
-                </button>
-              </div>
-
-              <fieldset>
-                <legend>Category</legend>
-
-                {categoryOptions.map((category) => (
-                  <label key={category}>
-                    <input
-                      type="radio"
-                      name="category"
-                      checked={
-                        String(filters.categories[0] || "").toLowerCase() ===
-                        String(category).toLowerCase()
-                      }
-                      onChange={() =>
-                        setFilters((current) => ({
-                          ...current,
-                          categories: [category],
-                        }))
-                      }
+            {mobileFiltersOpen
+              ? createPortal(
+                  <div className="filter_portal_root">
+                    <button
+                      className="filter_backdrop"
+                      type="button"
+                      aria-label="Close filters"
+                      onClick={() => setMobileFiltersOpen(false)}
                     />
-
-                    {category}
-                  </label>
-                ))}
-              </fieldset>
-
-              <fieldset className="price_filter">
-                <legend>Price</legend>
-
-                <div className="price_range_values">
-                  <span>₹{priceMin.toLocaleString("en-IN")}</span>
-
-                  <span>₹{currentPriceMax.toLocaleString("en-IN")}</span>
-                </div>
-
-                <div
-                  className="price_slider"
-                  style={{
-                    "--range-start": `${Math.max(
-                      0,
-                      Math.min(100, priceStartPercent),
-                    )}%`,
-
-                    "--range-end": `${Math.max(
-                      0,
-                      Math.min(100, priceEndPercent),
-                    )}%`,
-                  }}
-                >
-                  <div className="price_slider_track" />
-                  <input
-                    aria-label="Minimum price"
-                    className="price_range price_range_min"
-                    type="range"
-                    min={SLIDER_MIN_PRICE}
-                    max={SLIDER_MAX_PRICE}
-                    step={50}
-                    value={priceMin}
-                    onChange={(event) => {
-                      const value = Number(event.target.value);
-
-                      setFilters((current) => ({
-                        ...current,
-
-                        priceMin: Math.min(
-                          value,
-                          current.priceMax ?? SLIDER_MAX_PRICE,
-                        ),
-                      }));
-                    }}
-                  />
-
-                  <input
-                    aria-label="Maximum price"
-                    className="price_range price_range_max"
-                    type="range"
-                    min={SLIDER_MIN_PRICE}
-                    max={SLIDER_MAX_PRICE}
-                    step={50}
-                    value={currentPriceMax}
-                    onChange={(event) => {
-                      const value = Number(event.target.value);
-
-                      setFilters((current) => ({
-                        ...current,
-
-                        priceMax: Math.max(
-                          value,
-                          current.priceMin ?? SLIDER_MIN_PRICE,
-                        ),
-                      }));
-                    }}
-                  />
-                </div>
-
-                <small className="price_range_hint">
-                  Drag either handle to refine
-                </small>
-              </fieldset>
-
-              {showVariantFilters && (
-                <>
-                  <FilterGroup
-                    title="Color"
-                    options={colorOptions}
-                    selected={filters.colors}
-                    inputType="radio"
-                    name="color"
-                    onToggle={(value) => selectSingleFilter("colors", value)}
-                    getLabel={getColorLabel}
-                  />
-
-                  <fieldset className="size_filter">
-                    <legend>Size</legend>
-
-                    <div className="size_slider">
-                      <div
-                        className={`size_range_value${
-                          sizeSliderValue === 0
-                            ? " is_start"
-                            : sizeSliderValue === sizeSliderMax
-                              ? " is_end"
-                              : ""
-                        }`}
-                        style={{
-                          left: `${sizeSliderPosition}%`,
-                        }}
-                      >
-                        {sizeSliderIndex >= 0
-                          ? getSizeLabel(sizeOptions[sizeSliderIndex])
-                          : "Any size"}
-                      </div>
-
-                      <div
-                        className="price_slider_track"
-                        style={{
-                          "--range-start": "0%",
-
-                          "--range-end": `${sizeSliderPosition}%`,
-                        }}
-                      />
-
-                      <input
-                        aria-label="Size"
-                        className="size_range"
-                        type="range"
-                        min="0"
-                        max={sizeSliderMax}
-                        step="1"
-                        value={sizeSliderValue}
-                        disabled={!sizeOptions.length}
-                        onChange={(event) => {
-                          const value = Number(event.target.value);
-
-                          setSizeSliderSize(
-                            value === 0 ? "" : String(sizeOptions[value - 1]),
-                          );
-                        }}
-                      />
-                    </div>
-                  </fieldset>
-                </>
-              )}
-
-              <fieldset>
-                <legend>Availability</legend>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    name="availability"
-                    checked={filters.inStock}
-                    onChange={(event) =>
-                      setFilters((current) => ({
-                        ...current,
-
-                        inStock: event.target.checked,
-                      }))
-                    }
-                  />
-                  In Stock
-                </label>
-              </fieldset>
-
-              <fieldset>
-                <legend>Rating</legend>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    name="rating"
-                    checked={filters.rating}
-                    onChange={(event) =>
-                      setFilters((current) => ({
-                        ...current,
-
-                        rating: event.target.checked,
-                      }))
-                    }
-                  />
-                  ⭐ 4 & above
-                </label>
-              </fieldset>
-
-              <button
-                className="clear_filters"
-                type="button"
-                onClick={clearFilters}
-              >
-                Clear All
-              </button>
-
-              <button
-                className="mobile_filter_apply"
-                type="button"
-                onClick={() => setMobileFiltersOpen(false)}
-              >
-                Show {filteredProducts.length}{" "}
-                {filteredProducts.length === 1 ? "product" : "products"}
-              </button>
-            </div>
+                    {filterPanel}
+                  </div>,
+                  document.body,
+                )
+              : filterPanel}
           </div>
 
           <div className="category_results">

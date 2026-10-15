@@ -152,6 +152,31 @@
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
+.filter_portal_root {
+  --k-bg: #fffdf8;
+  --k-navy: #0a0a5c;
+  --k-orange: #ff4a12;
+  --k-muted: #3e3e7a;
+  --k-soft: #8a8ab0;
+  --k-line: #ece8e1;
+  --k-head: "Bricolage Grotesque", sans-serif;
+  --k-body: "Manrope", sans-serif;
+  position: fixed;
+  z-index: 2147483647;
+  inset: 0;
+  pointer-events: none;
+}
+
+.filter_portal_root *,
+.filter_portal_root *::before,
+.filter_portal_root *::after {
+  box-sizing: border-box;
+}
+
+.filter_portal_root > * {
+  pointer-events: auto;
+}
+
 .filter_panel fieldset {
   min-width: 0;
   margin: 0 0 16px;
@@ -607,7 +632,7 @@
   display: flex;
   flex-direction: column;
   width: auto;
-  padding: 12px;
+  padding: 10px;
   overflow: hidden;
   border: 0;
   border-radius: 28px;
@@ -649,6 +674,7 @@
   object-fit: cover;
   mix-blend-mode: normal;
   transition: transform 0.35s ease;
+  background-color: #F1F1F1;
 }
 
 .categories_items > .product_card:hover > img {
