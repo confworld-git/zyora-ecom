@@ -211,7 +211,14 @@ const Dashboard = () => {
               <ProductList onAddProduct={() => setActiveSection("add_product")} />
             )}
             {activeSection === "enquiry" && (
-              <EnquiryData enquiryData={enquiryData} />
+              <EnquiryData
+                enquiryData={enquiryData}
+                onDelete={(deletedId) =>
+                  setEnquiryData((current) =>
+                    current.filter((item) => item._id !== deletedId),
+                  )
+                }
+              />
             )}
             {activeSection === "add_product" && <AddProduct />}
             {activeSection === "admin" && <Admin />}

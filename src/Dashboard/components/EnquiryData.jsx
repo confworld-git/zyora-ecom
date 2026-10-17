@@ -1,8 +1,14 @@
 import { useMemo, useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 import "../styles/Management.css";
 
-const EnquiryData = ({ enquiryData }) => {
+const API = `${import.meta.env.VITE_API_BASE_URL}/api/contact`;
+const config = { withCredentials: true };
+
+const EnquiryData = ({ enquiryData, onDelete }) => {
   const [search, setSearch] = useState("");
+  const [deletingId, setDeletingId] = useState("");
   const visibleEnquiries = useMemo(() => {
     const query = search.trim().toLowerCase();
     if (!query) return enquiryData;
@@ -25,6 +31,23 @@ const EnquiryData = ({ enquiryData }) => {
     const daysOld = (Date.now() - createdAt.getTime()) / (24 * 60 * 60 * 1000);
     return Number.isFinite(createdAt.getTime()) && daysOld >= 0 && daysOld < 7;
   }).length;
+
+  const deleteEnquiry = async (enquiry) => {
+    const label = enquiry.name || enquiry.email || "this enquiry";
+    if (!window.confirm(`Delete the enquiry from ${label}? This can't be undone.`))
+      return;
+
+    try {
+      setDeletingId(enquiry._id);
+      await axios.delete(`${API}/${enquiry._id}`, config);
+      onDelete(enquiry._id);
+      toast.success("Enquiry deleted");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete enquiry");
+    } finally {
+      setDeletingId("");
+    }
+  };
 
   return (
     <main className="management-page">
@@ -65,6 +88,7 @@ const EnquiryData = ({ enquiryData }) => {
                 <th>Order ID</th>
                 <th>Message</th>
                 <th>Received</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -84,6 +108,19 @@ const EnquiryData = ({ enquiryData }) => {
                       <small>{new Date(item.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</small>
                     </>
                   ) : "—"}</td>
+                  <td>
+                    <div className="management-actions">
+                      <button
+                        type="button"
+                        className="danger-action"
+                        aria-label={`Delete enquiry from ${item.name || item.email || "customer"}`}
+                        disabled={Boolean(deletingId)}
+                        onClick={() => deleteEnquiry(item)}
+                      >
+                        {deletingId === item._id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
