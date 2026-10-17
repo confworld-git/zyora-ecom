@@ -20,14 +20,22 @@
   --pf-danger: #c8102e;
   --pf-success: #1e8e5a;
   --pf-radius: 20px;
-  --pf-shadow: 0 1px 2px rgba(2, 0, 146, 0.05),
-    0 14px 36px rgba(2, 0, 146, 0.08);
+  --pf-shadow:
+    0 1px 2px rgba(2, 0, 146, 0.05), 0 14px 36px rgba(2, 0, 146, 0.08);
 
   min-height: 100vh;
   color: var(--pf-text);
   background:
-    radial-gradient(900px 380px at 100% 0%, rgba(255, 64, 0, 0.08), transparent 60%),
-    radial-gradient(900px 380px at 0% 0%, rgba(2, 0, 146, 0.08), transparent 60%),
+    radial-gradient(
+      900px 380px at 100% 0%,
+      rgba(255, 64, 0, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 380px at 0% 0%,
+      rgba(2, 0, 146, 0.08),
+      transparent 60%
+    ),
     var(--pf-bg);
   padding: 10px 36px;
   font-family: "Poppins", sans-serif;
@@ -61,7 +69,8 @@
   inset: 0 0 auto 0;
   height: 96px;
   background:
-    radial-gradient(rgba(255, 255, 255, 0.16) 1.5px, transparent 1.5px) 0 0 / 16px 16px,
+    radial-gradient(rgba(255, 255, 255, 0.16) 1.5px, transparent 1.5px) 0 0 /
+      16px 16px,
     linear-gradient(115deg, #020092 0%, #020092 52%, #6a1b9a 78%, #ff4000 100%);
 }
 
@@ -169,7 +178,9 @@
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .zyora-profile-tabs button svg {
@@ -298,7 +309,9 @@
   background: #fff;
   color: var(--pf-text);
   caret-color: var(--pf-orange);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .zyora-profile-field input::placeholder {
@@ -370,7 +383,10 @@
   cursor: pointer;
   text-decoration: none;
   width: fit-content;
-  transition: transform 0.15s, box-shadow 0.2s, background 0.2s,
+  transition:
+    transform 0.15s,
+    box-shadow 0.2s,
+    background 0.2s,
     border-color 0.2s;
 }
 
@@ -453,7 +469,9 @@
   border: 1.5px solid var(--pf-border);
   border-radius: 16px;
   overflow: hidden;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .zyora-order-card:hover {
@@ -579,6 +597,136 @@
   color: var(--pf-navy);
 }
 
+.zyora-order-tracking {
+  padding: 10px 20px 18px;
+}
+
+.zyora-track-order-btn {
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid var(--pf-navy);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--pf-navy);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.zyora-track-order-btn:hover:not(:disabled) {
+  background: var(--pf-navy-soft);
+}
+
+.zyora-track-order-btn:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.zyora-order-tracking-panel {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--pf-border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.zyora-tracking-courier {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-bottom: 14px;
+  color: var(--pf-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.zyora-tracking-courier strong {
+  color: var(--pf-navy);
+}
+
+.zyora-tracking-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zyora-tracking-steps li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  color: var(--pf-muted);
+  text-align: center;
+  font-size: 11px;
+}
+
+.zyora-tracking-steps li.is-complete {
+  color: var(--pf-navy);
+  font-weight: 700;
+}
+
+.zyora-tracking-step-dot {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--pf-border);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.zyora-tracking-steps li.is-complete .zyora-tracking-step-dot {
+  border-color: var(--pf-success);
+  background: var(--pf-success);
+}
+
+.zyora-tracking-stopped {
+  color: var(--pf-danger);
+  font-weight: 700;
+}
+
+.zyora-tracking-timeline {
+  margin-top: 18px;
+  border-top: 1px solid var(--pf-border);
+}
+
+.zyora-tracking-timeline h3 {
+  margin: 14px 0 10px;
+  color: var(--pf-navy);
+  font-size: 13px;
+}
+
+.zyora-tracking-timeline ol {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zyora-tracking-timeline li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px 12px;
+  font-size: 12px;
+}
+
+.zyora-tracking-timeline li strong {
+  color: var(--pf-navy);
+}
+
+.zyora-tracking-timeline li span,
+.zyora-tracking-timeline li time {
+  color: var(--pf-muted);
+}
+
+.zyora-tracking-timeline li p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 /* ---------- Addresses ---------- */
 .zyora-address-grid {
   display: grid;
@@ -593,7 +741,9 @@
   padding: 22px 20px 20px;
   font-size: 14px;
   line-height: 1.5;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .zyora-address-card:hover {

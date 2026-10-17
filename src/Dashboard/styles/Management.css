@@ -217,9 +217,40 @@
 
 .shipment-assigned {
   display: flex;
+  flex-wrap: wrap;
   min-width: 150px;
   align-items: flex-start;
   gap: 9px;
+}
+
+.shipment-document-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
+  padding-left: 17px;
+}
+
+.shipment-document-actions button {
+  border: 1px solid #eadfd4;
+  border-radius: 6px;
+  padding: 5px 7px;
+  background: #fff;
+  color: #51483f;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shipment-document-actions button:hover:not(:disabled) {
+  border-color: #c9a992;
+  background: #fbf4ed;
+}
+
+.shipment-document-actions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 .shipment-status-dot {

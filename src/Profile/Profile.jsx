@@ -38,6 +38,7 @@ const STATUS_LABELS = {
   shipped: "Shipped",
   delivered: "Delivered",
   cancelled: "Cancelled",
+  refunded: "Refunded",
 };
 
 const formatPrice = (value) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
@@ -208,6 +209,125 @@ const AccountTab = ({ customer, refresh }) => {
 // ============================================================
 // ORDERS TAB
 // ============================================================
+const trackingSteps = [
+  ["placed", "Order placed"],
+  ["confirmed", "Confirmed"],
+  ["shipped", "Shipped"],
+  ["delivered", "Delivered"],
+];
+
+const OrderTracking = ({ order }) => {
+  const [tracking, setTracking] = useState(null);
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const showTracking = async () => {
+    if (tracking) {
+      setExpanded((current) => !current);
+      return;
+    }
+    try {
+      setLoading(true);
+      setError("");
+      const response = await axios.get(
+        `${API}/api/orders/${order._id}/track`,
+        { withCredentials: true },
+      );
+      setTracking(response.data.tracking);
+      setExpanded(true);
+    } catch {
+      setError("Unable to load tracking right now. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const currentStep = trackingSteps.findIndex(
+    ([status]) => status === (tracking?.orderStatus || order.orderStatus),
+  );
+  const isStopped = ["cancelled", "refunded"].includes(
+    tracking?.orderStatus || order.orderStatus,
+  );
+
+  return (
+    <div className="zyora-order-tracking">
+      <button
+        type="button"
+        className="zyora-track-order-btn"
+        aria-expanded={expanded}
+        onClick={showTracking}
+        disabled={loading}
+      >
+        {loading ? "Loading tracking…" : expanded ? "Hide tracking" : "Track order"}
+      </button>
+      {error && <p className="zyora-profile-error">{error}</p>}
+      {expanded && tracking && (
+        <div className="zyora-order-tracking-panel">
+          {tracking.awb ? (
+            <div className="zyora-tracking-courier">
+              <strong>{tracking.courierName || "Courier assigned"}</strong>
+              <span>AWB {tracking.awb}</span>
+              {tracking.shipmentStatus && (
+                <span>Latest update: {tracking.shipmentStatus}</span>
+              )}
+            </div>
+          ) : (
+            <p className="zyora-profile-muted">
+              Courier and AWB details will appear once your order is shipped.
+            </p>
+          )}
+
+          {isStopped ? (
+            <p className="zyora-tracking-stopped">
+              {STATUS_LABELS[tracking.orderStatus] || tracking.orderStatus}
+            </p>
+          ) : (
+            <ol className="zyora-tracking-steps">
+              {trackingSteps.map(([status, label], index) => {
+                const complete = index <= currentStep;
+                return (
+                  <li
+                    key={status}
+                    className={complete ? "is-complete" : ""}
+                    aria-current={index === currentStep ? "step" : undefined}
+                  >
+                    <span className="zyora-tracking-step-dot" />
+                    <span>{label}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+
+          {tracking.timeline?.length > 0 && (
+            <div className="zyora-tracking-timeline">
+              <h3>Courier scan history</h3>
+              <ol>
+                {tracking.timeline.map((event, index) => (
+                  <li key={`${event.timestamp}-${event.status}-${index}`}>
+                    <strong>{event.status}</strong>
+                    {event.location && <span>{event.location}</span>}
+                    {event.description && event.description !== event.status && (
+                      <p>{event.description}</p>
+                    )}
+                    <time dateTime={event.timestamp}>
+                      {new Date(event.timestamp).toLocaleString("en-IN", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </time>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const OrdersTab = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -324,6 +444,7 @@ const OrdersTab = () => {
 
               <strong>Total {formatPrice(order.total)}</strong>
             </footer>
+            <OrderTracking order={order} />
           </article>
         ))}
       </div>

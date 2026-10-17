@@ -45,9 +45,9 @@ const Orders = ({ initialOrderId = "" }) => {
   const [availableCouriers, setAvailableCouriers] = useState([]);
   const [selectedCourierId, setSelectedCourierId] = useState("");
   const [packageDetails, setPackageDetails] = useState({
-    length: "20",
-    breadth: "15",
-    height: "5",
+    length: "",
+    breadth: "",
+    height: "",
     weight: "",
   });
   const [courierAvailabilityChecked, setCourierAvailabilityChecked] =
@@ -55,6 +55,8 @@ const Orders = ({ initialOrderId = "" }) => {
   const [loadingCouriers, setLoadingCouriers] = useState(false);
   const [courierLoadError, setCourierLoadError] = useState("");
   const [creatingShipment, setCreatingShipment] = useState(false);
+  const [documentOperation, setDocumentOperation] = useState("");
+  const [pickupOrderId, setPickupOrderId] = useState("");
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -111,6 +113,7 @@ const Orders = ({ initialOrderId = "" }) => {
       paymentStatus: order.paymentStatus,
       paymentMethod: order.paymentMethod,
       stockReservationStatus: order.stockReservationStatus,
+      hasShipment: Boolean(order.shipment?.awb || order.shipment?.shipmentId),
       shippingAddress: {
         name: order.shippingAddress?.name || "",
         mobile: order.shippingAddress?.mobile || "",
@@ -159,6 +162,60 @@ const Orders = ({ initialOrderId = "" }) => {
     }
   };
 
+  const downloadShipmentDocument = async (order, documentName) => {
+    const key = `${order._id}:${documentName}`;
+    const documentWindow = window.open("about:blank", "_blank");
+    if (!documentWindow) {
+      toast.error("Allow pop-ups to open the shipment document.");
+      return;
+    }
+    documentWindow.opener = null;
+
+    try {
+      setDocumentOperation(key);
+      const response = await axios.get(
+        `${API}/${order._id}/${documentName}`,
+        config,
+      );
+      if (!response.data?.url) {
+        throw new Error("Shiprocket did not return a document link.");
+      }
+      documentWindow.location.replace(response.data.url);
+    } catch (error) {
+      documentWindow.close();
+      toast.error(
+        error.response?.data?.error ||
+          error.message ||
+          `Unable to generate the ${documentName}.`,
+      );
+    } finally {
+      setDocumentOperation("");
+    }
+  };
+
+  const retryPickup = async (order) => {
+    try {
+      setPickupOrderId(order._id);
+      const response = await axios.post(
+        `${API}/${order._id}/pickup`,
+        {},
+        config,
+      );
+      setOrders((current) =>
+        current.map((item) =>
+          item._id === order._id ? response.data.order : item,
+        ),
+      );
+      toast.success("Pickup scheduled.");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error || "Unable to schedule courier pickup.",
+      );
+    } finally {
+      setPickupOrderId("");
+    }
+  };
+
   const deleteOrder = async (order) => {
     if (
       !window.confirm(`Delete order ${order.orderId}? This cannot be undone.`)
@@ -186,7 +243,20 @@ const Orders = ({ initialOrderId = "" }) => {
     setShipmentOrder(order);
     setAvailableCouriers([]);
     setSelectedCourierId("");
-    setPackageDetails({ length: "20", breadth: "15", height: "5", weight: "" });
+    setPackageDetails({
+      length: order.shipment?.package?.length
+        ? String(order.shipment.package.length)
+        : "",
+      breadth: order.shipment?.package?.breadth
+        ? String(order.shipment.package.breadth)
+        : "",
+      height: order.shipment?.package?.height
+        ? String(order.shipment.package.height)
+        : "",
+      weight: order.shipment?.package?.weight
+        ? String(order.shipment.package.weight)
+        : "",
+    });
     setCourierAvailabilityChecked(false);
     setCourierLoadError("");
   };
@@ -225,6 +295,9 @@ const Orders = ({ initialOrderId = "" }) => {
           delivery: String(shipmentOrder.shippingAddress.pinCode).trim(),
           weight: Number(packageDetails.weight),
           cod: shipmentOrder.paymentMethod === "cod" ? 1 : 0,
+          length: Number(packageDetails.length),
+          breadth: Number(packageDetails.breadth),
+          height: Number(packageDetails.height),
         },
       });
       const couriers = response.data.couriers;
@@ -494,6 +567,38 @@ const Orders = ({ initialOrderId = "" }) => {
                               {order.shipment.courierName || "Assigned"}
                             </strong>
                             <small>AWB: {order.shipment.awb}</small>
+                            <small>
+                              {order.shipment.pickupScheduled
+                                ? "Pickup scheduled"
+                                : "Pickup not scheduled"}
+                            </small>
+                          </div>
+                          <div className="shipment-document-actions">
+                            {["label", "invoice", "manifest"].map((name) => (
+                              <button
+                                type="button"
+                                key={name}
+                                disabled={Boolean(documentOperation)}
+                                onClick={() =>
+                                  downloadShipmentDocument(order, name)
+                                }
+                              >
+                                {documentOperation === `${order._id}:${name}`
+                                  ? "Preparing…"
+                                  : titleCase(name)}
+                              </button>
+                            ))}
+                            {!order.shipment.pickupScheduled && (
+                              <button
+                                type="button"
+                                disabled={Boolean(pickupOrderId)}
+                                onClick={() => retryPickup(order)}
+                              >
+                                {pickupOrderId === order._id
+                                  ? "Scheduling…"
+                                  : "Retry pickup"}
+                              </button>
+                            )}
                           </div>
                         </div>
                       ) : [
@@ -574,9 +679,13 @@ const Orders = ({ initialOrderId = "" }) => {
                       key={status}
                       value={status}
                       disabled={
-                        editing.paymentMethod === "online" &&
-                        editing.paymentStatus === "paid" &&
-                        status === "cancelled"
+                        (editing.hasShipment &&
+                          status !== editing.orderStatus) ||
+                        (["shipped", "delivered"].includes(status) &&
+                          status !== editing.orderStatus) ||
+                        (editing.paymentMethod === "online" &&
+                          editing.paymentStatus === "paid" &&
+                          status === "cancelled")
                       }
                     >
                       {titleCase(status)}
@@ -619,6 +728,7 @@ const Orders = ({ initialOrderId = "" }) => {
                     name={name}
                     value={editing.shippingAddress[name]}
                     onChange={updateAddress}
+                    disabled={editing.hasShipment}
                     required={[
                       "name",
                       "mobile",
@@ -719,6 +829,7 @@ const Orders = ({ initialOrderId = "" }) => {
                         type="number"
                         name={name}
                         min="0.01"
+                        max={name === "weight" ? "100" : "500"}
                         step="any"
                         value={packageDetails[name]}
                         onChange={updatePackageDetails}
