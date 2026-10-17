@@ -33,13 +33,21 @@ const Login = () => {
       : "/Dashboard";
   const { isLoggedIn, loading: authLoading, refresh } = useAuth();
 
-  // "login" | "register"
-  const [mode, setMode] = useState("login");
-  const [formData, setFormData] = useState(emptyForm);
+  // "login" | "register" | "forgot" | "reset"
+  const resetToken = new URLSearchParams(location.search).get("resetToken");
+  const [mode, setMode] = useState(() => (resetToken ? "reset" : "login"));
+  const [formData, setFormData] = useState(() => ({
+    ...emptyForm,
+    email: new URLSearchParams(location.search).get("email") || "",
+  }));
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [forgotSubmitted, setForgotSubmitted] = useState(false);
 
   const isLogin = mode === "login";
+  const isRegister = mode === "register";
+  const isForgot = mode === "forgot";
+  const isReset = mode === "reset";
 
   // Show errors sent back by the Google OAuth redirect (/login?error=...)
   useEffect(() => {
@@ -61,6 +69,8 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
+    if (name === "email") setForgotSubmitted(false);
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -70,6 +80,7 @@ const Login = () => {
   const switchMode = (next) => {
     setMode(next);
     setShowPassword(false);
+    setForgotSubmitted(false);
 
     setFormData((prev) => ({
       ...emptyForm,
@@ -120,7 +131,7 @@ const Login = () => {
       );
 
       if (response.data.success) {
-        const me = await refresh(); // updates global auth state and returns the customer
+        const me = await refresh();
         const firstName = me?.name?.split(" ")[0];
 
         toast.success(
@@ -130,6 +141,67 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to sign in");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    const email = formData.email.trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await axios.post(`${API}/api/auth/customer-forgot-password`, { email });
+      setForgotSubmitted(true);
+      toast.success("If an account exists, a reset link will be sent.");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Unable to send a reset link",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetToken) {
+      toast.error("This reset link is invalid or expired. Request a new one.");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${API}/api/auth/customer-reset-password`,
+        {
+          token: resetToken,
+          password: formData.password,
+        },
+      );
+
+      toast.success(response.data.message || "Password reset successfully");
+      setMode("login");
+      setFormData({ ...emptyForm, email: formData.email });
+      navigate("/Login", { replace: true });
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Unable to reset your password",
+      );
     } finally {
       setLoading(false);
     }
@@ -209,7 +281,10 @@ const Login = () => {
 
     if (loading) return;
 
-    return isLogin ? handleLogin() : handleRegister();
+    if (isLogin) return handleLogin();
+    if (isRegister) return handleRegister();
+    if (isForgot) return handleForgotPassword();
+    return handleResetPassword();
   };
 
   const handleGoogleLogin = () => {
@@ -230,15 +305,15 @@ const Login = () => {
 
   // Already signed-in customers don't need the login page
   // (must stay below all hooks)
-  if (!authLoading && isLoggedIn) {
+  if (!authLoading && isLoggedIn && !isReset) {
     return <Navigate to={redirectTo} replace />;
   }
 
   return (
     <>
       <SEO
-        title="Sign in | ZYORA"
-        description="Sign in to your ZYORA account to track orders and shop faster."
+        title={`${isReset ? "Reset password" : isForgot ? "Forgot password" : isRegister ? "Create account" : "Sign in"} | ZYORA`}
+        description="Access your ZYORA account to manage your profile and orders."
         canonical={`${import.meta.env.VITE_API_DOMAIN}/Login`}
         noindex
       />
@@ -285,7 +360,7 @@ const Login = () => {
                       — it’s quick, easy, and free!
                     </p>
                   </>
-                ) : (
+                ) : isRegister ? (
                   <>
                     <h1>Create your account</h1>
 
@@ -301,6 +376,22 @@ const Login = () => {
                       </button>
                     </p>
                   </>
+                ) : isForgot ? (
+                  <>
+                    <h1>Forgot your password?</h1>
+                    <p>
+                      Enter your account email and we’ll send you a secure
+                      password reset link.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h1>Choose a new password</h1>
+                    <p>
+                      Your reset link is valid for 15 minutes. Set a new
+                      password to sign in.
+                    </p>
+                  </>
                 )}
               </div>
 
@@ -310,7 +401,7 @@ const Login = () => {
                 onSubmit={handleSubmit}
               >
                 {/* NAME */}
-                {!isLogin && (
+                {isRegister && (
                   <div className="zyora-input-group">
                     <label htmlFor="name">Full name</label>
 
@@ -330,25 +421,27 @@ const Login = () => {
                 )}
 
                 {/* EMAIL */}
-                <div className="zyora-input-group">
-                  <label htmlFor="email">Email address</label>
+                {!isReset && (
+                  <div className="zyora-input-group">
+                    <label htmlFor="email">Email address</label>
 
-                  <div className="zyora-input-wrapper">
-                    <input
-                      id="email"
-                      type="email"
-                      name="email"
-                      placeholder="you@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      autoComplete="email"
-                      required
-                    />
+                    <div className="zyora-input-wrapper">
+                      <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        autoComplete="email"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* MOBILE */}
-                {!isLogin && (
+                {isRegister && (
                   <div className="zyora-input-group">
                     <label htmlFor="mobile">Mobile number</label>
 
@@ -370,33 +463,33 @@ const Login = () => {
                 )}
 
                 {/* PASSWORD */}
-                <div className="zyora-input-group">
-                  <label htmlFor="password">Password</label>
+                {(isLogin || isRegister || isReset) && (
+                  <div className="zyora-input-group">
+                    <label htmlFor="password">Password</label>
 
-                  <div className="zyora-input-wrapper">
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      placeholder={
-                        isLogin
-                          ? "Enter your password"
-                          : "At least 8 characters"
-                      }
-                      value={formData.password}
-                      onChange={handleChange}
-                      autoComplete={
-                        isLogin ? "current-password" : "new-password"
-                      }
-                      required
-                    />
+                    <div className="zyora-input-wrapper">
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder={
+                          isLogin ? "Enter your password" : "At least 8 characters"
+                        }
+                        value={formData.password}
+                        onChange={handleChange}
+                        autoComplete={
+                          isLogin ? "current-password" : "new-password"
+                        }
+                        required
+                      />
 
-                    {passwordToggle}
+                      {passwordToggle}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* CONFIRM PASSWORD */}
-                {!isLogin && (
+                {(isRegister || isReset) && (
                   <div className="zyora-input-group">
                     <label htmlFor="confirmPassword">Confirm password</label>
 
@@ -416,7 +509,7 @@ const Login = () => {
                 )}
 
                 {/* TERMS */}
-                {!isLogin && (
+                {isRegister && (
                   <div className="zyora-terms">
                     <label className="zyora-checkbox-label">
                       <input
@@ -448,15 +541,18 @@ const Login = () => {
                     <button
                       type="button"
                       className="zyora-forgot"
-                      onClick={() =>
-                        toast(
-                          "Contact the administrator to reset your password",
-                        )
-                      }
+                      onClick={() => switchMode("forgot")}
                     >
                       Forgot password?
                     </button>
                   </div>
+                )}
+
+                {forgotSubmitted && isForgot && (
+                  <p className="zyora-reset-notice" role="status">
+                    If an account exists for this email, a reset link will be
+                    sent shortly. Check your inbox and spam folder.
+                  </p>
                 )}
 
                 {/* SUBMIT */}
@@ -468,37 +564,63 @@ const Login = () => {
                   {loading
                     ? isLogin
                       ? "Signing in…"
-                      : "Creating account…"
+                      : isRegister
+                        ? "Creating account…"
+                        : isForgot
+                          ? "Sending link…"
+                          : "Updating password…"
                     : isLogin
                       ? "Sign in"
-                      : "Create account"}
+                      : isRegister
+                        ? "Create account"
+                        : isForgot
+                          ? "Send reset link"
+                          : "Reset password"}
                 </button>
-                <div className="zyora-login-divider">
-                  <span>OR</span>
-                </div>
-                <button
-                  type="button"
-                  className="zyora-google-button"
-                  onClick={handleGoogleLogin}
-                  disabled={loading}
-                >
-                  <img
-                    src="https://img.icons8.com/color/48/google-logo.png"
-                    alt="Google"
-                    className="zyora-google-icon"
-                  />
-                  Continue with Google
-                </button>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    opacity: 0.7,
-                    textAlign: "center",
-                  }}
-                >
-                  By continuing with Google you agree to our Terms & Conditions
-                  and Privacy Policy.
-                </p>
+                {(isLogin || isRegister) && (
+                  <>
+                    <div className="zyora-login-divider">
+                      <span>OR</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="zyora-google-button"
+                      onClick={handleGoogleLogin}
+                      disabled={loading}
+                    >
+                      <img
+                        src="https://img.icons8.com/color/48/google-logo.png"
+                        alt="Google"
+                        className="zyora-google-icon"
+                      />
+                      Continue with Google
+                    </button>
+                    <p
+                      style={{
+                        fontSize: "12px",
+                        opacity: 0.7,
+                        textAlign: "center",
+                      }}
+                    >
+                      By continuing with Google you agree to our Terms &
+                      Conditions and Privacy Policy.
+                    </p>
+                  </>
+                )}
+                {(isForgot || isReset) && (
+                  <div className="zyora-login-options zyora-reset-back">
+                    <button
+                      type="button"
+                      className="zyora-forgot"
+                      onClick={() => {
+                        switchMode("login");
+                        navigate("/Login", { replace: true });
+                      }}
+                    >
+                      Back to sign in
+                    </button>
+                  </div>
+                )}
               </form>
 
               <div className="zyora-login-security">
