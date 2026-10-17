@@ -108,7 +108,7 @@ const Contact = () => {
                 <i className="bi bi-envelope-open-heart"></i>
                 Email
               </p>
-              <span>zyoraecommerce@gmail.com</span>
+              <span>support@zyoraecom.in</span>
             </li>
             <li>
               <p>
