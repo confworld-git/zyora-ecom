@@ -223,8 +223,8 @@ const OrderTracking = ({ order }) => {
   const [error, setError] = useState("");
 
   const showTracking = async () => {
-    if (tracking) {
-      setExpanded((current) => !current);
+    if (expanded) {
+      setExpanded(false);
       return;
     }
     try {
@@ -274,7 +274,10 @@ const OrderTracking = ({ order }) => {
             </div>
           ) : (
             <p className="zyora-profile-muted">
-              Courier and AWB details will appear once your order is shipped.
+              {tracking.shipmentStatus === "Not sent to Shiprocket"
+                ? "This order has not been sent to Shiprocket yet."
+                : tracking.shipmentStatus ||
+                  "Courier assignment and AWB are pending in Shiprocket."}
             </p>
           )}
 
