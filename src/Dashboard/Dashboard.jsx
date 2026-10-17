@@ -73,6 +73,7 @@ const Dashboard = () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/contact/Contact_data`,
+          { withCredentials: true },
         );
         setEnquiryData(response.data.data);
       } catch (error) {
@@ -92,7 +93,7 @@ const Dashboard = () => {
         axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/orders`, {
           withCredentials: true,
         }),
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/coupons`, {
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/coupons/admin`, {
           withCredentials: true,
         }),
       ]);

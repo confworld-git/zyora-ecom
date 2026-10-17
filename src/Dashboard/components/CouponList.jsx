@@ -40,7 +40,7 @@ const CouponList = () => {
   const fetchCoupons = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(API, cfg);
+      const res = await axios.get(`${API}/admin`, cfg);
       const list = res.data.coupons || res.data.data || res.data;
       setCoupons(Array.isArray(list) ? list : []);
     } catch (error) {

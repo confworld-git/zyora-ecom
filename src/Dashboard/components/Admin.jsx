@@ -33,6 +33,11 @@ const Admin = () => {
       return;
     }
 
+    if (formData.newPassword && formData.newPassword.length < 12) {
+      toast.error("New password must be at least 12 characters");
+      return;
+    }
+
     if (
       formData.newPassword &&
       formData.newPassword !== formData.confirmPassword
@@ -262,7 +267,8 @@ const Admin = () => {
               name="newPassword"
               value={formData.newPassword}
               onChange={handleChange}
-              placeholder="Enter new password"
+              minLength={12}
+              placeholder="Enter new password (12 characters minimum)"
             />
           </div>
 
