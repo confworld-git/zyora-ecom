@@ -50,32 +50,50 @@ const ProductDetail = () => {
   const videoUrl =
     typeof product.video === "string" ? product.video : product.video?.url || "";
   const isVideoSelected = selection.showVideo === true && Boolean(videoUrl);
-  const colourNames = product.variants?.colours || [];
+  const colourNames = (product.variants?.colours || []).map((name) =>
+    String(name ?? "").trim(),
+  );
 
-  // Each image = one colour option (hex from image.color, name from variants.colours by index)
-  const colorOptions = images.map((image, index) => ({
-    id: image.id,
-    color: image.color,
-    name: colourNames[index] || image.color || `Colour ${index + 1}`,
-    image,
-  }));
+  // Colour #1 belongs to image #1, colour #2 to image #2, and so on.
+  // Images after the last colour (extra angles, a second chain in the same
+  // colour...) are gallery photos only and are not colour options.
+  const colorOptions = colourNames
+    .map((name, index) => ({
+      id: images[index]?.id,
+      color: images[index]?.color,
+      name,
+      image: images[index],
+    }))
+    .filter((option) => option.name && option.image);
 
-  // Selected image (defaults to first image); colour is derived from it
+  // Selected image (defaults to first image)
   const activeImage =
     selection.image ??
     images.find((image) => image.url === location.state?.selectedImage) ??
     images[0] ??
     null;
   const selectedImage = activeImage?.url ?? "";
-  const selectedColorOption = colorOptions.find(
-    (option) => option.id === activeImage?.id,
-  );
+
+  // Selected colour: the one the customer picked, else the one that matches
+  // the shown image, else the only colour when there is just one
+  const selectedColorOption =
+    colorOptions.find((option) => option.id === selection.colorId) ??
+    colorOptions.find((option) => option.id === activeImage?.id) ??
+    (colorOptions.length === 1 ? colorOptions[0] : undefined);
   const selectedColor = selectedColorOption?.name ?? "";
   const selectedSize = selection.size ?? "";
+
   const selectImage = (image) => {
+    const option = colorOptions.find((item) => item.id === image.id);
+
     setSelectionsByProduct((current) => ({
       ...current,
-      [id]: { ...current[id], image, showVideo: false },
+      [id]: {
+        ...current[id],
+        image,
+        showVideo: false,
+        ...(option && { colorId: option.id }),
+      },
     }));
   };
 
@@ -286,16 +304,22 @@ const ProductDetail = () => {
                 {colorOptions.length > 0 ? (
                   colorOptions.map((option) => (
                     <button
-                      className={
-                        activeImage?.id === option.id ? "selected" : ""
-                      }
+                      className={`${
+                        selectedColorOption?.id === option.id ? "selected" : ""
+                      } ${option.color ? "" : "has-label"}`.trim()}
                       key={option.id}
                       type="button"
                       title={option.name}
                       aria-label={`Select ${option.name} color`}
-                      style={{ backgroundColor: option.color }}
+                      style={
+                        option.color
+                          ? { backgroundColor: option.color }
+                          : undefined
+                      }
                       onClick={() => selectImage(option.image)}
-                    />
+                    >
+                      {!option.color && option.name}
+                    </button>
                   ))
                 ) : (
                   <span className="no-colors">Not specified</span>
@@ -377,12 +401,14 @@ const ProductDetail = () => {
               {colorOptions.length > 0 ? (
                 colorOptions.map((option) => (
                   <span className="variant-colour" key={option.id}>
-                    <span
-                      className="variant-colour-swatch"
-                      style={{ backgroundColor: option.color }}
-                      title={option.name}
-                      aria-label={option.name}
-                    />
+                    {option.color && (
+                      <span
+                        className="variant-colour-swatch"
+                        style={{ backgroundColor: option.color }}
+                        title={option.name}
+                        aria-label={option.name}
+                      />
+                    )}
                     {option.name}
                   </span>
                 ))

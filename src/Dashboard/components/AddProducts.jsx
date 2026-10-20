@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useProducts } from "../../Context/ProductContext.jsx";
+import { parseLooseJson, productJsonToFormFields } from "./productJson.js";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -57,6 +58,44 @@ function AddProduct() {
   const [videoPreview, setVideoPreview] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const [showJsonBox, setShowJsonBox] = useState(false);
+  const [jsonText, setJsonText] = useState("");
+  const [jsonError, setJsonError] = useState("");
+
+  const handleInsertJson = () => {
+    let data;
+
+    try {
+      data = parseLooseJson(jsonText);
+    } catch (error) {
+      setJsonError(`Could not read the details: ${error.message}`);
+      return;
+    }
+
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      setJsonError(
+        "Paste one product object that starts with { and ends with }.",
+      );
+      return;
+    }
+
+    const fields = productJsonToFormFields(data, categories);
+
+    if (data.category && !fields.category) {
+      toast.error(
+        `Category "${data.category}" is not in your list. Please choose one.`,
+      );
+    }
+
+    // Images and video are left exactly as they are
+    setFormData((prev) => ({ ...prev, ...fields }));
+    setErrors({});
+    setJsonError("");
+    setJsonText("");
+    setShowJsonBox(false);
+    toast.success("Details filled in. Now add the images and video.");
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -546,10 +585,10 @@ function AddProduct() {
       data.append(
         "image_metadata",
         JSON.stringify(
-          formData.images.map((image) => ({
-            id: image.id,
+          formData.images.map((image, index) => ({
+            id: `img-${index + 1}`,
             color: image.color,
-            alt: image.alt,
+            alt: `${formData.name.trim() || "Product"} image ${index + 1}`,
           })),
         ),
       );
@@ -563,7 +602,9 @@ function AddProduct() {
 
       toast.success(response.data.message);
       if (!(await refreshProducts())) {
-        toast.error("Product added, but storefront data could not be refreshed.");
+        toast.error(
+          "Product added, but storefront data could not be refreshed.",
+        );
       }
 
       if (videoPreview) URL.revokeObjectURL(videoPreview);
@@ -670,7 +711,72 @@ function AddProduct() {
             <h1>Add Product</h1>
             <p>Add a new product to your Zyora store.</p>
           </div>
+
+          <button
+            type="button"
+            className="small-add-btn"
+            onClick={() => setShowJsonBox((open) => !open)}
+          >
+            {showJsonBox ? "Close" : "Insert JSON"}
+          </button>
         </div>
+
+        {showJsonBox && (
+          <section className="product-section">
+            <div className="section-heading">
+              <div>
+                <h2>Insert JSON</h2>
+                <p>
+                  Paste the product details. Everything except images and video
+                  will be filled in.
+                </p>
+              </div>
+            </div>
+
+            <textarea
+              value={jsonText}
+              onChange={(e) => {
+                setJsonText(e.target.value);
+                setJsonError("");
+              }}
+              placeholder="{ id: 'ZYR-PRD-...', name: '...', price: { mrp: 1299, selling_price: 799 } }"
+              rows={14}
+              spellCheck={false}
+              style={{
+                width: "100%",
+                fontFamily: "monospace",
+                fontSize: "13px",
+                padding: "12px",
+                boxSizing: "border-box",
+              }}
+            />
+
+            {jsonError && <small className="field-error">{jsonError}</small>}
+
+            <div className="form-actions">
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => {
+                  setJsonText("");
+                  setJsonError("");
+                  setShowJsonBox(false);
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="submit-btn"
+                onClick={handleInsertJson}
+                disabled={!jsonText.trim()}
+              >
+                Fill Form
+              </button>
+            </div>
+          </section>
+        )}
 
         {errors.submit && (
           <div className="alert error-alert">{errors.submit}</div>
@@ -937,7 +1043,7 @@ function AddProduct() {
             {imagePreviews.length > 0 && (
               <div className="image-preview-grid">
                 {imagePreviews.map((image, index) => (
-                  <div className="image-preview" key={image.id}>
+                  <div className="image-preview" key={image.url}>
                     <div className="image-preview-wrapper">
                       <img src={image.url} alt={image.alt} />
 
@@ -983,7 +1089,11 @@ function AddProduct() {
                 onChange={handleVideoUpload}
               />
               <div className="upload-icon">▶</div>
-              <strong>{videoPreview ? "Replace product video" : "Click to upload a video"}</strong>
+              <strong>
+                {videoPreview
+                  ? "Replace product video"
+                  : "Click to upload a video"}
+              </strong>
               <span>One video per product</span>
             </label>
             {errors.video && (
