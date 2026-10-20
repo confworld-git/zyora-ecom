@@ -52,6 +52,7 @@ const JewelleryList = () => {
                   key={productId}
                   style={{ "--card-index": Math.min(index, 8) }}
                   to={`/Zyora_Category/product/${encodeURIComponent(productId)}/${encodeURIComponent(slug)}`}
+                  state={{ from: "/Jewellery" }}
                 >
                   <div className="zyora-jewellery-image-wrap">
                     {product.images?.[0]?.url ? (

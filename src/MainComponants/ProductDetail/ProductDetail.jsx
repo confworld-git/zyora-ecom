@@ -18,6 +18,10 @@ const ProductDetail = () => {
   const { loading, error: productsError, getProductById } = useProducts();
   const { productId, slug } = useParams();
   const location = useLocation();
+  const productListPath =
+    location.state?.from === "/Jewellery" ? "/Jewellery" : "/Zyora_Category";
+  const productListLabel =
+    productListPath === "/Jewellery" ? "Jewellery" : "Categories";
   const id = productId;
   const product = getProductById(id);
   const [selectionsByProduct, setSelectionsByProduct] = useState({});
@@ -38,7 +42,7 @@ const ProductDetail = () => {
     return (
       <main className="product-detail-state">
         <p>{productsError || "Product not found."}</p>
-        <Link to="/Zyora_Category">Back to categories</Link>
+        <Link to={productListPath}>Back to {productListLabel.toLowerCase()}</Link>
       </main>
     );
   }
@@ -225,7 +229,7 @@ const ProductDetail = () => {
           <p>
             <Link to="/">Home</Link>
             <MdKeyboardArrowRight />
-            <Link to="/Zyora_Category">Categories</Link>
+            <Link to={productListPath}>{productListLabel}</Link>
             <MdKeyboardArrowRight />
             <span aria-current="page">{slug}</span>
           </p>
