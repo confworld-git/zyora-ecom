@@ -1,4 +1,5 @@
 import "./About.css";
+import { Link } from "react-router-dom";
 import { FaHandsHelping } from "react-icons/fa";
 import { FaTruck } from "react-icons/fa6";
 import arc from "../../assets/Images/arc.png";
@@ -38,7 +39,9 @@ const About = () => {
       <div className="About_us">
         <div id="page_path">
           <p>
-            Home <MdKeyboardArrowRight /> About Us
+            <Link to="/">Home</Link>
+            <MdKeyboardArrowRight />
+            <span aria-current="page">About Us</span>
           </p>
         </div>
         <div className="about_title">

@@ -1,4 +1,5 @@
 import "./Contact.css";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import "react-phone-number-input/style.css";
@@ -89,7 +90,9 @@ const Contact = () => {
       <div className="contact_main">
         <div id="page_path">
           <p>
-            Home <MdKeyboardArrowRight /> Contact Us
+            <Link to="/">Home</Link>
+            <MdKeyboardArrowRight />
+            <span aria-current="page">Contact Us</span>
           </p>
         </div>
         <ScrollReveal className="Contact">

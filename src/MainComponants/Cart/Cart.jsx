@@ -9,7 +9,7 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import CouponPopup from "./CouponPopup.jsx";
 import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import { BiSolidOffer } from "react-icons/bi";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../Context/AuthContext.jsx";
 import { useProducts } from "../../Context/ProductContext.jsx";
@@ -729,7 +729,9 @@ const Cart = () => {
     <ScrollReveal className="cart">
       <div id="page_path">
         <p>
-          Home <MdKeyboardArrowRight /> Cart
+          <Link to="/">Home</Link>
+          <MdKeyboardArrowRight />
+          <span aria-current="page">Cart</span>
         </p>
       </div>
 

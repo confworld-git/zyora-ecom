@@ -223,8 +223,11 @@ const ProductDetail = () => {
       <ScrollReveal as="main" className="product-detail-page">
         <div id="page_path">
           <p>
-            Home <MdKeyboardArrowRight /> Categories <MdKeyboardArrowRight />{" "}
-            {slug}
+            <Link to="/">Home</Link>
+            <MdKeyboardArrowRight />
+            <Link to="/Zyora_Category">Categories</Link>
+            <MdKeyboardArrowRight />
+            <span aria-current="page">{slug}</span>
           </p>
         </div>
         <ScrollReveal as="section" className="product-detail-hero">

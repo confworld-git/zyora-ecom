@@ -2,7 +2,7 @@ import "./Favorites.css";
 import { useWishlist } from "../../Context/WishlistContext";
 import { useCart } from "../../Context/CartContext.jsx";
 import { useProducts } from "../../Context/ProductContext.jsx";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import toast from "react-hot-toast";
 import ScrollReveal from "../../Components/ScrollReveal.jsx";
@@ -94,7 +94,9 @@ const Favorites = () => {
     <ScrollReveal className="favourites">
       <div id="page_path">
         <p>
-          Home <MdKeyboardArrowRight /> Favourites
+          <Link to="/">Home</Link>
+          <MdKeyboardArrowRight />
+          <span aria-current="page">Favourites</span>
         </p>
       </div>
       {wishlistItems.length > 0 && (

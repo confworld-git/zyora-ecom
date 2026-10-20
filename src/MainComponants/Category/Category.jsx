@@ -1,7 +1,7 @@
 import "./Category.css";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   MdClose,
   MdFilterList,
@@ -662,9 +662,9 @@ const Category = () => {
       <ScrollReveal className="category">
         <div id="page_path">
           <p>
-            Home
+            <Link to="/">Home</Link>
             <MdKeyboardArrowRight />
-            Categories
+            <span aria-current="page">Categories</span>
           </p>
         </div>
 
