@@ -811,7 +811,7 @@ function AddProduct() {
                 )}
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label>
                   Category <span>*</span>
                 </label>
@@ -829,6 +829,32 @@ function AddProduct() {
                     </option>
                   ))}
                 </select>
+
+                {errors.category && (
+                  <small className="field-error">{errors.category}</small>
+                )}
+              </div> */}
+
+              <div className="form-group">
+                <label>
+                  Category <span>*</span>
+                </label>
+
+                <input
+                  type="text"
+                  name="category"
+                  list="category-options"
+                  placeholder="Select or type a category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  autoComplete="off"
+                />
+
+                <datalist id="category-options">
+                  {categories.map((category) => (
+                    <option key={category} value={category} />
+                  ))}
+                </datalist>
 
                 {errors.category && (
                   <small className="field-error">{errors.category}</small>
