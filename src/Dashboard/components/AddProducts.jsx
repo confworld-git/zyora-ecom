@@ -17,6 +17,7 @@ const categories = [
   "Beauty",
   "Stationery",
   "Handbags",
+  "Accessories",
   "Soft Toys",
   "Immitation Jewellery",
 ];
