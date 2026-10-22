@@ -716,6 +716,7 @@ function AddProduct() {
           <button
             type="button"
             className="small-add-btn"
+            style={{marginTop:"20px"}}
             onClick={() => setShowJsonBox((open) => !open)}
           >
             {showJsonBox ? "Close" : "Insert JSON"}

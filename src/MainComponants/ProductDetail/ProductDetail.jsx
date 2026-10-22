@@ -269,8 +269,15 @@ const ProductDetail = () => {
                 aria-pressed={isVideoSelected}
                 onClick={() => updateSelection("showVideo", true)}
               >
+                {images[0]?.url && (
+                  <img
+                    className="product-video-poster"
+                    src={images[0].url}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                )}
                 <span aria-hidden="true">▶</span>
-                <small>Video</small>
               </button>
             )}
           </div>

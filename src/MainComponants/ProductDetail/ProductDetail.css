@@ -2,7 +2,7 @@
 
 /* ================= TOKENS & PAGE ================= */
 .product-detail-page {
-  --pd-bg: #f6f3ee;
+  --pd-bg: #f5f1ed;
   --pd-navy: #0a0a5c;
   --pd-navy-2: #1b1b7a;
   --pd-acc: #ff4a12;
@@ -131,26 +131,41 @@ main.product-detail-state a:hover {
 }
 
 .product-detail-gallery .product-video-thumbnail {
+  position: relative;
   display: flex;
   flex: 0 0 auto;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
   padding: 0;
-  color: var(--pd-navy);
+  overflow: hidden;
+  color: #fff;
   cursor: pointer;
 }
 
 .product-video-thumbnail span {
-  color: var(--pd-acc);
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  padding-left: 2px;
+  border-radius: 50%;
+  background: rgba(10, 10, 92, 0.78);
+  color: #fff;
   font-size: 17px;
   line-height: 1;
 }
 
-.product-video-thumbnail small {
-  font-size: 9px;
-  font-weight: 700;
+.product-detail-gallery .product-video-thumbnail > .product-video-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+  object-fit: cover;
+  cursor: pointer;
 }
 
 .product-detail-gallery .no-image {
@@ -162,11 +177,11 @@ main.product-detail-state a:hover {
   cursor: default;
 }
 
-.product-detail-gallery img:hover {
+.product-detail-gallery > img:hover {
   transform: scale(1.06);
 }
 
-.product-detail-gallery img.selected {
+.product-detail-gallery > img.selected {
   border-color: var(--pd-acc);
   outline: 0;
 }
