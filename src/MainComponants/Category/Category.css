@@ -95,6 +95,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
+  margin-top: 10px;
 }
 
 /* .category > section > :nth-child(1) {
