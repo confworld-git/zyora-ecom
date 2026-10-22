@@ -107,8 +107,6 @@ const Category = () => {
   }, [categoryProducts]);
 
   const [filters, setFilters] = useState({
-    categories: selectedCategory ? [selectedCategory] : [],
-
     priceMin: null,
     priceMax: null,
 
@@ -128,6 +126,30 @@ const Category = () => {
       ),
     ].sort();
   }, [categoryProducts]);
+
+  const categories = useMemo(
+    () =>
+      categoryOptions.map((category) => {
+        const productsInCategory = categoryProducts.filter(
+          (product) =>
+            String(product.category).toLowerCase() ===
+            String(category).toLowerCase(),
+        );
+
+        return {
+          name: category,
+          count: productsInCategory.length,
+          image: productsInCategory.find((product) => product.images?.[0]?.url)
+            ?.images?.[0],
+        };
+      }),
+    [categoryOptions, categoryProducts],
+  );
+
+  const currentCategory = categoryOptions.find(
+    (category) =>
+      String(category).toLowerCase() === String(selectedCategory || "").toLowerCase(),
+  );
 
   const maxProductPrice = useMemo(() => {
     const highestPrice = categoryProducts.reduce(
@@ -162,16 +184,12 @@ const Category = () => {
       const matchesSearch = !search || productText.includes(search);
 
       const matchesCategory =
-        !filters.categories.length ||
-        filters.categories.some(
-          (selectedCategory) =>
-            String(selectedCategory).toLowerCase() ===
-            String(category).toLowerCase(),
-        );
+        !selectedCategory ||
+        String(selectedCategory).toLowerCase() === String(category).toLowerCase();
 
       return matchesSearch && matchesCategory;
     });
-  }, [categoryProducts, searchTerm, filters.categories]);
+  }, [categoryProducts, searchTerm, selectedCategory]);
 
   const colorOptions = useMemo(() => {
     const colors = availableProducts.flatMap(
@@ -243,12 +261,8 @@ const Category = () => {
       const productSizes = product.variants?.sizes || [];
       const matchesSearch = !search || productText.includes(search);
       const matchesCategory =
-        !filters.categories.length ||
-        filters.categories.some(
-          (selectedCategory) =>
-            String(selectedCategory).toLowerCase() ===
-            String(category).toLowerCase(),
-        );
+        !selectedCategory ||
+        String(selectedCategory).toLowerCase() === String(category).toLowerCase();
 
       const matchesColor =
         !activeColors.length ||
@@ -315,6 +329,7 @@ const Category = () => {
     categoryProducts,
     searchTerm,
     filters,
+    selectedCategory,
     SLIDER_MIN_PRICE,
     SLIDER_MAX_PRICE,
   ]);
@@ -324,10 +339,12 @@ const Category = () => {
 
     setSizeSliderSize("");
 
-    setSearchParams({}, { replace: true });
+    setSearchParams(
+      selectedCategory ? { category: selectedCategory } : {},
+      { replace: true },
+    );
 
     setFilters({
-      categories: [],
       priceMin: null,
       priceMax: null,
       colors: [],
@@ -336,6 +353,37 @@ const Category = () => {
       rating: false,
       sort: "relevance",
     });
+  };
+
+  const openCategory = (category) => {
+    setSearchTerm("");
+    setFilters({
+      priceMin: null,
+      priceMax: null,
+      colors: [],
+      sizes: [],
+      inStock: false,
+      rating: false,
+      sort: "relevance",
+    });
+    setSizeSliderSize("");
+    setSearchParams({ category });
+  };
+
+  const showCategories = () => {
+    setSearchTerm("");
+    setSizeSliderSize("");
+    setMobileFiltersOpen(false);
+    setFilters({
+      priceMin: null,
+      priceMax: null,
+      colors: [],
+      sizes: [],
+      inStock: false,
+      rating: false,
+      sort: "relevance",
+    });
+    setSearchParams({});
   };
 
   const getColorLabel = (color) => {
@@ -357,7 +405,7 @@ const Category = () => {
   };
 
   const showVariantFilters =
-    Boolean(searchTerm.trim()) || filters.categories.length > 0;
+    Boolean(searchTerm.trim()) || Boolean(selectedCategory);
 
   const sizeSliderIndex = sizeOptions.findIndex(
     (size) => String(size).toLowerCase() === sizeSliderSize.toLowerCase(),
@@ -373,11 +421,19 @@ const Category = () => {
       : 0;
 
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
+  const categoryPageTitle = currentCategory
+    ? `Shop ${currentCategory} | ZYORA`
+    : "Shop All Categories | ZYORA";
+  const categoryPageDescription = currentCategory
+    ? `Explore ${currentCategory} products at ZYORA. Find quality products selected for your everyday needs.`
+    : "Explore all product categories at ZYORA and discover quality, functional and affordable products for everyday life. Shop home and kitchen essentials, stationery, handbags, soft toys, fashion, footwear, electronics, watches, beauty, sports and fitness, and more. Find products that fit your needs with secure payments, reliable delivery and easy 7-day returns.";
   const categoryJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Shop All Categories | ZYORA",
-    url: `${siteUrl}/Zyora_Category`,
+    name: categoryPageTitle,
+    url: `${siteUrl}/Zyora_Category${
+      currentCategory ? `?category=${encodeURIComponent(currentCategory)}` : ""
+    }`,
     mainEntity: {
       "@type": "ItemList",
       itemListElement: filteredProducts.flatMap((product, index) => {
@@ -422,7 +478,15 @@ const Category = () => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-    navigate(`/Zyora_Category/product/${productId}/${slug}`);
+    navigate(`/Zyora_Category/product/${productId}/${slug}`, {
+      state: {
+        from: selectedCategory
+          ? `/Zyora_Category?category=${encodeURIComponent(
+              currentCategory || selectedCategory,
+            )}`
+          : "/Zyora_Category",
+      },
+    });
   };
 
   const filterPanel = (
@@ -445,7 +509,7 @@ const Category = () => {
         </button>
       </div>
 
-      <fieldset>
+      {/* <fieldset>
         <legend>Category</legend>
 
         {categoryOptions.map((category) => (
@@ -454,21 +518,16 @@ const Category = () => {
               type="radio"
               name="category"
               checked={
-                String(filters.categories[0] || "").toLowerCase() ===
+                String(selectedCategory || "").toLowerCase() ===
                 String(category).toLowerCase()
               }
-              onChange={() =>
-                setFilters((current) => ({
-                  ...current,
-                  categories: [category],
-                }))
-              }
+              onChange={() => setSearchParams({ category })}
             />
 
             {category}
           </label>
         ))}
-      </fieldset>
+      </fieldset> */}
 
       <fieldset className="price_filter">
         <legend>Price</legend>
@@ -654,9 +713,13 @@ const Category = () => {
   return (
     <>
       <SEO
-        title="Shop All Categories | ZYORA"
-        description="Explore all product categories at ZYORA and discover quality, functional and affordable products for everyday life. Shop home and kitchen essentials, stationery, handbags, soft toys, fashion, footwear, electronics, watches, beauty, sports and fitness, and more. Find products that fit your needs with secure payments, reliable delivery and easy 7-day returns."
-        canonical={`${import.meta.env.VITE_API_DOMAIN}/Zyora_Category`}
+        title={categoryPageTitle}
+        description={categoryPageDescription}
+        canonical={`${siteUrl}/Zyora_Category${
+          currentCategory
+            ? `?category=${encodeURIComponent(currentCategory)}`
+            : ""
+        }`}
         jsonLd={categoryJsonLd}
       />
       <ScrollReveal className="category">
@@ -664,18 +727,38 @@ const Category = () => {
           <p>
             <Link to="/">Home</Link>
             <MdKeyboardArrowRight />
-            <span aria-current="page">Categories</span>
+            {selectedCategory ? (
+              <>
+                <button type="button" onClick={showCategories}>
+                  Categories
+                </button>
+                <MdKeyboardArrowRight />
+                <span aria-current="page">
+                  {currentCategory || selectedCategory}
+                </span>
+              </>
+            ) : (
+              <span aria-current="page">Categories</span>
+            )}
           </p>
         </div>
 
-        <h1>Your <span>Era</span>, Your <span>Style</span></h1>
+        {selectedCategory ? (
+          <h1>{currentCategory || selectedCategory}</h1>
+        ) : (
+          <>
+            <h1>
+              Your <span>Era</span>, Your <span>Style</span>
+            </h1>
+            <p>
+              Explore our wide range of carefully selected categories, made to
+              bring style, comfort, and convenience to your everyday life.
+            </p>
+          </>
+        )}
 
-        <p>
-          Explore our wide range of carefully selected categories, made to bring
-          style, comfort, and convenience to your everyday life.
-        </p>
-
-        <ScrollReveal as="section">
+        {selectedCategory ? (
+          <ScrollReveal as="section" className="category_products_view">
           <div className="categories_list">
             <div className="collection_search">
               <i className="bi bi-search"></i>
@@ -783,16 +866,25 @@ const Category = () => {
                         }
                       }}
                     >
-                      <img
-                        src={product.images?.[0]?.url}
-                        alt={
-                          product.images?.[0]?.alt || product.title || "Product"
-                        }
-                      />
+                      {product.images?.[0]?.url ? (
+                        <img
+                          src={product.images[0].url}
+                          alt={
+                            product.images[0].alt ||
+                            product.name ||
+                            product.title ||
+                            "Product"
+                          }
+                        />
+                      ) : (
+                        <div className="product_image_fallback">
+                          No image available
+                        </div>
+                      )}
 
                       {!hasStock && (
                         <span
-                          id="product-stock-badge"
+                          className="product_stock_badge"
                           aria-label="Out of stock"
                         >
                           Out of stock
@@ -806,18 +898,31 @@ const Category = () => {
                       )}
                       <span>{product.brand}</span>
                       <br />
-                      <small>{product.name}</small>
-                      <p className="product_description">{product.title}</p>
+                      <small>{product.name || product.title}</small>
+                      {/* {product.name &&
+                        product.title &&
+                        product.name !== product.title && (
+                          <p className="product_description">{product.title}</p>
+                        )} */}
                       <div className="price">
                         <strong>
                           Rs.
-                          {product.price?.selling_price}
+                          {product.price?.selling_price
+                            ? Number(
+                                product.price.selling_price,
+                              ).toLocaleString("en-IN")
+                            : "—"}
                         </strong>
-                        <del>
-                          Rs.
-                          {product.price?.mrp}
-                        </del>
-                        <span>({product.price?.discount_percent}% OFF)</span>
+                        {product.price?.mrp && (
+                          <del>
+                            Rs.{Number(product.price.mrp).toLocaleString("en-IN")}
+                          </del>
+                        )}
+                        {Number(product.price?.discount_percent) > 0 && (
+                          <span>
+                            ({product.price.discount_percent}% OFF)
+                          </span>
+                        )}
                       </div>
 
                       {/* <span>add to fav</span> */}
@@ -827,7 +932,54 @@ const Category = () => {
               )}
             </div>
           </div>
-        </ScrollReveal>
+          </ScrollReveal>
+        ) : (
+          <ScrollReveal as="section" className="category_overview">
+            {loading ? (
+              <p className="empty_results" role="status">
+                Loading categories...
+              </p>
+            ) : error ? (
+              <div className="empty_results" role="alert">
+                <p>{error}</p>
+                <button type="button" onClick={() => void refreshProducts()}>
+                  Try again
+                </button>
+              </div>
+            ) : categories.length ? (
+              <div className="category_cards">
+                {categories.map(({ name, count, image }) => (
+                  <button
+                    className="category_card"
+                    key={name}
+                    type="button"
+                    onClick={() => openCategory(name)}
+                  >
+                    <span className="category_card_image">
+                      {image?.url ? (
+                        <img src={image.url} alt={image.alt || name} />
+                      ) : (
+                        <span aria-hidden="true">✦</span>
+                      )}
+                    </span>
+                    <span className="category_card_info">
+                      <strong>{name}</strong>
+                      <small>
+                        {count} {count === 1 ? "product" : "products"}
+                      </small>
+                    </span>
+                    <MdKeyboardArrowRight
+                      className="category_card_arrow"
+                      aria-hidden="true"
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="empty_results">No categories available.</p>
+            )}
+          </ScrollReveal>
+        )}
       </ScrollReveal>
     </>
   );

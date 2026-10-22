@@ -18,10 +18,22 @@ const ProductDetail = () => {
   const { loading, error: productsError, getProductById } = useProducts();
   const { productId, slug } = useParams();
   const location = useLocation();
+  const categoryPath = location.state?.from?.startsWith(
+    "/Zyora_Category?category=",
+  )
+    ? location.state.from
+    : "";
   const productListPath =
-    location.state?.from === "/Jewellery" ? "/Jewellery" : "/Zyora_Category";
+    location.state?.from === "/Jewellery"
+      ? "/Jewellery"
+      : categoryPath || "/Zyora_Category";
+  const categoryName = categoryPath
+    ? new URLSearchParams(categoryPath.split("?")[1]).get("category")
+    : "";
   const productListLabel =
-    productListPath === "/Jewellery" ? "Jewellery" : "Categories";
+    productListPath === "/Jewellery"
+      ? "Jewellery"
+      : categoryName || "Categories";
   const id = productId;
   const product = getProductById(id);
   const [selectionsByProduct, setSelectionsByProduct] = useState({});

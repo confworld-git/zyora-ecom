@@ -134,9 +134,14 @@ const Featured = () => {
                     ?.toLowerCase()
                     .trim()
                     .replace(/[^a-z0-9]+/g, "-")
-                    .replace(/^-+|-+$/g, "");
+                    .replace(/^-+|-+$/g, "") || "product";
 
-                  const productUrl = `/Zyora_Category/product/${productId}/${slug}`;
+                  const productUrl = `/Zyora_Category/product/${encodeURIComponent(
+                    productId,
+                  )}/${encodeURIComponent(slug)}`;
+                  const categoryUrl = `/Zyora_Category?category=${encodeURIComponent(
+                    category,
+                  )}`;
 
                   return (
                     <Link
@@ -144,6 +149,7 @@ const Featured = () => {
                       key={productId}
                       style={{ "--card-index": Math.min(index, 8) }}
                       to={productUrl}
+                      state={{ from: categoryUrl }}
                     >
                       {product.images?.[0]?.url ? (
                         <img
