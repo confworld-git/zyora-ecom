@@ -39,6 +39,7 @@ const createEditForm = (product) => {
     id: product.id || "",
     name: product.name || "",
     category: product.category || "",
+    subcategory: product.subcategory || "",
     title: product.title || "",
     brand: product.brand || "",
     mrp: String(product.price?.mrp ?? ""),
@@ -153,7 +154,14 @@ const ProductList = ({ onAddProduct }) => {
     if (!query) return products;
 
     return products.filter((product) =>
-      [product.id, product.name, product.title, product.brand, product.category]
+      [
+        product.id,
+        product.name,
+        product.title,
+        product.brand,
+        product.category,
+        product.subcategory,
+      ]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query)),
     );
@@ -180,6 +188,9 @@ const ProductList = ({ onAddProduct }) => {
       form: {
         ...current.form,
         [name]: type === "checkbox" ? checked : value,
+        ...(name === "category" && value !== current.form.category
+          ? { subcategory: "" }
+          : {}),
       },
     }));
   };
@@ -490,6 +501,7 @@ const ProductList = ({ onAddProduct }) => {
       data.append("id", form.id.trim());
       data.append("name", form.name.trim());
       data.append("category", form.category.trim());
+      data.append("subcategory", form.subcategory.trim());
       data.append("title", form.title.trim());
       data.append("brand", form.brand.trim());
       data.append(
@@ -744,7 +756,12 @@ const ProductList = ({ onAddProduct }) => {
                       </div>
                     </td>
                     <td>{product.id}</td>
-                    <td>{product.category}</td>
+                    <td>
+                      <strong>{product.category}</strong>
+                      {product.subcategory && (
+                        <small>{product.subcategory}</small>
+                      )}
+                    </td>
                     <td>
                       <strong>₹{product.price?.selling_price ?? "—"}</strong>
                       {product.price?.mrp ? (
@@ -841,6 +858,14 @@ const ProductList = ({ onAddProduct }) => {
                   value={editing.form.category}
                   onChange={updateForm}
                   required
+                />
+              </label>
+              <label>
+                Subcategory
+                <input
+                  name="subcategory"
+                  value={editing.form.subcategory}
+                  onChange={updateForm}
                 />
               </label>
               <label>

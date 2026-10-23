@@ -181,7 +181,7 @@ function productJsonToFormFields(data, categories) {
   const variants = obj(data.variants);
   const next = {};
 
-  for (const key of ["id", "name", "title", "brand"]) {
+  for (const key of ["id", "name", "subcategory", "title", "brand"]) {
     if (data[key] !== undefined) next[key] = cleanText(data[key]);
   }
   if (data.category !== undefined)

@@ -2,11 +2,7 @@ import "./Category.css";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import {
-  MdClose,
-  MdFilterList,
-  MdKeyboardArrowRight,
-} from "react-icons/md";
+import { MdClose, MdFilterList, MdKeyboardArrowRight } from "react-icons/md";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import SEO from "../../SEO.jsx";
 import { normalizeProductRating } from "../../utils/productRating.js";
@@ -110,6 +106,7 @@ const Category = () => {
     priceMin: null,
     priceMax: null,
 
+    subcategories: [],
     colors: [],
     sizes: [],
 
@@ -148,7 +145,8 @@ const Category = () => {
 
   const currentCategory = categoryOptions.find(
     (category) =>
-      String(category).toLowerCase() === String(selectedCategory || "").toLowerCase(),
+      String(category).toLowerCase() ===
+      String(selectedCategory || "").toLowerCase(),
   );
 
   const maxProductPrice = useMemo(() => {
@@ -178,18 +176,33 @@ const Category = () => {
       const title = product.title || "";
       const brand = product.brand || "";
       const category = product.category || "";
+      const subcategory = product.subcategory || "";
 
-      const productText = `${title} ${brand} ${category}`.toLowerCase();
+      const productText =
+        `${title} ${brand} ${category} ${subcategory}`.toLowerCase();
 
       const matchesSearch = !search || productText.includes(search);
 
       const matchesCategory =
         !selectedCategory ||
-        String(selectedCategory).toLowerCase() === String(category).toLowerCase();
+        String(selectedCategory).toLowerCase() ===
+          String(category).toLowerCase();
 
       return matchesSearch && matchesCategory;
     });
   }, [categoryProducts, searchTerm, selectedCategory]);
+
+  const subcategoryOptions = useMemo(
+    () =>
+      [
+        ...new Set(
+          availableProducts
+            .map((product) => String(product.subcategory || "").trim())
+            .filter(Boolean),
+        ),
+      ].sort((first, second) => first.localeCompare(second)),
+    [availableProducts],
+  );
 
   const colorOptions = useMemo(() => {
     const colors = availableProducts.flatMap(
@@ -256,13 +269,22 @@ const Category = () => {
       const title = product.title || "";
       const brand = product.brand || "";
       const category = product.category || "";
-      const productText = `${title} ${brand} ${category}`.toLowerCase();
+      const subcategory = String(product.subcategory || "").trim();
+      const productText =
+        `${title} ${brand} ${category} ${subcategory}`.toLowerCase();
       const productColors = product.variants?.colours || [];
       const productSizes = product.variants?.sizes || [];
       const matchesSearch = !search || productText.includes(search);
       const matchesCategory =
         !selectedCategory ||
-        String(selectedCategory).toLowerCase() === String(category).toLowerCase();
+        String(selectedCategory).toLowerCase() ===
+          String(category).toLowerCase();
+      const matchesSubcategory =
+        !filters.subcategories.length ||
+        filters.subcategories.some(
+          (selectedSubcategory) =>
+            selectedSubcategory.toLowerCase() === subcategory.toLowerCase(),
+        );
 
       const matchesColor =
         !activeColors.length ||
@@ -298,6 +320,7 @@ const Category = () => {
       return (
         matchesSearch &&
         matchesCategory &&
+        matchesSubcategory &&
         matchesColor &&
         matchesSize &&
         matchesStock &&
@@ -339,14 +362,14 @@ const Category = () => {
 
     setSizeSliderSize("");
 
-    setSearchParams(
-      selectedCategory ? { category: selectedCategory } : {},
-      { replace: true },
-    );
+    setSearchParams(selectedCategory ? { category: selectedCategory } : {}, {
+      replace: true,
+    });
 
     setFilters({
       priceMin: null,
       priceMax: null,
+      subcategories: [],
       colors: [],
       sizes: [],
       inStock: false,
@@ -360,6 +383,7 @@ const Category = () => {
     setFilters({
       priceMin: null,
       priceMax: null,
+      subcategories: [],
       colors: [],
       sizes: [],
       inStock: false,
@@ -377,6 +401,7 @@ const Category = () => {
     setFilters({
       priceMin: null,
       priceMax: null,
+      subcategories: [],
       colors: [],
       sizes: [],
       inStock: false,
@@ -521,13 +546,38 @@ const Category = () => {
                 String(selectedCategory || "").toLowerCase() ===
                 String(category).toLowerCase()
               }
-              onChange={() => setSearchParams({ category })}
+              onChange={() => {
+                setFilters((current) => ({ ...current, subcategories: [] }));
+                setSearchParams({ category });
+              }}
             />
 
             {category}
           </label>
         ))}
       </fieldset> */}
+
+      {selectedCategory && subcategoryOptions.length > 0 && (
+        <FilterGroup
+          title="Subcategory"
+          options={[
+            { value: "__all_subcategories__", label: "All" },
+            ...subcategoryOptions,
+          ]}
+          selected={
+            filters.subcategories.length
+              ? filters.subcategories
+              : ["__all_subcategories__"]
+          }
+          inputType="radio"
+          name="subcategory"
+          onToggle={(value) =>
+            value === "__all_subcategories__"
+              ? setFilters((current) => ({ ...current, subcategories: [] }))
+              : selectSingleFilter("subcategories", value)
+          }
+        />
+      )}
 
       <fieldset className="price_filter">
         <legend>Price</legend>
@@ -559,10 +609,7 @@ const Category = () => {
 
               setFilters((current) => ({
                 ...current,
-                priceMin: Math.min(
-                  value,
-                  current.priceMax ?? SLIDER_MAX_PRICE,
-                ),
+                priceMin: Math.min(value, current.priceMax ?? SLIDER_MAX_PRICE),
               }));
             }}
           />
@@ -580,18 +627,13 @@ const Category = () => {
 
               setFilters((current) => ({
                 ...current,
-                priceMax: Math.max(
-                  value,
-                  current.priceMin ?? SLIDER_MIN_PRICE,
-                ),
+                priceMax: Math.max(value, current.priceMin ?? SLIDER_MIN_PRICE),
               }));
             }}
           />
         </div>
 
-        <small className="price_range_hint">
-          Drag either handle to refine
-        </small>
+        <small className="price_range_hint">Drag either handle to refine</small>
       </fieldset>
 
       {showVariantFilters && (
@@ -759,179 +801,183 @@ const Category = () => {
 
         {selectedCategory ? (
           <ScrollReveal as="section" className="category_products_view">
-          <div className="categories_list">
-            <div className="collection_search">
-              <i className="bi bi-search"></i>
+            <div className="categories_list">
+              <div className="collection_search">
+                <i className="bi bi-search"></i>
 
-              <input
-                type="search"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-              />
+                <input
+                  type="search"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                />
+              </div>
+
+              <button
+                className="mobile_filter_button"
+                type="button"
+                aria-expanded={mobileFiltersOpen}
+                aria-controls="category-filter-panel"
+                onClick={() => setMobileFiltersOpen(true)}
+              >
+                <MdFilterList aria-hidden="true" />
+                Filter
+              </button>
+
+              {mobileFiltersOpen
+                ? createPortal(
+                    <div className="filter_portal_root">
+                      <button
+                        className="filter_backdrop"
+                        type="button"
+                        aria-label="Close filters"
+                        onClick={() => setMobileFiltersOpen(false)}
+                      />
+                      {filterPanel}
+                    </div>,
+                    document.body,
+                  )
+                : filterPanel}
             </div>
 
-            <button
-              className="mobile_filter_button"
-              type="button"
-              aria-expanded={mobileFiltersOpen}
-              aria-controls="category-filter-panel"
-              onClick={() => setMobileFiltersOpen(true)}
-            >
-              <MdFilterList aria-hidden="true" />
-              Filter
-            </button>
+            <div className="category_results">
+              <div className="sort_row">
+                <span>
+                  {filteredProducts.length}{" "}
+                  {filteredProducts.length === 1 ? "product" : "products"}
+                </span>
 
-            {mobileFiltersOpen
-              ? createPortal(
-                  <div className="filter_portal_root">
+                <label>
+                  Sort by:
+                  <select
+                    value={filters.sort}
+                    onChange={(event) =>
+                      setFilters((current) => ({
+                        ...current,
+
+                        sort: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="relevance">Relevance</option>
+
+                    <option value="price-low">Price: low to high</option>
+
+                    <option value="price-high">Price: high to low</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="categories_items">
+                {loading ? (
+                  <p className="empty_results" role="status">
+                    Loading products...
+                  </p>
+                ) : error ? (
+                  <div className="empty_results" role="alert">
+                    <p>{error}</p>
                     <button
-                      className="filter_backdrop"
                       type="button"
-                      aria-label="Close filters"
-                      onClick={() => setMobileFiltersOpen(false)}
-                    />
-                    {filterPanel}
-                  </div>,
-                  document.body,
-                )
-              : filterPanel}
-          </div>
-
-          <div className="category_results">
-            <div className="sort_row">
-              <span>
-                {filteredProducts.length}{" "}
-                {filteredProducts.length === 1 ? "product" : "products"}
-              </span>
-
-              <label>
-                Sort by:
-                <select
-                  value={filters.sort}
-                  onChange={(event) =>
-                    setFilters((current) => ({
-                      ...current,
-
-                      sort: event.target.value,
-                    }))
-                  }
-                >
-                  <option value="relevance">Relevance</option>
-
-                  <option value="price-low">Price: low to high</option>
-
-                  <option value="price-high">Price: high to low</option>
-                </select>
-              </label>
-            </div>
-
-            <div className="categories_items">
-              {loading ? (
-                <p className="empty_results" role="status">
-                  Loading products...
-                </p>
-              ) : error ? (
-                <div className="empty_results" role="alert">
-                  <p>{error}</p>
-                  <button type="button" onClick={() => void refreshProducts()}>
-                    Try again
-                  </button>
-                </div>
-              ) : !filteredProducts.length ? (
-                <p className="empty_results">No products available.</p>
-              ) : (
-                filteredProducts.map((product, index) => {
-                  const productId = product.id || product._id;
-                  const rating = normalizeProductRating(product.rating);
-                  const hasStock =
-                    product.stock?.in_stock === true &&
-                    Number(product.stock?.quantity) > 0;
-
-                  return (
-                    <div
-                      className="product_card"
-                      key={productId}
-                      style={{ "--card-index": Math.min(index, 8) }}
-                      role="button"
-                      tabIndex={0}
-                      // onMouseMove={handleTiltMove}
-                      onMouseLeave={handleTiltLeave}
-                      onClick={() => openProduct(product)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-
-                          openProduct(product);
-                        }
-                      }}
+                      onClick={() => void refreshProducts()}
                     >
-                      {product.images?.[0]?.url ? (
-                        <img
-                          src={product.images[0].url}
-                          alt={
-                            product.images[0].alt ||
-                            product.name ||
-                            product.title ||
-                            "Product"
+                      Try again
+                    </button>
+                  </div>
+                ) : !filteredProducts.length ? (
+                  <p className="empty_results">No products available.</p>
+                ) : (
+                  filteredProducts.map((product, index) => {
+                    const productId = product.id || product._id;
+                    const rating = normalizeProductRating(product.rating);
+                    const hasStock =
+                      product.stock?.in_stock === true &&
+                      Number(product.stock?.quantity) > 0;
+
+                    return (
+                      <div
+                        className="product_card"
+                        key={productId}
+                        style={{ "--card-index": Math.min(index, 8) }}
+                        role="button"
+                        tabIndex={0}
+                        // onMouseMove={handleTiltMove}
+                        onMouseLeave={handleTiltLeave}
+                        onClick={() => openProduct(product)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+
+                            openProduct(product);
                           }
-                        />
-                      ) : (
-                        <div className="product_image_fallback">
-                          No image available
-                        </div>
-                      )}
+                        }}
+                      >
+                        {product.images?.[0]?.url ? (
+                          <img
+                            src={product.images[0].url}
+                            alt={
+                              product.images[0].alt ||
+                              product.name ||
+                              product.title ||
+                              "Product"
+                            }
+                          />
+                        ) : (
+                          <div className="product_image_fallback">
+                            No image available
+                          </div>
+                        )}
 
-                      {!hasStock && (
-                        <span
-                          className="product_stock_badge"
-                          aria-label="Out of stock"
-                        >
-                          Out of stock
-                        </span>
-                      )}
+                        {!hasStock && (
+                          <span
+                            className="product_stock_badge"
+                            aria-label="Out of stock"
+                          >
+                            Out of stock
+                          </span>
+                        )}
 
-                      {rating.count > 0 && (
-                        <p className="rating_pre">
-                          ⭐ {rating.average.toFixed(1)} ({rating.count})
-                        </p>
-                      )}
-                      <span>{product.brand}</span>
-                      <br />
-                      <small>{product.name || product.title}</small>
-                      {/* {product.name &&
+                        {rating.count > 0 && (
+                          <p className="rating_pre">
+                            ⭐ {rating.average.toFixed(1)} ({rating.count})
+                          </p>
+                        )}
+                        <span>{product.brand}</span>
+                        <br />
+                        <small>{product.name || product.title}</small>
+                        {/* {product.name &&
                         product.title &&
                         product.name !== product.title && (
                           <p className="product_description">{product.title}</p>
                         )} */}
-                      <div className="price">
-                        <strong>
-                          Rs.
-                          {product.price?.selling_price
-                            ? Number(
-                                product.price.selling_price,
-                              ).toLocaleString("en-IN")
-                            : "—"}
-                        </strong>
-                        {product.price?.mrp && (
-                          <del>
-                            Rs.{Number(product.price.mrp).toLocaleString("en-IN")}
-                          </del>
-                        )}
-                        {Number(product.price?.discount_percent) > 0 && (
-                          <span>
-                            ({product.price.discount_percent}% OFF)
-                          </span>
-                        )}
-                      </div>
+                        <div className="price">
+                          <strong>
+                            Rs.
+                            {product.price?.selling_price
+                              ? Number(
+                                  product.price.selling_price,
+                                ).toLocaleString("en-IN")
+                              : "—"}
+                          </strong>
+                          {product.price?.mrp && (
+                            <del>
+                              Rs.
+                              {Number(product.price.mrp).toLocaleString(
+                                "en-IN",
+                              )}
+                            </del>
+                          )}
+                          {Number(product.price?.discount_percent) > 0 && (
+                            <span>({product.price.discount_percent}% OFF)</span>
+                          )}
+                        </div>
 
-                      {/* <span>add to fav</span> */}
-                    </div>
-                  );
-                })
-              )}
+                        {/* <span>add to fav</span> */}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
-          </div>
           </ScrollReveal>
         ) : (
           <ScrollReveal as="section" className="category_overview">

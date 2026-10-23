@@ -28,6 +28,7 @@ function AddProduct() {
     id: "",
     name: "",
     category: "",
+    subcategory: "",
     title: "",
     brand: "",
 
@@ -118,6 +119,7 @@ function AddProduct() {
       setFormData((prev) => ({
         ...prev,
         category: value,
+        subcategory: "",
         id: value ? `ZYR-PRD-${categoryPart}-${timePart}` : "",
       }));
 
@@ -565,6 +567,7 @@ function AddProduct() {
       data.append("id", formData.id.trim());
       data.append("name", formData.name.trim());
       data.append("category", formData.category);
+      data.append("subcategory", formData.subcategory.trim());
       data.append("title", formData.title.trim());
       data.append("brand", formData.brand.trim());
 
@@ -671,6 +674,7 @@ function AddProduct() {
         id: "",
         name: "",
         category: "",
+        subcategory: "",
         title: "",
         brand: "",
         mrp: "",
@@ -920,6 +924,18 @@ function AddProduct() {
                 {errors.category && (
                   <small className="field-error">{errors.category}</small>
                 )}
+              </div>
+
+              <div className="form-group">
+                <label>Subcategory</label>
+                <input
+                  type="text"
+                  name="subcategory"
+                  placeholder="Optional, e.g. Earrings"
+                  value={formData.subcategory}
+                  onChange={handleChange}
+                  autoComplete="off"
+                />
               </div>
 
               <div className="form-group">

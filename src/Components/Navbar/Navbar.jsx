@@ -42,7 +42,7 @@ const Navbar = () => {
         </li>
 
         <li>
-          <Link to="/Zyora_Category">Category</Link>
+          <Link to="/Zyora_Category">All Category</Link>
         </li>
 
         <li>
