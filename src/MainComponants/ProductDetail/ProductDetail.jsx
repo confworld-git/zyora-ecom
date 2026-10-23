@@ -332,8 +332,12 @@ const ProductDetail = () => {
             </div>
             <p className="product-quantity">
               <span>Availability</span>
-              <strong className={isOutOfStock ? "out-of-stock" : "in-stock"}>
-                {isOutOfStock ? "Out of stock" : `In stock (${stockQuantity})`}
+              <strong
+                className={productOutOfStock ? "out-of-stock" : "in-stock"}
+              >
+                {productOutOfStock
+                  ? "Out of stock"
+                  : `In stock (${productStockQuantity})`}
               </strong>
             </p>
             <div className="color-selection">

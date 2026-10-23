@@ -318,7 +318,7 @@ const StockManagement = () => {
                 <th>Product</th>
                 <th>SKU</th>
                 <th>Category</th>
-                <th>Quantity</th>
+                <th>Stock by variant</th>
                 <th>Availability</th>
                 <th>Actions</th>
               </tr>
@@ -350,10 +350,29 @@ const StockManagement = () => {
                             colorStocks[product.id] || getColorStocks(product)
                           ).map((item, index) => (
                             <div
-                              className="inventory-color-stock"
+                              className={`inventory-color-stock ${
+                                !item.enabled
+                                  ? "is-disabled"
+                                  : Number(item.quantity) <= 0
+                                    ? "is-out"
+                                    : Number(item.quantity) <= 5
+                                      ? "is-low"
+                                      : "is-available"
+                              }`}
                               key={item.color}
                             >
-                              <strong>{item.color}</strong>
+                              <div className="inventory-color-heading">
+                                <strong>{item.color}</strong>
+                                <span className="inventory-color-state">
+                                  {!item.enabled
+                                    ? "Disabled"
+                                    : Number(item.quantity) <= 0
+                                      ? "Out of stock"
+                                      : Number(item.quantity) <= 5
+                                        ? "Low stock"
+                                        : "Available"}
+                                </span>
+                              </div>
                               <input
                                 className="stock-quantity-input"
                                 aria-label={`${item.color} stock quantity for ${product.name}`}
@@ -383,10 +402,13 @@ const StockManagement = () => {
                                     )
                                   }
                                 />
-                                Available
+                                For sale
                               </label>
                             </div>
                           ))}
+                          <small className="inventory-total">
+                            Product total: {quantity}
+                          </small>
                         </div>
                       ) : (
                         <input
