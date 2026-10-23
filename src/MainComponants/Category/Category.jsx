@@ -2,12 +2,48 @@ import "./Category.css";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { MdClose, MdFilterList, MdKeyboardArrowRight } from "react-icons/md";
+import {
+  MdCheckroom,
+  MdCategory,
+  MdClose,
+  MdDevices,
+  MdDiamond,
+  MdDirectionsWalk,
+  MdFace,
+  MdFitnessCenter,
+  MdFilterList,
+  MdHome,
+  MdKeyboardArrowRight,
+  MdMenuBook,
+  MdShoppingBag,
+  MdSearch,
+  MdToys,
+  MdWatch,
+} from "react-icons/md";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import SEO from "../../SEO.jsx";
 import { normalizeProductRating } from "../../utils/productRating.js";
 import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import { isImitationJewellery } from "../../utils/productCategory.js";
+
+const categoryImageAssets = import.meta.glob("../../assets/Category/*", {
+  eager: true,
+  import: "default",
+  query: "?url",
+});
+
+const normalizeCategoryImageName = (value) =>
+  String(value || "")
+    .replace(/\.[^.]+$/, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+const categoryImagesByName = new Map(
+  Object.entries(categoryImageAssets).map(([path, url]) => [
+    normalizeCategoryImageName(path.split("/").pop()),
+    url,
+  ]),
+);
 
 const clothingSizeLabels = {
   S: "S - Small",
@@ -16,6 +52,24 @@ const clothingSizeLabels = {
   XL: "XL - Extra Large",
   XXL: "XXL",
   XXXL: "XXXL",
+};
+
+const getCategoryIcon = (category) => {
+  const name = String(category || "")
+    .trim()
+    .toLowerCase();
+  if (/electronic|gadget|computer|phone/.test(name)) return MdDevices;
+  if (/fashion|clothing|apparel/.test(name)) return MdCheckroom;
+  if (/footwear|shoe|sandal/.test(name)) return MdDirectionsWalk;
+  if (/watch/.test(name)) return MdWatch;
+  if (/home|kitchen/.test(name)) return MdHome;
+  if (/sport|fitness/.test(name)) return MdFitnessCenter;
+  if (/beauty|cosmetic/.test(name)) return MdFace;
+  if (/stationery|book/.test(name)) return MdMenuBook;
+  if (/handbag|bag/.test(name)) return MdShoppingBag;
+  if (/jewell|accessor/.test(name)) return MdDiamond;
+  if (/toy|kid/.test(name)) return MdToys;
+  return MdCategory;
 };
 
 const Category = () => {
@@ -132,21 +186,50 @@ const Category = () => {
             String(product.category).toLowerCase() ===
             String(category).toLowerCase(),
         );
-
         return {
           name: category,
           count: productsInCategory.length,
-          image: productsInCategory.find((product) => product.images?.[0]?.url)
-            ?.images?.[0],
+          image:
+            categoryImagesByName.get(normalizeCategoryImageName(category)) ||
+            productsInCategory
+              .flatMap((product) => product.images || [])
+              .find((image) => image?.url)?.url,
+          searchText: productsInCategory
+            .map((product) => product.subcategory)
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase(),
         };
       }),
     [categoryOptions, categoryProducts],
   );
 
+  const visibleCategories = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return categories;
+    return categories.filter(
+      (category) =>
+        category.name.toLowerCase().includes(query) ||
+        category.searchText.includes(query),
+    );
+  }, [categories, searchTerm]);
+
   const currentCategory = categoryOptions.find(
     (category) =>
       String(category).toLowerCase() ===
       String(selectedCategory || "").toLowerCase(),
+  );
+
+  const hasRatedProducts = useMemo(
+    () =>
+      categoryProducts.some(
+        (product) =>
+          (!selectedCategory ||
+            String(product.category || "").toLowerCase() ===
+              selectedCategory.toLowerCase()) &&
+          normalizeProductRating(product.rating).count > 0,
+      ),
+    [categoryProducts, selectedCategory],
   );
 
   const maxProductPrice = useMemo(() => {
@@ -173,13 +256,14 @@ const Category = () => {
     const search = searchTerm.trim().toLowerCase();
 
     return categoryProducts.filter((product) => {
+      const name = product.name || "";
       const title = product.title || "";
       const brand = product.brand || "";
       const category = product.category || "";
       const subcategory = product.subcategory || "";
 
       const productText =
-        `${title} ${brand} ${category} ${subcategory}`.toLowerCase();
+        `${name} ${title} ${brand} ${category} ${subcategory}`.toLowerCase();
 
       const matchesSearch = !search || productText.includes(search);
 
@@ -205,12 +289,23 @@ const Category = () => {
   );
 
   const colorOptions = useMemo(() => {
-    const colors = availableProducts.flatMap(
-      (product) => product.variants?.colours || [],
-    );
+    const colorsByName = new Map();
 
-    return [...new Set(colors.filter(Boolean))].sort((a, b) =>
-      String(a).localeCompare(String(b)),
+    availableProducts.forEach((product) => {
+      const images = product.images || [];
+      (product.variants?.colours || []).forEach((color, index) => {
+        const name = String(color ?? "").trim();
+        if (!name || !images[index]) return;
+
+        const normalizedName = name.toLowerCase();
+        if (!colorsByName.has(normalizedName)) {
+          colorsByName.set(normalizedName, name);
+        }
+      });
+    });
+
+    return [...colorsByName.values()].sort((first, second) =>
+      first.localeCompare(second),
     );
   }, [availableProducts]);
 
@@ -266,12 +361,13 @@ const Category = () => {
 
     const result = categoryProducts.filter((product) => {
       const price = Number(product.price?.selling_price) || 0;
+      const name = product.name || "";
       const title = product.title || "";
       const brand = product.brand || "";
       const category = product.category || "";
       const subcategory = String(product.subcategory || "").trim();
       const productText =
-        `${title} ${brand} ${category} ${subcategory}`.toLowerCase();
+        `${name} ${title} ${brand} ${category} ${subcategory}`.toLowerCase();
       const productColors = product.variants?.colours || [];
       const productSizes = product.variants?.sizes || [];
       const matchesSearch = !search || productText.includes(search);
@@ -638,7 +734,7 @@ const Category = () => {
 
       {showVariantFilters && (
         <>
-          <FilterGroup
+          {/* <FilterGroup
             title="Color"
             options={colorOptions}
             selected={filters.colors}
@@ -646,7 +742,7 @@ const Category = () => {
             name="color"
             onToggle={(value) => selectSingleFilter("colors", value)}
             getLabel={getColorLabel}
-          />
+          /> */}
 
           <fieldset className="size_filter">
             <legend>Size</legend>
@@ -718,24 +814,26 @@ const Category = () => {
         </label>
       </fieldset>
 
-      <fieldset>
-        <legend>Rating</legend>
+      {hasRatedProducts && (
+        <fieldset>
+          <legend>Rating</legend>
 
-        <label>
-          <input
-            type="checkbox"
-            name="rating"
-            checked={filters.rating}
-            onChange={(event) =>
-              setFilters((current) => ({
-                ...current,
-                rating: event.target.checked,
-              }))
-            }
-          />
-          ⭐ 4 & above
-        </label>
-      </fieldset>
+          <label>
+            <input
+              type="checkbox"
+              name="rating"
+              checked={filters.rating}
+              onChange={(event) =>
+                setFilters((current) => ({
+                  ...current,
+                  rating: event.target.checked,
+                }))
+              }
+            />
+            ⭐ 4 & above
+          </label>
+        </fieldset>
+      )}
 
       <button className="clear_filters" type="button" onClick={clearFilters}>
         Clear All
@@ -788,22 +886,43 @@ const Category = () => {
         {selectedCategory ? (
           <h1>{currentCategory || selectedCategory}</h1>
         ) : (
-          <>
-            <h1>
-              Your <span>Era</span>, Your <span>Style</span>
-            </h1>
-            <p>
-              Explore our wide range of carefully selected categories, made to
-              bring style, comfort, and convenience to your everyday life.
-            </p>
-          </>
+          <div className="category_overview_heading">
+            <div>
+              <h1>
+                Your <span>Era</span>, Your <span>Style</span>
+              </h1>
+              <p>
+                Explore our wide range of carefully selected categories, made to
+                bring style, comfort, and convenience to your everyday life.
+              </p>
+            </div>
+            <div className="category_overview_search">
+              <MdSearch aria-hidden="true" />
+              <input
+                type="search"
+                aria-label="Search categories or products"
+                placeholder="Search for categories or products..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  aria-label="Clear category search"
+                  onClick={() => setSearchTerm("")}
+                >
+                  <MdClose aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          </div>
         )}
 
         {selectedCategory ? (
           <ScrollReveal as="section" className="category_products_view">
             <div className="categories_list">
               <div className="collection_search">
-                <i className="bi bi-search"></i>
+                <MdSearch aria-hidden="true" />
 
                 <input
                   type="search"
@@ -992,37 +1111,54 @@ const Category = () => {
                   Try again
                 </button>
               </div>
-            ) : categories.length ? (
+            ) : visibleCategories.length ? (
               <div className="category_cards">
-                {categories.map(({ name, count, image }) => (
-                  <button
-                    className="category_card"
-                    key={name}
-                    type="button"
-                    onClick={() => openCategory(name)}
-                  >
-                    <span className="category_card_image">
-                      {image?.url ? (
-                        <img src={image.url} alt={image.alt || name} />
-                      ) : (
-                        <span aria-hidden="true">✦</span>
-                      )}
-                    </span>
-                    <span className="category_card_info">
-                      <strong>{name}</strong>
-                      <small>
-                        {count} {count === 1 ? "product" : "products"}
-                      </small>
-                    </span>
-                    <MdKeyboardArrowRight
-                      className="category_card_arrow"
-                      aria-hidden="true"
-                    />
-                  </button>
-                ))}
+                {visibleCategories.map(({ name, count, image }, index) => {
+                  const CategoryIcon = getCategoryIcon(name);
+                  return (
+                    <button
+                      className="category_card"
+                      key={name}
+                      type="button"
+                      style={{ "--card-index": Math.min(index, 8) }}
+                      onClick={() => openCategory(name)}
+                    >
+                      <span className="category_card_image" aria-hidden="true">
+                        {image ? (
+                          <img src={image} alt="" loading="lazy" />
+                        ) : (
+                          <MdCategory className="category_card_image_fallback" />
+                        )}
+                      </span>
+                      <span className="category_card_footer">
+                        <span className="category_card_info">
+                          <span className="category_card_heading">
+                            <span className="category_card_icon">
+                              <CategoryIcon aria-hidden="true" />
+                            </span>
+                          </span>
+                          <div>
+                            <strong>{name}</strong>
+                            <small>
+                              {count} {count === 1 ? "product" : "products"}
+                            </small>
+                          </div>
+                        </span>
+                        <MdKeyboardArrowRight
+                          className="category_card_arrow"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             ) : (
-              <p className="empty_results">No categories available.</p>
+              <p className="empty_results">
+                {categories.length
+                  ? "No categories or products match your search."
+                  : "No categories available."}
+              </p>
             )}
           </ScrollReveal>
         )}
