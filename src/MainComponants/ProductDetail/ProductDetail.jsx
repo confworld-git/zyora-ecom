@@ -54,17 +54,21 @@ const ProductDetail = () => {
     return (
       <main className="product-detail-state">
         <p>{productsError || "Product not found."}</p>
-        <Link to={productListPath}>Back to {productListLabel.toLowerCase()}</Link>
+        <Link to={productListPath}>
+          Back to {productListLabel.toLowerCase()}
+        </Link>
       </main>
     );
   }
 
-  const stockQuantity = Number(product.stock?.quantity) || 0;
-  const isOutOfStock =
-    product.stock?.in_stock !== true || stockQuantity <= 0;
+  const productStockQuantity = Number(product.stock?.quantity) || 0;
+  const productOutOfStock =
+    product.stock?.in_stock !== true || productStockQuantity <= 0;
   const images = product.images || [];
   const videoUrl =
-    typeof product.video === "string" ? product.video : product.video?.url || "";
+    typeof product.video === "string"
+      ? product.video
+      : product.video?.url || "";
   const isVideoSelected = selection.showVideo === true && Boolean(videoUrl);
   const colourNames = (product.variants?.colours || []).map((name) =>
     String(name ?? "").trim(),
@@ -98,6 +102,21 @@ const ProductDetail = () => {
     (colorOptions.length === 1 ? colorOptions[0] : undefined);
   const selectedColor = selectedColorOption?.name ?? "";
   const selectedSize = selection.size ?? "";
+  const selectedColorStock = product.variants?.colorStock?.find(
+    (item) =>
+      String(item.color || "")
+        .trim()
+        .toLowerCase() === selectedColor.trim().toLowerCase(),
+  );
+  const hasColorStock = (product.variants?.colorStock || []).length > 0;
+  const stockQuantity = hasColorStock
+    ? Number(selectedColorStock?.quantity) || 0
+    : productStockQuantity;
+  const isOutOfStock = hasColorStock
+    ? !selectedColorStock ||
+      selectedColorStock.enabled === false ||
+      stockQuantity <= 0
+    : productOutOfStock;
 
   const selectImage = (image) => {
     const option = colorOptions.find((item) => item.id === image.id);
@@ -114,8 +133,9 @@ const ProductDetail = () => {
   };
 
   const productName = product.name || product.title;
-  const { average: ratingAverage, count: ratingCount } =
-    normalizeProductRating(product.rating);
+  const { average: ratingAverage, count: ratingCount } = normalizeProductRating(
+    product.rating,
+  );
   const displayedRating = Math.round(ratingAverage * 2) / 2;
   const information = product.product_information || {};
   const details = [
@@ -234,7 +254,6 @@ const ProductDetail = () => {
           property="product:price:currency"
           content={product.price?.currency || "INR"}
         />
-
       </Helmet>
       <ScrollReveal as="main" className="product-detail-page">
         <div id="page_path">
@@ -328,25 +347,43 @@ const ProductDetail = () => {
               </h3>
               <div className="color-options">
                 {colorOptions.length > 0 ? (
-                  colorOptions.map((option) => (
-                    <button
-                      className={`${
-                        selectedColorOption?.id === option.id ? "selected" : ""
-                      } ${option.color ? "" : "has-label"}`.trim()}
-                      key={option.id}
-                      type="button"
-                      title={option.name}
-                      aria-label={`Select ${option.name} color`}
-                      style={
-                        option.color
-                          ? { backgroundColor: option.color }
-                          : undefined
-                      }
-                      onClick={() => selectImage(option.image)}
-                    >
-                      {!option.color && option.name}
-                    </button>
-                  ))
+                  colorOptions.map((option) => {
+                    const optionStock = (
+                      product.variants?.colorStock || []
+                    ).find(
+                      (item) =>
+                        String(item.color || "")
+                          .trim()
+                          .toLowerCase() === option.name.trim().toLowerCase(),
+                    );
+                    const unavailable =
+                      hasColorStock &&
+                      (!optionStock ||
+                        optionStock.enabled === false ||
+                        Number(optionStock.quantity) <= 0);
+                    return (
+                      <button
+                        className={`${
+                          selectedColorOption?.id === option.id
+                            ? "selected"
+                            : ""
+                        } ${option.color ? "" : "has-label"}`.trim()}
+                        key={option.id}
+                        type="button"
+                        title={`${option.name}${unavailable ? " (out of stock)" : ""}`}
+                        aria-label={`Select ${option.name} color${unavailable ? ", out of stock" : ""}`}
+                        disabled={unavailable}
+                        style={
+                          option.color
+                            ? { backgroundColor: option.color }
+                            : undefined
+                        }
+                        onClick={() => selectImage(option.image)}
+                      >
+                        {!option.color && option.name}
+                      </button>
+                    );
+                  })
                 ) : (
                   <span className="no-colors">Not specified</span>
                 )}
@@ -419,7 +456,10 @@ const ProductDetail = () => {
           )}
         </ScrollReveal>
 
-        <ScrollReveal as="section" className="product-detail-section detail-grid">
+        <ScrollReveal
+          as="section"
+          className="product-detail-section detail-grid"
+        >
           <div>
             <h2>Variants</h2>
             <div className="variant-colours">

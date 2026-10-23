@@ -81,7 +81,13 @@ function parseLooseJson(text) {
       skipSpace();
       if (src[i] !== ")") fail("Expected a closing )");
       i++;
-      return ["NumberInt", "NumberLong", "NumberDecimal", "Int32", "Double"].includes(word)
+      return [
+        "NumberInt",
+        "NumberLong",
+        "NumberDecimal",
+        "Int32",
+        "Double",
+      ].includes(word)
         ? Number(arg)
         : arg;
     }
@@ -135,9 +141,7 @@ function parseLooseJson(text) {
 const cleanText = (value) => (value == null ? "" : String(value).trim());
 
 const toList = (value) => {
-  const list = Array.isArray(value)
-    ? value.map(cleanText).filter(Boolean)
-    : [];
+  const list = Array.isArray(value) ? value.map(cleanText).filter(Boolean) : [];
   return list.length ? list : [""];
 };
 
@@ -158,7 +162,8 @@ const matchCategory = (value, categories) => {
   return (
     categories.find((c) => c.toLowerCase() === wanted) ||
     categories.find(
-      (c) => c.toLowerCase().includes(wanted) || wanted.includes(c.toLowerCase())
+      (c) =>
+        c.toLowerCase().includes(wanted) || wanted.includes(c.toLowerCase()),
     ) ||
     ""
   );
@@ -179,26 +184,62 @@ function productJsonToFormFields(data, categories) {
   for (const key of ["id", "name", "title", "brand"]) {
     if (data[key] !== undefined) next[key] = cleanText(data[key]);
   }
-  if (data.category !== undefined) next.category = matchCategory(data.category, categories);
+  if (data.category !== undefined)
+    next.category = matchCategory(data.category, categories);
 
   if (price.mrp !== undefined) next.mrp = cleanText(price.mrp);
-  if (price.selling_price !== undefined) next.selling_price = cleanText(price.selling_price);
+  if (price.selling_price !== undefined)
+    next.selling_price = cleanText(price.selling_price);
 
-  if (rating.average !== undefined) next.ratingAverage = cleanText(rating.average);
+  if (rating.average !== undefined)
+    next.ratingAverage = cleanText(rating.average);
   if (rating.count !== undefined) next.ratingCount = cleanText(rating.count);
 
-  if (data.about_this_item !== undefined) next.about_this_item = toList(data.about_this_item);
+  if (data.about_this_item !== undefined)
+    next.about_this_item = toList(data.about_this_item);
 
-  for (const section of ["features_specs", "style", "measurements", "materials_care", "item_details"]) {
-    if (info[section] !== undefined) next[section] = toKeyValueRows(info[section]);
+  for (const section of [
+    "features_specs",
+    "style",
+    "measurements",
+    "materials_care",
+    "item_details",
+  ]) {
+    if (info[section] !== undefined)
+      next[section] = toKeyValueRows(info[section]);
   }
 
   if (variants.colours !== undefined) next.colours = toList(variants.colours);
   if (variants.sizes !== undefined) next.sizes = toList(variants.sizes);
 
+  if (variants.colours !== undefined || variants.colorStock !== undefined) {
+    const colorStock = Array.isArray(variants.colorStock)
+      ? variants.colorStock
+      : [];
+    const colours =
+      next.colours || toList(colorStock.map((item) => item?.color));
+    const byColor = new Map(
+      colorStock
+        .filter((item) => item && typeof item === "object")
+        .map((item) => [cleanText(item.color).toLowerCase(), item]),
+    );
+    next.colours = colours;
+    next.colorQuantities = colours.map((color, index) => {
+      const item = byColor.get(color.toLowerCase());
+      return cleanText(
+        item?.quantity ?? (index === 0 ? (stock.quantity ?? "") : "0"),
+      );
+    });
+    next.colorEnabled = colours.map((color) => {
+      const item = byColor.get(color.toLowerCase());
+      return item ? item.enabled !== false : stock.in_stock !== false;
+    });
+  }
+
   if (stock.in_stock !== undefined) next.in_stock = isTrue(stock.in_stock);
   if (stock.quantity !== undefined) next.quantity = cleanText(stock.quantity);
-  if (data.is_best_seller !== undefined) next.is_best_seller = isTrue(data.is_best_seller);
+  if (data.is_best_seller !== undefined)
+    next.is_best_seller = isTrue(data.is_best_seller);
 
   return next;
 }

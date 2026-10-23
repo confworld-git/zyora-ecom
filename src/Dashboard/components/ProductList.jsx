@@ -21,46 +21,78 @@ const toKeyValueRows = (value) =>
     value: String(itemValue ?? ""),
   }));
 
-const createEditForm = (product) => ({
-  id: product.id || "",
-  name: product.name || "",
-  category: product.category || "",
-  title: product.title || "",
-  brand: product.brand || "",
-  mrp: String(product.price?.mrp ?? ""),
-  sellingPrice: String(product.price?.selling_price ?? ""),
-  ratingAverage: String(product.rating?.average ?? 0),
-  ratingCount: String(product.rating?.count ?? 0),
-  quantity: String(product.stock?.quantity ?? 0),
-  inStock: product.stock?.in_stock === true,
-  isBestSeller: product.is_best_seller === true,
-  images: (product.images || []).map((image) => ({
-    id: image.id || "",
-    url: image.url,
-    color: image.color || "",
-    alt: image.alt || "",
-    file: null,
-  })),
-  videoUrl:
-    typeof product.video === "string" ? product.video : product.video?.url || "",
-  videoPreview:
-    typeof product.video === "string" ? product.video : product.video?.url || "",
-  videoFile: null,
-  videoRemoved: false,
-  aboutThisItem: product.about_this_item?.length
-    ? [...product.about_this_item]
-    : [""],
-  productInformation: Object.fromEntries(
-    INFO_SECTIONS.map(([key]) => [
-      key,
-      toKeyValueRows(product.product_information?.[key]),
-    ]),
-  ),
-  colours: product.variants?.colours?.length
+const createEditForm = (product) => {
+  const colours = product.variants?.colours?.length
     ? [...product.variants.colours]
-    : [""],
-  sizes: product.variants?.sizes?.length ? [...product.variants.sizes] : [""],
-});
+    : [""];
+  const existingColorStock = new Map(
+    (product.variants?.colorStock || []).map((item) => [
+      String(item.color || "")
+        .trim()
+        .toLowerCase(),
+      item,
+    ]),
+  );
+  const hasSavedColorStock = existingColorStock.size > 0;
+
+  return {
+    id: product.id || "",
+    name: product.name || "",
+    category: product.category || "",
+    title: product.title || "",
+    brand: product.brand || "",
+    mrp: String(product.price?.mrp ?? ""),
+    sellingPrice: String(product.price?.selling_price ?? ""),
+    ratingAverage: String(product.rating?.average ?? 0),
+    ratingCount: String(product.rating?.count ?? 0),
+    quantity: String(product.stock?.quantity ?? 0),
+    inStock: product.stock?.in_stock === true,
+    colorQuantities: colours.map((color, index) => {
+      const saved = existingColorStock.get(color.trim().toLowerCase());
+      return String(
+        saved?.quantity ??
+          (!hasSavedColorStock && index === 0
+            ? (product.stock?.quantity ?? 0)
+            : 0),
+      );
+    }),
+    colorEnabled: colours.map((color) => {
+      const saved = existingColorStock.get(color.trim().toLowerCase());
+      return saved
+        ? saved.enabled !== false
+        : product.stock?.in_stock !== false;
+    }),
+    isBestSeller: product.is_best_seller === true,
+    images: (product.images || []).map((image) => ({
+      id: image.id || "",
+      url: image.url,
+      color: image.color || "",
+      alt: image.alt || "",
+      file: null,
+    })),
+    videoUrl:
+      typeof product.video === "string"
+        ? product.video
+        : product.video?.url || "",
+    videoPreview:
+      typeof product.video === "string"
+        ? product.video
+        : product.video?.url || "",
+    videoFile: null,
+    videoRemoved: false,
+    aboutThisItem: product.about_this_item?.length
+      ? [...product.about_this_item]
+      : [""],
+    productInformation: Object.fromEntries(
+      INFO_SECTIONS.map(([key]) => [
+        key,
+        toKeyValueRows(product.product_information?.[key]),
+      ]),
+    ),
+    colours,
+    sizes: product.variants?.sizes?.length ? [...product.variants.sizes] : [""],
+  };
+};
 
 const ProductList = ({ onAddProduct }) => {
   const { refreshProducts } = useProducts();
@@ -217,6 +249,10 @@ const ProductList = ({ onAddProduct }) => {
       form: {
         ...current.form,
         [field]: [...current.form[field], value],
+        ...(field === "colours" && {
+          colorQuantities: [...current.form.colorQuantities, ""],
+          colorEnabled: [...current.form.colorEnabled, current.form.inStock],
+        }),
       },
     }));
   };
@@ -226,7 +262,29 @@ const ProductList = ({ onAddProduct }) => {
       ...current,
       form: {
         ...current.form,
-        [field]: current.form[field].filter((_, itemIndex) => itemIndex !== index),
+        [field]: current.form[field].filter(
+          (_, itemIndex) => itemIndex !== index,
+        ),
+        ...(field === "colours" && {
+          colorQuantities: current.form.colorQuantities.filter(
+            (_, itemIndex) => itemIndex !== index,
+          ),
+          colorEnabled: current.form.colorEnabled.filter(
+            (_, itemIndex) => itemIndex !== index,
+          ),
+        }),
+      },
+    }));
+  };
+
+  const updateColorStock = (index, field, value) => {
+    setEditing((current) => ({
+      ...current,
+      form: {
+        ...current.form,
+        [field]: current.form[field].map((item, itemIndex) =>
+          itemIndex === index ? value : item,
+        ),
       },
     }));
   };
@@ -357,10 +415,50 @@ const ProductList = ({ onAddProduct }) => {
       toast.error("Selling price must be positive and less than MRP.");
       return;
     }
-    if (!Number.isInteger(quantity) || quantity < 0) {
+    const colors = form.colours.map((color) => color.trim());
+    const hasColorVariants = colors.some(Boolean);
+    if (!hasColorVariants && (!Number.isInteger(quantity) || quantity < 0)) {
       toast.error("Stock quantity must be a non-negative whole number.");
       return;
     }
+    if (
+      (hasColorVariants && colors.some((color) => !color)) ||
+      colors.length > form.images.length
+    ) {
+      toast.error(
+        "Complete each colour and keep one image per colour variant.",
+      );
+      return;
+    }
+    const colorStock = colors.map((color, index) => {
+      if (!color) return null;
+      const colorQuantity = Number(form.colorQuantities[index]);
+      if (
+        form.colorQuantities[index] === "" ||
+        !Number.isInteger(colorQuantity) ||
+        colorQuantity < 0
+      ) {
+        return false;
+      }
+      return {
+        color,
+        quantity: colorQuantity,
+        enabled: form.colorEnabled[index] !== false,
+      };
+    });
+    if (colorStock.includes(false)) {
+      toast.error(
+        "Enter a non-negative whole-number quantity for every colour.",
+      );
+      return;
+    }
+    const savedColorStock = colorStock.filter(Boolean);
+    const totalQuantity = savedColorStock.length
+      ? savedColorStock.reduce((total, item) => total + item.quantity, 0)
+      : quantity;
+    const anyAvailable = savedColorStock.length
+      ? savedColorStock.some((item) => item.enabled && item.quantity > 0)
+      : form.inStock && totalQuantity > 0;
     const ratingAverage = Number(form.ratingAverage);
     const ratingCount = Number(form.ratingCount);
     if (
@@ -408,12 +506,14 @@ const ProductList = ({ onAddProduct }) => {
       );
       data.append(
         "stock",
-        JSON.stringify({ quantity, in_stock: form.inStock }),
+        JSON.stringify({ quantity: totalQuantity, in_stock: anyAvailable }),
       );
       data.append("is_best_seller", String(form.isBestSeller));
       data.append(
         "about_this_item",
-        JSON.stringify(form.aboutThisItem.map((item) => item.trim()).filter(Boolean)),
+        JSON.stringify(
+          form.aboutThisItem.map((item) => item.trim()).filter(Boolean),
+        ),
       );
       data.append(
         "product_information",
@@ -433,7 +533,8 @@ const ProductList = ({ onAddProduct }) => {
       data.append(
         "variants",
         JSON.stringify({
-          colours: form.colours.map((item) => item.trim()).filter(Boolean),
+          colours: colors.filter(Boolean),
+          colorStock: savedColorStock,
           sizes: form.sizes.map((item) => item.trim()).filter(Boolean),
         }),
       );
@@ -478,7 +579,9 @@ const ProductList = ({ onAddProduct }) => {
       setEditing(null);
       toast.success(response.data.message || "Product updated successfully.");
       if (!(await refreshProducts())) {
-        toast.error("Product saved, but storefront data could not be refreshed.");
+        toast.error(
+          "Product saved, but storefront data could not be refreshed.",
+        );
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to update product.");
@@ -489,9 +592,7 @@ const ProductList = ({ onAddProduct }) => {
 
   const deleteProduct = async (product) => {
     if (
-      !window.confirm(
-        `Delete "${product.name}"? This action cannot be undone.`,
-      )
+      !window.confirm(`Delete "${product.name}"? This action cannot be undone.`)
     ) {
       return;
     }
@@ -507,7 +608,9 @@ const ProductList = ({ onAddProduct }) => {
       );
       toast.success(response.data.message || "Product deleted successfully.");
       if (!(await refreshProducts())) {
-        toast.error("Product deleted, but storefront data could not be refreshed.");
+        toast.error(
+          "Product deleted, but storefront data could not be refreshed.",
+        );
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to delete product.");
@@ -807,27 +910,31 @@ const ProductList = ({ onAddProduct }) => {
                   required
                 />
               </label>
-              <label>
-                Stock quantity
-                <input
-                  name="quantity"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={editing.form.quantity}
-                  onChange={updateForm}
-                  required
-                />
-              </label>
-              <label className="product-list-checkbox">
-                <input
-                  name="inStock"
-                  type="checkbox"
-                  checked={editing.form.inStock}
-                  onChange={updateForm}
-                />
-                Available for sale
-              </label>
+              {!editing.form.colours.some((color) => color.trim()) && (
+                <>
+                  <label>
+                    Stock quantity
+                    <input
+                      name="quantity"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={editing.form.quantity}
+                      onChange={updateForm}
+                      required
+                    />
+                  </label>
+                  <label className="product-list-checkbox">
+                    <input
+                      name="inStock"
+                      type="checkbox"
+                      checked={editing.form.inStock}
+                      onChange={updateForm}
+                    />
+                    Available for sale
+                  </label>
+                </>
+              )}
               <label className="product-list-checkbox">
                 <input
                   name="isBestSeller"
@@ -857,7 +964,10 @@ const ProductList = ({ onAddProduct }) => {
                 </label>
               </div>
               {editing.form.images.map((image, index) => (
-                <div className="product-edit-image" key={`${image.id}-${index}`}>
+                <div
+                  className="product-edit-image"
+                  key={`${image.id}-${index}`}
+                >
                   <img src={image.url} alt={image.alt || ""} />
                   <label>
                     Colour
@@ -877,6 +987,41 @@ const ProductList = ({ onAddProduct }) => {
                       }
                     />
                   </label>
+                  {editing.form.colours[index]?.trim() && (
+                    <div className="product-edit-variant-stock">
+                      <label>
+                        {editing.form.colours[index]} quantity
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={editing.form.colorQuantities[index] ?? ""}
+                          onChange={(event) =>
+                            updateColorStock(
+                              index,
+                              "colorQuantities",
+                              event.target.value,
+                            )
+                          }
+                          required
+                        />
+                      </label>
+                      <label className="product-list-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={editing.form.colorEnabled[index] !== false}
+                          onChange={(event) =>
+                            updateColorStock(
+                              index,
+                              "colorEnabled",
+                              event.target.checked,
+                            )
+                          }
+                        />
+                        Available
+                      </label>
+                    </div>
+                  )}
                   <button
                     className="product-image-remove"
                     type="button"
@@ -942,7 +1087,11 @@ const ProductList = ({ onAddProduct }) => {
                     aria-label={`About this item ${index + 1}`}
                     value={item}
                     onChange={(event) =>
-                      updateListField("aboutThisItem", index, event.target.value)
+                      updateListField(
+                        "aboutThisItem",
+                        index,
+                        event.target.value,
+                      )
                     }
                     rows={2}
                   />
@@ -982,7 +1131,12 @@ const ProductList = ({ onAddProduct }) => {
                       placeholder="Field name"
                       value={item.key}
                       onChange={(event) =>
-                        updateInformation(section, index, "key", event.target.value)
+                        updateInformation(
+                          section,
+                          index,
+                          "key",
+                          event.target.value,
+                        )
                       }
                     />
                     <input
@@ -990,7 +1144,12 @@ const ProductList = ({ onAddProduct }) => {
                       placeholder="Value"
                       value={item.value}
                       onChange={(event) =>
-                        updateInformation(section, index, "value", event.target.value)
+                        updateInformation(
+                          section,
+                          index,
+                          "value",
+                          event.target.value,
+                        )
                       }
                     />
                     <button
@@ -1024,7 +1183,10 @@ const ProductList = ({ onAddProduct }) => {
                   </button>
                 </div>
                 {editing.form[field].map((value, index) => (
-                  <div className="product-edit-list-row" key={`${field}-${index}`}>
+                  <div
+                    className="product-edit-list-row"
+                    key={`${field}-${index}`}
+                  >
                     <input
                       aria-label={`${label} ${index + 1}`}
                       value={value}

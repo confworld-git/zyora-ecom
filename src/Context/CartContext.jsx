@@ -28,15 +28,55 @@ const getProductImage = (product, color) => {
   return typeof image === "string" ? image : image?.url || "";
 };
 
+const normalizeColor = (color) =>
+  String(color ?? "")
+    .trim()
+    .toLowerCase();
+
+const getStockForColor = (product, color) => {
+  const inventory = product?.variants?.colorStock;
+  if (Array.isArray(inventory) && inventory.length > 0) {
+    const entry = inventory.find(
+      (item) => normalizeColor(item.color) === normalizeColor(color),
+    );
+    const quantity = Number(entry?.quantity) || 0;
+    return {
+      quantity,
+      in_stock: entry?.enabled !== false && quantity > 0,
+    };
+  }
+  const quantity = Number(product?.stock?.quantity) || 0; // Fallback for products without color stock
+  return {
+    quantity,
+    in_stock: product?.stock?.in_stock === true && quantity > 0,
+  };
+};
+
+const getCartInventoryKey = (item) => {
+  const usesColorStock =
+    Array.isArray(item.colorStock) && item.colorStock.length > 0;
+  const color = item.color === "Not specified" ? "" : item.color;
+  return `${String(item.id)}\u0000${usesColorStock ? normalizeColor(color) : ""}`;
+};
+
 const capCartItemsToProductStock = (items) => {
-  const quantitiesByProduct = new Map();
+  const quantitiesByInventory = new Map();
 
   return items
     .map((item) => {
-      const productId = String(item.id);
-      const stockQuantity = Number(item.stock?.quantity) || 0;
-      const inStock = item.stock?.in_stock === true;
-      const alreadyInCart = quantitiesByProduct.get(productId) || 0;
+      const entry = item.colorStock?.find(
+        (stock) => normalizeColor(stock.color) === normalizeColor(item.color),
+      );
+      const usesColorStock =
+        Array.isArray(item.colorStock) && item.colorStock.length > 0;
+      const stockQuantity = usesColorStock
+        ? Number(entry?.quantity) || 0
+        : Number(item.stock?.quantity) || 0;
+      const inStock = usesColorStock
+        ? Boolean(entry?.enabled) && stockQuantity > 0
+        : item.stock?.in_stock === true && stockQuantity > 0;
+      const inventoryKey = getCartInventoryKey(item);
+      const alreadyInCart = quantitiesByInventory.get(inventoryKey) || 0;
       const quantity = inStock
         ? Math.min(
             Number(item.quantity) || 1,
@@ -44,7 +84,7 @@ const capCartItemsToProductStock = (items) => {
           )
         : 0;
 
-      quantitiesByProduct.set(productId, alreadyInCart + quantity);
+      quantitiesByInventory.set(inventoryKey, alreadyInCart + quantity);
 
       return {
         ...item,
@@ -55,11 +95,7 @@ const capCartItemsToProductStock = (items) => {
 };
 
 export const CartProvider = ({ children }) => {
-  const {
-    getProductById,
-    loading: productsLoading,
-    products,
-  } = useProducts();
+  const { getProductById, loading: productsLoading, products } = useProducts();
   const { customer, isLoggedIn, loading: authLoading } = useAuth();
 
   const customerId = customer?.id ? String(customer.id) : null;
@@ -121,10 +157,8 @@ export const CartProvider = ({ children }) => {
 
       return {
         ...item,
-        stock: {
-          in_stock: product.stock?.in_stock === true,
-          quantity: Number(product.stock?.quantity) || 0,
-        },
+        stock: getStockForColor(product, item.color), // Get stock based on selected color
+        colorStock: product.variants?.colorStock || [],
       };
     });
     const nextItems = capCartItemsToProductStock(withCurrentStock);
@@ -175,10 +209,7 @@ export const CartProvider = ({ children }) => {
           localStorage.removeItem(CART_STORAGE_KEY);
           localStorage.removeItem(CART_OWNER_STORAGE_KEY);
         } catch (error) {
-          console.error(
-            "Failed to clear the signed-in cart cache:",
-            error,
-          );
+          console.error("Failed to clear the signed-in cart cache:", error);
         }
       }
 
@@ -201,9 +232,7 @@ export const CartProvider = ({ children }) => {
       setCartSyncingCustomerId(customerId);
 
       try {
-        const storedOwner = localStorage.getItem(
-          CART_OWNER_STORAGE_KEY,
-        );
+        const storedOwner = localStorage.getItem(CART_OWNER_STORAGE_KEY);
 
         const guestItems =
           !storedOwner && cartItemsRef.current.length > 0
@@ -242,26 +271,19 @@ export const CartProvider = ({ children }) => {
                   in_stock: product?.stock?.in_stock === true,
                   quantity: Number(product?.stock?.quantity) || 0,
                 },
-                color:
-                  item.color === "Not specified"
-                    ? ""
-                    : item.color,
-                size:
-                  item.size === "Not specified"
-                    ? ""
-                    : item.size,
+                colorStock: product?.variants?.colorStock || [],
+                color: item.color === "Not specified" ? "" : item.color,
+                size: item.size === "Not specified" ? "" : item.size,
               };
             })
             .filter(Boolean);
 
-          const cappedItems = capCartItemsToProductStock(items).map(
-            (item) => ({
-              productId: item.id,
-              quantity: item.quantity,
-              color: item.color,
-              size: item.size,
-            }),
-          );
+          const cappedItems = capCartItemsToProductStock(items).map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+            color: item.color,
+            size: item.size,
+          }));
 
           if (cappedItems.length > 0) {
             const merged = await axios.post(
@@ -277,87 +299,65 @@ export const CartProvider = ({ children }) => {
         if (cancelled) return;
 
         // Convert backend cart into frontend cart structure
-        const nextCart = capCartItemsToProductStock(serverItems
-          .filter((item) => item.product)
-          .map((item) => {
-            const product = item.product;
+        const nextCart = capCartItemsToProductStock(
+          serverItems
+            .filter((item) => item.product)
+            .map((item) => {
+              const product = item.product;
 
-            const id =
-              product.id ?? String(product._id);
+              const id = product.id ?? String(product._id);
 
-            const color =
-              item.color || "Not specified";
+              const color = item.color || "Not specified";
 
-            const size =
-              item.size || "Not specified";
+              const size = item.size || "Not specified";
 
-            const colors =
-              product.variants?.colours || [];
+              const colors = product.variants?.colours || [];
 
-            const sizes =
-              product.variants?.sizes || [];
+              const sizes = product.variants?.sizes || [];
 
-            const stockQuantity =
-              Number(product.stock?.quantity) || 0;
+              const stockQuantity = Number(product.stock?.quantity) || 0;
 
-            const isInStock =
-              product.stock?.in_stock === true;
+              const isInStock = product.stock?.in_stock === true;
 
-            return {
-              cartId: `${String(id)}-${color}-${size}`,
+              return {
+                cartId: `${String(id)}-${color}-${size}`,
 
-              id,
+                id,
 
-              productMongoId: String(
-                product._id ?? item.productId,
-              ),
+                productMongoId: String(product._id ?? item.productId),
 
-              name:
-                product.name ||
-                product.title ||
-                "Product",
+                name: product.name || product.title || "Product",
 
-              title: product.title,
+                title: product.title,
 
-              brand: product.brand,
+                brand: product.brand,
 
-              image: getProductImage(
-                product,
+                image: getProductImage(product, color),
+
+                colors,
+                sizes,
+
+                price: Number(product.price?.selling_price) || 0,
+
+                mrp: Number(product.price?.mrp) || 0,
+
+                discountPercent: Number(product.price?.discount_percent) || 0,
+
                 color,
-              ),
+                size,
 
-              colors,
-              sizes,
+                stock: {
+                  in_stock: isInStock,
+                  quantity: stockQuantity,
+                },
+                colorStock: product.variants?.colorStock || [],
 
-              price:
-                Number(
-                  product.price?.selling_price,
-                ) || 0,
-
-              mrp:
-                Number(product.price?.mrp) || 0,
-
-              discountPercent:
-                Number(
-                  product.price?.discount_percent,
-                ) || 0,
-
-              color,
-              size,
-
-              stock: {
-                in_stock: isInStock,
-                quantity: stockQuantity,
-              },
-
-              quantity: Number(item.quantity) || 1,
-            };
-          }));
-
-        localStorage.setItem(
-          CART_OWNER_STORAGE_KEY,
-          customerId,
+                quantity: Number(item.quantity) || 1,
+              };
+            }),
         );
+
+        localStorage.setItem(CART_OWNER_STORAGE_KEY, customerId);
 
         syncedCustomerRef.current = customerId;
 
@@ -367,14 +367,9 @@ export const CartProvider = ({ children }) => {
       } catch (error) {
         if (cancelled) return;
 
-        console.error(
-          "Failed to sync cart with the server:",
-          error,
-        );
+        console.error("Failed to sync cart with the server:", error);
 
-        toast.error(
-          "Unable to sync your cart. Your local cart is unchanged.",
-        );
+        toast.error("Unable to sync your cart. Your local cart is unchanged.");
       } finally {
         if (!cancelled) {
           cartSyncingCustomerRef.current = null;
@@ -388,11 +383,7 @@ export const CartProvider = ({ children }) => {
     return () => {
       cancelled = true;
 
-      if (
-        customerId &&
-        cartSyncingCustomerRef.current ===
-        customerId
-      ) {
+      if (customerId && cartSyncingCustomerRef.current === customerId) {
         cartSyncingCustomerRef.current = null;
       }
     };
@@ -415,48 +406,41 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    const items = capCartItemsToProductStock(cartItems
-      .map((item) => {
-        const product = getProductById(item.id);
+    const items = capCartItemsToProductStock(
+      cartItems
+        .map((item) => {
+          const product = getProductById(item.id);
 
-        const productId =
-          product?.id ?? item.id;
+          const productId = product?.id ?? item.id;
 
-        if (!productId) {
-          return null;
-        }
+          if (!productId) {
+            return null;
+          }
 
-        return {
-          id: String(productId),
-          quantity: item.quantity,
-          stock: {
-            in_stock: product?.stock?.in_stock === true,
-            quantity: Number(product?.stock?.quantity) || 0,
-          },
-          color:
-            item.color === "Not specified"
-              ? ""
-              : item.color,
-          size:
-            item.size === "Not specified"
-              ? ""
-              : item.size,
-        };
-      })
-      .filter(Boolean)).map((item) => ({
-        productId: item.id,
-        quantity: item.quantity,
-        color: item.color,
-        size: item.size,
-      }));
+          return {
+            id: String(productId),
+            quantity: item.quantity,
+            stock: {
+              in_stock: product?.stock?.in_stock === true,
+              quantity: Number(product?.stock?.quantity) || 0,
+            },
+            colorStock: product?.variants?.colorStock || [],
+            color: item.color === "Not specified" ? "" : item.color,
+            size: item.size === "Not specified" ? "" : item.size,
+          };
+        })
+        .filter(Boolean),
+    ).map((item) => ({
+      productId: item.id,
+      quantity: item.quantity,
+      color: item.color,
+      size: item.size,
+    }));
 
     saveQueueRef.current = saveQueueRef.current
       .catch(() => {})
       .then(() => {
-        if (
-          syncedCustomerRef.current !==
-          customerId
-        ) {
+        if (syncedCustomerRef.current !== customerId) {
           return undefined;
         }
 
@@ -467,21 +451,11 @@ export const CartProvider = ({ children }) => {
         );
       })
       .catch((error) => {
-        console.error(
-          "Failed to save cart to the server:",
-          error,
-        );
+        console.error("Failed to save cart to the server:", error);
 
-        toast.error(
-          "Unable to save your cart. Your local cart is unchanged.",
-        );
+        toast.error("Unable to save your cart. Your local cart is unchanged.");
       });
-  }, [
-    cartItems,
-    customerId,
-    getProductById,
-    syncedCustomerId,
-  ]);
+  }, [cartItems, customerId, getProductById, syncedCustomerId]);
 
   // =========================================================
   // ADD TO CART
@@ -493,36 +467,24 @@ export const CartProvider = ({ children }) => {
     selectedSize,
     selectedImage,
   ) => {
-    if (
-      customerId &&
-      cartSyncingCustomerRef.current ===
-      customerId
-    ) {
+    if (customerId && cartSyncingCustomerRef.current === customerId) {
       return false;
     }
 
     const product =
-      typeof productOrId === "object" &&
-      productOrId !== null
+      typeof productOrId === "object" && productOrId !== null
         ? productOrId
         : getProductById(productOrId);
 
-    const productId =
-      product?.id ?? product?._id;
+    const productId = product?.id ?? product?._id;
 
     if (!product || !productId) {
       return false;
     }
 
-    const colors =
-      product?.variants?.colours ??
-      product?.colors ??
-      [];
+    const colors = product?.variants?.colours ?? product?.colors ?? [];
 
-    const sizes =
-      product?.variants?.sizes ??
-      product?.sizes ??
-      [];
+    const sizes = product?.variants?.sizes ?? product?.sizes ?? [];
 
     if (colors.length > 0 && !selectedColor) {
       toast.error("Please select a color before adding to cart.");
@@ -543,38 +505,33 @@ export const CartProvider = ({ children }) => {
 
     const mrp =
       Number(
-        typeof product.price === "object"
-          ? product.price?.mrp
-          : product.mrp,
+        typeof product.price === "object" ? product.price?.mrp : product.mrp,
       ) || 0;
 
     const discountPercent =
       Number(
         typeof product.price === "object"
           ? product.price?.discount_percent
-          : (
-              product.discountPercent ??
-              product.discount_percent
-            ),
+          : (product.discountPercent ?? product.discount_percent),
       ) || 0;
 
-    const color =
-      selectedColor || "Not specified";
+    const color = selectedColor || "Not specified";
 
-    const size =
-      selectedSize || "Not specified";
+    const size = selectedSize || "Not specified";
 
     // Same product + same color + same size
     // = same cart item
-    const cartId = `${String(
-      productId,
-    )}-${color}-${size}`;
+    const cartId = `${String(productId)}-${color}-${size}`;
 
-    const stockQuantity =
-      Number(product.stock?.quantity) || 0;
-
-    const isInStock =
-      product.stock?.in_stock === true;
+    const colorStock = product.variants?.colorStock || [];
+    const selectedStock = getStockForColor(product, color);
+    const stockQuantity = selectedStock.quantity;
+    const isInStock = selectedStock.in_stock;
+    const inventoryKey = getCartInventoryKey({
+      id: productId,
+      color,
+      colorStock,
+    });
 
     // Product is out of stock
     if (!isInStock || stockQuantity <= 0) {
@@ -583,7 +540,7 @@ export const CartProvider = ({ children }) => {
     }
 
     const productQuantityInCart = cartItemsRef.current
-      .filter((item) => String(item.id) === String(productId))
+      .filter((item) => getCartInventoryKey(item) === inventoryKey)
       .reduce((total, item) => total + (Number(item.quantity) || 0), 0);
 
     if (productQuantityInCart >= stockQuantity) {
@@ -596,25 +553,15 @@ export const CartProvider = ({ children }) => {
 
       id: productId,
 
-      productMongoId: String(
-        product._id ?? productId,
-      ),
+      productMongoId: String(product._id ?? productId),
 
-      name:
-        product.name ||
-        product.title ||
-        "Product",
+      name: product.name || product.title || "Product",
 
       title: product.title,
 
       brand: product.brand,
 
-      image:
-        selectedImage ||
-        getProductImage(
-          product,
-          color,
-        ),
+      image: selectedImage || getProductImage(product, color),
 
       colors,
       sizes,
@@ -630,13 +577,14 @@ export const CartProvider = ({ children }) => {
         in_stock: isInStock,
         quantity: stockQuantity,
       },
+      colorStock,
 
       quantity: 1,
     };
 
     updateCartItems((currentItems) => {
       const currentProductQuantity = currentItems
-        .filter((item) => String(item.id) === String(productId))
+        .filter((item) => getCartInventoryKey(item) === inventoryKey)
         .reduce((total, item) => total + (Number(item.quantity) || 0), 0);
 
       if (currentProductQuantity >= stockQuantity) {
@@ -644,51 +592,35 @@ export const CartProvider = ({ children }) => {
         return currentItems;
       }
 
-      const existingItem =
-        currentItems.find(
-          (item) =>
-            item.cartId === cartId,
-        );
+      const existingItem = currentItems.find((item) => item.cartId === cartId);
 
       // =====================================================
       // SAME PRODUCT + SAME VARIANT
       // =====================================================
 
       if (existingItem) {
-        if (
-          existingItem.quantity >=
-          stockQuantity
-        ) {
-          toast.error(
-            `Only ${stockQuantity} item(s) available in stock.`,
-          );
+        if (existingItem.quantity >= stockQuantity) {
+          toast.error(`Only ${stockQuantity} item(s) available in stock.`);
 
           return currentItems;
         }
 
-        return currentItems.map(
-          (item) =>
-            item.cartId === cartId
-              ? {
-                  ...item,
+        return currentItems.map((item) =>
+          item.cartId === cartId
+            ? {
+                ...item,
 
-                  image:
-                    selectedImage ||
-                    item.image,
+                image: selectedImage || item.image,
 
-                  stock: {
-                    in_stock:
-                      isInStock,
-                    quantity:
-                      stockQuantity,
-                  },
+                stock: {
+                  in_stock: isInStock,
+                  quantity: stockQuantity,
+                },
+                colorStock,
 
-                  quantity: Math.min(
-                    stockQuantity,
-                    item.quantity + 1,
-                  ),
-                }
-              : item,
+                quantity: Math.min(stockQuantity, item.quantity + 1),
+              }
+            : item,
         );
       }
 
@@ -696,10 +628,7 @@ export const CartProvider = ({ children }) => {
       // NEW PRODUCT / NEW VARIANT
       // =====================================================
 
-      return [
-        ...currentItems,
-        cartItem,
-      ];
+      return [...currentItems, cartItem];
     });
 
     return true;
@@ -710,11 +639,7 @@ export const CartProvider = ({ children }) => {
   // =========================================================
 
   const increaseQuantity = (cartId) => {
-    if (
-      customerId &&
-      cartSyncingCustomerRef.current ===
-      customerId
-    ) {
+    if (customerId && cartSyncingCustomerRef.current === customerId) {
       return;
     }
 
@@ -725,46 +650,34 @@ export const CartProvider = ({ children }) => {
         }
 
         // Get latest product information
-        const product =
-          getProductById(item.id);
+        const product = getProductById(item.id);
 
-        const stockQuantity =
-          Number(
-            product?.stock?.quantity ??
-              item.stock?.quantity,
-          ) || 0;
-
-        const isInStock =
-          product?.stock?.in_stock ??
-          item.stock?.in_stock ??
-          false;
+        const stockSource = product || {
+          stock: item.stock,
+          variants: { colorStock: item.colorStock },
+        };
+        const colorStock =
+          product?.variants?.colorStock || item.colorStock || [];
+        const selectedStock = getStockForColor(stockSource, item.color);
+        const stockQuantity = selectedStock.quantity;
+        const isInStock = selectedStock.in_stock;
+        const inventoryKey = getCartInventoryKey({ ...item, colorStock });
 
         const productQuantityInCart = items
-          .filter((cartItem) => String(cartItem.id) === String(item.id))
+          .filter((cartItem) => getCartInventoryKey(cartItem) === inventoryKey)
           .reduce(
-            (total, cartItem) =>
-              total + (Number(cartItem.quantity) || 0),
+            (total, cartItem) => total + (Number(cartItem.quantity) || 0),
             0,
           );
 
-        if (
-          !isInStock ||
-          stockQuantity <= 0
-        ) {
-          toast.error(
-            "This product is out of stock.",
-          );
+        if (!isInStock || stockQuantity <= 0) {
+          toast.error("This product is out of stock.");
 
           return item;
         }
 
-        if (
-          productQuantityInCart >=
-          stockQuantity
-        ) {
-          toast.error(
-            `Only ${stockQuantity} item(s) available in stock.`,
-          );
+        if (productQuantityInCart >= stockQuantity) {
+          toast.error(`Only ${stockQuantity} item(s) available in stock.`);
 
           return item;
         }
@@ -776,11 +689,9 @@ export const CartProvider = ({ children }) => {
             in_stock: isInStock,
             quantity: stockQuantity,
           },
+          colorStock,
 
-          quantity: Math.min(
-            stockQuantity,
-            item.quantity + 1,
-          ),
+          quantity: Math.min(stockQuantity, item.quantity + 1),
         };
       }),
     );
@@ -791,11 +702,7 @@ export const CartProvider = ({ children }) => {
   // =========================================================
 
   const decreaseQuantity = (cartId) => {
-    if (
-      customerId &&
-      cartSyncingCustomerRef.current ===
-      customerId
-    ) {
+    if (customerId && cartSyncingCustomerRef.current === customerId) {
       return;
     }
 
@@ -805,15 +712,11 @@ export const CartProvider = ({ children }) => {
           item.cartId === cartId
             ? {
                 ...item,
-                quantity:
-                  item.quantity - 1,
+                quantity: item.quantity - 1,
               }
             : item,
         )
-        .filter(
-          (item) =>
-            item.quantity > 0,
-        ),
+        .filter((item) => item.quantity > 0),
     );
   };
 
@@ -822,142 +725,103 @@ export const CartProvider = ({ children }) => {
   // =========================================================
 
   const removeFromCart = (cartId) => {
-    if (
-      customerId &&
-      cartSyncingCustomerRef.current ===
-      customerId
-    ) {
+    if (customerId && cartSyncingCustomerRef.current === customerId) {
       return;
     }
 
-    updateCartItems((items) =>
-      items.filter(
-        (item) =>
-          item.cartId !== cartId,
-      ),
-    );
+    updateCartItems((items) => items.filter((item) => item.cartId !== cartId));
   };
 
   // =========================================================
   // UPDATE SIZE / COLOR
   // =========================================================
 
-  const updateCartItemOption = (
-    cartId,
-    option,
-    value,
-  ) => {
-    if (
-      customerId &&
-      cartSyncingCustomerRef.current ===
-      customerId
-    ) {
+  const updateCartItemOption = (cartId, option, value) => {
+    if (customerId && cartSyncingCustomerRef.current === customerId) {
       return;
     }
 
     updateCartItems((items) => {
-      const item = items.find(
-        (currentItem) =>
-          currentItem.cartId === cartId,
-      );
+      const item = items.find((currentItem) => currentItem.cartId === cartId);
 
-      if (
-        !item ||
-        item[option] === value
-      ) {
+      if (!item || item[option] === value) {
         return items;
       }
 
       const newColor =
-        option === "color"
-          ? value
-          : item.color ||
-            "Not specified";
+        option === "color" ? value : item.color || "Not specified";
 
-      const newSize =
-        option === "size"
-          ? value
-          : item.size ||
-            "Not specified";
+      const newSize = option === "size" ? value : item.size || "Not specified";
 
-      const newCartId = `${String(
-        item.id,
-      )}-${newColor}-${newSize}`;
+      const newCartId = `${String(item.id)}-${newColor}-${newSize}`;
 
       const duplicate = items.find(
         (currentItem) =>
-          currentItem.cartId ===
-            newCartId &&
-          currentItem.cartId !==
-            cartId,
+          currentItem.cartId === newCartId && currentItem.cartId !== cartId,
       );
 
-      const product =
-        getProductById(item.id);
-
-      const stockQuantity =
-        Number(
-          product?.stock?.quantity,
-        ) || 0;
-
-      const isInStock =
-        product?.stock?.in_stock ===
-        true;
+      const product = getProductById(item.id);
+      const stockSource = product || {
+        stock: item.stock,
+        variants: { colorStock: item.colorStock },
+      };
+      const colorStock = product?.variants?.colorStock || item.colorStock || [];
+      const selectedStock = getStockForColor(stockSource, newColor);
+      const stockQuantity = selectedStock.quantity;
+      const isInStock = selectedStock.in_stock;
+      const targetInventoryKey = getCartInventoryKey({
+        id: item.id,
+        color: newColor,
+        colorStock,
+      });
+      const quantityAlreadyInTarget = items
+        .filter(
+          (cartItem) =>
+            cartItem.cartId !== cartId &&
+            getCartInventoryKey(cartItem) === targetInventoryKey,
+        )
+        .reduce(
+          (total, cartItem) => total + (Number(cartItem.quantity) || 0),
+          0,
+        );
+      const availableForMove = Math.max(
+        0,
+        stockQuantity - quantityAlreadyInTarget,
+      );
 
       // =====================================================
       // TARGET VARIANT ALREADY EXISTS
       // =====================================================
 
       if (duplicate) {
-        if (
-          !isInStock ||
-          stockQuantity <= 0
-        ) {
-          toast.error(
-            "This product is out of stock.",
-          );
+        if (!isInStock || stockQuantity <= 0) {
+          toast.error("This product is out of stock.");
 
           return items;
         }
 
-        const mergedQuantity =
-          Math.min(
-            stockQuantity,
-            duplicate.quantity +
-              item.quantity,
-          );
+        const mergedQuantity = Math.min(
+          stockQuantity,
+          duplicate.quantity + Math.min(item.quantity, availableForMove),
+        );
 
-        if (
-          duplicate.quantity +
-            item.quantity >
-          stockQuantity
-        ) {
-          toast.error(
-            `Only ${stockQuantity} item(s) available in stock.`,
-          );
+        if (duplicate.quantity + item.quantity > stockQuantity) {
+          toast.error(`Only ${stockQuantity} item(s) available in stock.`);
         }
 
         return items
-          .filter(
-            (currentItem) =>
-              currentItem.cartId !==
-              cartId,
-          )
+          .filter((currentItem) => currentItem.cartId !== cartId)
           .map((currentItem) =>
-            currentItem.cartId ===
-            newCartId
+            currentItem.cartId === newCartId
               ? {
                   ...currentItem,
 
                   stock: {
-                    in_stock:
-                      isInStock,
-                    quantity:
-                      stockQuantity,
+                    in_stock: isInStock,
+                    quantity: stockQuantity,
                   },
 
-                  quantity:
-                    mergedQuantity,
+                  quantity: mergedQuantity,
                 }
               : currentItem,
           );
@@ -967,63 +831,42 @@ export const CartProvider = ({ children }) => {
       // CHANGE TO NEW VARIANT
       // =====================================================
 
-      if (
-        !isInStock ||
-        stockQuantity <= 0
-      ) {
-        toast.error(
-          "This product is out of stock.",
-        );
+      if (!isInStock || stockQuantity <= 0) {
+        toast.error("This product is out of stock.");
 
         return items;
       }
 
-      const newQuantity = Math.min(
-        item.quantity,
-        stockQuantity,
-      );
+      const newQuantity = Math.min(item.quantity, availableForMove);
 
-      if (
-        item.quantity >
-        stockQuantity
-      ) {
-        toast.error(
-          `Only ${stockQuantity} item(s) available in stock.`,
-        );
+      if (item.quantity > stockQuantity) {
+        toast.error(`Only ${stockQuantity} item(s) available in stock.`);
       }
 
-      return items.map(
-        (currentItem) =>
-          currentItem.cartId ===
-          cartId
-            ? {
-                ...currentItem,
+      return items.map((currentItem) =>
+        currentItem.cartId === cartId
+          ? {
+              ...currentItem,
 
-                [option]: value,
+              [option]: value,
 
-                cartId: newCartId,
+              cartId: newCartId,
 
-                stock: {
-                  in_stock:
-                    isInStock,
-                  quantity:
-                    stockQuantity,
-                },
+              stock: {
+                in_stock: isInStock,
+                quantity: stockQuantity,
+              },
+              colorStock,
 
-                quantity:
-                  newQuantity,
+              quantity: newQuantity,
 
-                ...(option === "color"
-                  ? {
-                      image:
-                        getProductImage(
-                          product || {},
-                          value,
-                        ),
-                    }
-                  : {}),
-              }
-            : currentItem,
+              ...(option === "color"
+                ? {
+                    image: getProductImage(product || {}, value),
+                  }
+                : {}),
+            }
+          : currentItem,
       );
     });
   };
@@ -1040,28 +883,20 @@ export const CartProvider = ({ children }) => {
   // TOTAL ITEMS
   // =========================================================
 
-  const totalItems =
-    cartItems.reduce(
-      (total, item) =>
-        total +
-        (Number(item.quantity) ||
-          0),
-      0,
-    );
+  const totalItems = cartItems.reduce(
+    (total, item) => total + (Number(item.quantity) || 0),
+    0,
+  );
 
   // =========================================================
   // SUBTOTAL
   // =========================================================
 
-  const subtotal =
-    cartItems.reduce(
-      (total, item) =>
-        total +
-        (Number(item.price) || 0) *
-          (Number(item.quantity) ||
-            0),
-      0,
-    );
+  const subtotal = cartItems.reduce(
+    (total, item) =>
+      total + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+    0,
+  );
 
   return (
     <CartContext.Provider
@@ -1089,13 +924,10 @@ export const CartProvider = ({ children }) => {
 // Context modules export both provider and hook.
 // eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
-  const context =
-    useContext(CartContext);
+  const context = useContext(CartContext);
 
   if (!context) {
-    throw new Error(
-      "useCart must be used within a CartProvider",
-    );
+    throw new Error("useCart must be used within a CartProvider");
   }
 
   return context;

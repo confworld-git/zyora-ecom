@@ -48,6 +48,8 @@ function AddProduct() {
     item_details: [{ key: "", value: "" }],
 
     colours: [""],
+    colorQuantities: [""],
+    colorEnabled: [true],
     sizes: [""],
 
     in_stock: true,
@@ -372,6 +374,8 @@ function AddProduct() {
     setFormData((prev) => ({
       ...prev,
       colours: [...prev.colours, ""],
+      colorQuantities: [...prev.colorQuantities, ""],
+      colorEnabled: [...prev.colorEnabled, prev.in_stock],
     }));
   };
 
@@ -381,6 +385,26 @@ function AddProduct() {
     setFormData((prev) => ({
       ...prev,
       colours: prev.colours.filter((_, i) => i !== index),
+      colorQuantities: prev.colorQuantities.filter((_, i) => i !== index),
+      colorEnabled: prev.colorEnabled.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleColorQuantityChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      colorQuantities: prev.colorQuantities.map((quantity, itemIndex) =>
+        itemIndex === index ? value : quantity,
+      ),
+    }));
+  };
+
+  const handleColorAvailabilityChange = (index, enabled) => {
+    setFormData((prev) => ({
+      ...prev,
+      colorEnabled: prev.colorEnabled.map((value, itemIndex) =>
+        itemIndex === index ? enabled : value,
+      ),
     }));
   };
 
@@ -474,11 +498,34 @@ function AddProduct() {
       newErrors.images = "Please upload at least one product image";
     }
 
-    if (
+    const colors = formData.colours.map((color) => color.trim());
+    const hasColorVariants = colors.some(Boolean);
+    if (hasColorVariants && colors.some((color) => !color)) {
+      newErrors.colours = "Complete or remove every colour variant";
+    }
+    if (colors.length > formData.images.length) {
+      newErrors.colours = "Add one image for every colour variant";
+    }
+    if (hasColorVariants) {
+      colors.forEach((color, index) => {
+        if (!color) return;
+        const quantity = formData.colorQuantities[index];
+        if (
+          quantity === "" ||
+          !Number.isInteger(Number(quantity)) ||
+          Number(quantity) < 0
+        ) {
+          newErrors[`colorQuantity-${index}`] =
+            "Enter a non-negative whole number";
+        }
+      });
+    } else if (
       formData.in_stock &&
-      (!formData.quantity || Number(formData.quantity) < 0)
+      (formData.quantity === "" ||
+        !Number.isInteger(Number(formData.quantity)) ||
+        Number(formData.quantity) < 0)
     ) {
-      newErrors.quantity = "Enter a valid stock quantity";
+      newErrors.quantity = "Enter a non-negative whole-number stock quantity";
     }
 
     setErrors(newErrors);
@@ -559,7 +606,18 @@ function AddProduct() {
       data.append(
         "variants",
         JSON.stringify({
-          colours: formData.colours.filter((item) => item.trim() !== ""),
+          colours: formData.colours.map((item) => item.trim()).filter(Boolean),
+          colorStock: formData.colours
+            .map((color, index) =>
+              color.trim()
+                ? {
+                    color: color.trim(),
+                    quantity: Number(formData.colorQuantities[index]) || 0,
+                    enabled: formData.colorEnabled[index] !== false,
+                  }
+                : null,
+            )
+            .filter(Boolean),
           sizes: formData.sizes.filter((item) => item.trim() !== ""),
         }),
       );
@@ -628,6 +686,8 @@ function AddProduct() {
         materials_care: [{ key: "", value: "" }],
         item_details: [{ key: "", value: "" }],
         colours: [""],
+        colorQuantities: [""],
+        colorEnabled: [true],
         sizes: [""],
         in_stock: true,
         is_best_seller: false,
@@ -716,7 +776,7 @@ function AddProduct() {
           <button
             type="button"
             className="small-add-btn"
-            style={{marginTop:"20px"}}
+            style={{ marginTop: "20px" }}
             onClick={() => setShowJsonBox((open) => !open)}
           >
             {showJsonBox ? "Close" : "Insert JSON"}
@@ -1097,6 +1157,44 @@ function AddProduct() {
                       />
                       <span>{image.color || "Select colour"}</span>
                     </div>
+                    {formData.colours[index]?.trim() && (
+                      <div className="image-variant-stock">
+                        <label>
+                          {formData.colours[index]} quantity
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={formData.colorQuantities[index] ?? ""}
+                            onChange={(event) =>
+                              handleColorQuantityChange(
+                                index,
+                                event.target.value,
+                              )
+                            }
+                            aria-label={`${formData.colours[index]} stock quantity`}
+                          />
+                        </label>
+                        <label className="image-variant-availability">
+                          <input
+                            type="checkbox"
+                            checked={formData.colorEnabled[index] !== false}
+                            onChange={(event) =>
+                              handleColorAvailabilityChange(
+                                index,
+                                event.target.checked,
+                              )
+                            }
+                          />
+                          Available
+                        </label>
+                        {errors[`colorQuantity-${index}`] && (
+                          <small className="field-error">
+                            {errors[`colorQuantity-${index}`]}
+                          </small>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1235,6 +1333,9 @@ function AddProduct() {
                   </div>
                 ))}
               </div>
+              {errors.colours && (
+                <small className="field-error">{errors.colours}</small>
+              )}
             </div>
 
             {/* Sizes */}
@@ -1288,6 +1389,11 @@ function AddProduct() {
                     setFormData((prev) => ({
                       ...prev,
                       in_stock: e.target.checked,
+                      colorEnabled: prev.colours.map((color, index) =>
+                        color.trim()
+                          ? e.target.checked
+                          : prev.colorEnabled[index],
+                      ),
                     }))
                   }
                 />
@@ -1314,23 +1420,24 @@ function AddProduct() {
                 <span>Feature as a best seller</span>
               </label>
 
-              <div className="form-group quantity-field">
-                <label>Quantity</label>
-
-                <input
-                  type="number"
-                  min="0"
-                  name="quantity"
-                  placeholder="0"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  disabled={!formData.in_stock}
-                />
-
-                {errors.quantity && (
-                  <small className="field-error">{errors.quantity}</small>
-                )}
-              </div>
+              {!formData.colours.some((colour) => colour.trim()) && (
+                <div className="form-group quantity-field">
+                  <label>Quantity</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    name="quantity"
+                    placeholder="0"
+                    value={formData.quantity}
+                    onChange={handleChange}
+                    disabled={!formData.in_stock}
+                  />
+                  {errors.quantity && (
+                    <small className="field-error">{errors.quantity}</small>
+                  )}
+                </div>
+              )}
             </div>
           </section>
 

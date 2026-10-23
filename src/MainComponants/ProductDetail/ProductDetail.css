@@ -364,6 +364,15 @@ main.product-detail-state a:hover {
   transform: scale(1.1);
 }
 
+.color-options button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.color-options button:disabled:hover {
+  transform: none;
+}
+
 .color-options button.selected {
   box-shadow: 0 0 0 2.5px var(--pd-navy);
 }
