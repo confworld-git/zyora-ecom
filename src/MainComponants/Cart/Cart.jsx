@@ -249,18 +249,6 @@ const Cart = () => {
       ? 0
       : shippingCharge;
 
-  const totalMRP = selectedItems.reduce(
-    (sum, item) => sum + (Number(item.mrp) || 0) * (Number(item.quantity) || 0),
-    0,
-  );
-
-  const productDiscount = selectedItems.reduce((sum, item) => {
-    const mrp = Number(item.mrp) || 0;
-    const price = Number(item.price) || 0;
-    const qty = Number(item.quantity) || 0;
-    return sum + Math.max(0, mrp - price) * qty;
-  }, 0);
-
   const couponDiscount = appliedCoupon?.discountAmount || 0;
 
   const totalItemsCount = selectedItems.reduce(
@@ -628,7 +616,8 @@ const Cart = () => {
                     {
                       state: {
                         order,
-                        reason: "You cancelled the payment before it completed.",
+                        reason:
+                          "You cancelled the payment before it completed.",
                       },
                     },
                   );
@@ -976,28 +965,11 @@ const Cart = () => {
               </h2>
 
               <div className="summary_row">
-                <span>Total MRP</span>
+                <span>Price</span>
 
                 <strong>
                   <i className="bi bi-currency-rupee"></i>
-                  {totalMRP.toLocaleString("en-IN")}
-                </strong>
-              </div>
-
-              <div className="summary_row">
-                <span>Discount on MRP</span>
-
-                <strong className={productDiscount > 0 ? "discount" : ""}>
-                  {productDiscount > 0 ? (
-                    <>
-                      - <i className="bi bi-currency-rupee"></i>
-                      {productDiscount.toLocaleString("en-IN")}
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-currency-rupee"></i>0
-                    </>
-                  )}
+                  {subtotal.toLocaleString("en-IN")}
                 </strong>
               </div>
 
@@ -1079,14 +1051,14 @@ const Cart = () => {
                 </strong>
               </div>
 
-              <div className="summary_row">
+              {/* <div className="summary_row">
                 <span>Free shipping above</span>
                 <strong>
                   {pricing
                     ? `₹${pricing.freeShippingLimit.toLocaleString("en-IN")}`
                     : "—"}
                 </strong>
-              </div>
+              </div> */}
 
               <div className="summary_row">
                 <span>

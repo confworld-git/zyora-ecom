@@ -22,9 +22,23 @@ const toKeyValueRows = (value) =>
   }));
 
 const createEditForm = (product) => {
-  const colours = product.variants?.colours?.length
-    ? [...product.variants.colours]
-    : [""];
+  const colours = [...(product.variants?.colours || [])];
+  const knownColours = new Set(
+    colours.map((color) =>
+      String(color || "")
+        .trim()
+        .toLowerCase(),
+    ),
+  );
+  (product.variants?.colorStock || []).forEach((item) => {
+    const color = String(item.color || "").trim();
+    const key = color.toLowerCase();
+    if (color && !knownColours.has(key)) {
+      colours.push(color);
+      knownColours.add(key);
+    }
+  });
+  if (!colours.length) colours.push("");
   const existingColorStock = new Map(
     (product.variants?.colorStock || []).map((item) => [
       String(item.color || "")
