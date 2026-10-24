@@ -1,6 +1,7 @@
+import { useContext, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "./Policies.css";
-import ScrollReveal from "../ScrollReveal.jsx";
+import ScrollToElementContext from "../../ProtectedRoute/ScrollToElementContext.js";
 
 const policies = [
   {
@@ -376,9 +377,7 @@ const renderPolicyContent = (content) => {
 
     const heading = line.match(/^#{1,3}\s+(.+)$/);
     if (heading) {
-      blocks.push(
-        <h2 key={`heading-${index}`}>{renderInline(heading[1])}</h2>,
-      );
+      blocks.push(<h2 key={`heading-${index}`}>{renderInline(heading[1])}</h2>);
       index += 1;
       continue;
     }
@@ -388,9 +387,7 @@ const renderPolicyContent = (content) => {
       const ordered = /^\d+\./.test(listItem[1]);
       const items = [];
       while (index < lines.length) {
-        const currentItem = lines[index]
-          .trim()
-          .match(/^(-|\d+\.)\s+(.+)$/);
+        const currentItem = lines[index].trim().match(/^(-|\d+\.)\s+(.+)$/);
         if (!currentItem || /^\d+\./.test(currentItem[1]) !== ordered) break;
         items.push(
           <li key={`item-${index}`}>{renderInline(currentItem[2])}</li>,
@@ -419,16 +416,30 @@ const renderPolicyContent = (content) => {
 
 const Policies = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const policyDocumentRef = useRef(null);
+  const previousPolicyRef = useRef(null);
+  const [scrollRequest, setScrollRequest] = useState(0);
+  const scrollToElement = useContext(ScrollToElementContext);
   const requestedPolicy = searchParams.get("policy");
   const selectedPolicy =
     policies.find((policy) => policy.id === requestedPolicy) ?? policies[0];
 
   const selectPolicy = (policyId) => {
     setSearchParams({ policy: policyId });
+    setScrollRequest((request) => request + 1);
   };
 
+  useEffect(() => {
+    const selectionChanged = previousPolicyRef.current !== selectedPolicy.id;
+    previousPolicyRef.current = selectedPolicy.id;
+
+    if (scrollRequest > 0 || selectionChanged) {
+      scrollToElement?.(policyDocumentRef.current);
+    }
+  }, [scrollRequest, scrollToElement, selectedPolicy.id]);
+
   return (
-    <ScrollReveal as="main" className="policies-page">
+    <div as="main" className="policies-page">
       <header className="policies-heading">
         <p className="policies-eyebrow">ZYORA CUSTOMER CARE</p>
         <h1>Policies</h1>
@@ -440,7 +451,9 @@ const Policies = () => {
           <p className="policies-nav-label">POLICIES</p>
           {policies.map((policy) => (
             <button
-              aria-current={selectedPolicy.id === policy.id ? "page" : undefined}
+              aria-current={
+                selectedPolicy.id === policy.id ? "page" : undefined
+              }
               className={
                 selectedPolicy.id === policy.id
                   ? "policies-nav-item is-active"
@@ -456,7 +469,12 @@ const Policies = () => {
           ))}
         </nav>
 
-        <ScrollReveal as="article" className="policy-document" aria-live="polite">
+        <div
+          as="article"
+          className="policy-document"
+          aria-live="polite"
+          ref={policyDocumentRef}
+        >
           <div className="policy-document-heading">
             <p>ZYORA POLICIES</p>
             <h2>{selectedPolicy.title}</h2>
@@ -464,9 +482,9 @@ const Policies = () => {
           <div className="policy-document-content">
             {renderPolicyContent(selectedPolicy.content)}
           </div>
-        </ScrollReveal>
+        </div>
       </div>
-    </ScrollReveal>
+    </div>
   );
 };
 

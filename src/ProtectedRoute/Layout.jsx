@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import Navbar from "../Components/Navbar/Navbar";
 import Footer from "../Components/Footer/Footer";
+import ScrollToElementContext from "./ScrollToElementContext.js";
 
 const Layout = () => {
   const location = useLocation();
@@ -20,6 +21,25 @@ const Layout = () => {
     !isAdminPage &&
     path !== "/jewellery" &&
     !path.startsWith("/jewellery/");
+  const scrollToElement = useCallback((element) => {
+    if (!element) return;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (lenisRef.current) {
+      lenisRef.current.resize();
+      lenisRef.current.scrollTo(element, {
+        immediate: reduceMotion,
+      });
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: reduceMotion ? "instant" : "smooth",
+      block: "start",
+    });
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("storefront-body", isStorefrontPage);
@@ -53,7 +73,9 @@ const Layout = () => {
   return (
     <>
       {!hideChrome && <Navbar />}
-      <Outlet />
+      <ScrollToElementContext.Provider value={scrollToElement}>
+        <Outlet />
+      </ScrollToElementContext.Provider>
       {!hideChrome && <Footer />}
     </>
   );

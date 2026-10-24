@@ -21,7 +21,7 @@ const JewelleryList = ({ selectedSubcategory = "" }) => {
   );
 
   return (
-    <ScrollReveal>
+    <div>
       <section
         className="zyora-jewellery-collection"
         aria-labelledby="zyora-jewellery-heading"
@@ -124,7 +124,7 @@ const JewelleryList = ({ selectedSubcategory = "" }) => {
           </div>
         )}
       </section>
-    </ScrollReveal>
+    </div>
   );
 };
 

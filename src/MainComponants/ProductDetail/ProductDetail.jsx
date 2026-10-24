@@ -307,10 +307,11 @@ const ProductDetail = () => {
                 className="product-detail-video-player"
                 src={videoUrl}
                 poster={images[0]?.url}
-                // controls
+                controls
                 playsInline
                 preload="metadata"
                 autoPlay
+                loop
               >
                 Your browser does not support embedded videos.
               </video>
