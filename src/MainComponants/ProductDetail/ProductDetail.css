@@ -476,6 +476,9 @@ main.product-detail-state a:hover {
 .product_btns > button:first-child {
   background: transparent;
   box-shadow: none;
+  background: var(--pd-navy);
+  color: #fff;
+  font-family: var(--pd-body);
 }
 
 .product_btns > button:first-child:hover:not(:disabled) {

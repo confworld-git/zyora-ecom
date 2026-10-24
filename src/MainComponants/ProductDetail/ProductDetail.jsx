@@ -85,6 +85,9 @@ const ProductDetail = () => {
       image: images[index],
     }))
     .filter((option) => option.name && option.image);
+  const sizeOptions = (product.variants?.sizes || [])
+    .map((size) => String(size ?? "").trim())
+    .filter(Boolean);
 
   // Selected image (defaults to first image)
   const activeImage =
@@ -147,7 +150,8 @@ const ProductDetail = () => {
   ];
 
   const colorRequired = colorOptions.length > 0;
-  const sizeRequired = product.variants?.sizes?.length > 0;
+  const sizeRequired = sizeOptions.length > 0;
+  const hasVariantOptions = colorRequired || sizeRequired;
 
   const validateSelection = () => {
     if (colorRequired && !selectedColor) {
@@ -341,18 +345,18 @@ const ProductDetail = () => {
                   : `In stock (${productStockQuantity})`}
               </strong>
             </p>
-            <div className="color-selection">
-              <h3>
-                Color
-                {selectedColor && (
-                  <>
-                    : <span>{selectedColor}</span>
-                  </>
-                )}
-              </h3>
-              <div className="color-options">
-                {colorOptions.length > 0 ? (
-                  colorOptions.map((option) => {
+            {colorRequired && (
+              <div className="color-selection">
+                <h3>
+                  Color
+                  {selectedColor && (
+                    <>
+                      : <span>{selectedColor}</span>
+                    </>
+                  )}
+                </h3>
+                <div className="color-options">
+                  {colorOptions.map((option) => {
                     const optionStock = (
                       product.variants?.colorStock || []
                     ).find(
@@ -388,18 +392,16 @@ const ProductDetail = () => {
                         {!option.color && option.name}
                       </button>
                     );
-                  })
-                ) : (
-                  <span className="no-colors">Not specified</span>
-                )}
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="size-selection">
-              <h3>Size</h3>
-              <div className="size-options">
-                {product.variants?.sizes?.length > 0 ? (
-                  product.variants.sizes.map((size) => (
+            {sizeRequired && (
+              <div className="size-selection">
+                <h3>Size</h3>
+                <div className="size-options">
+                  {sizeOptions.map((size) => (
                     <button
                       className={selectedSize === size ? "selected" : ""}
                       key={size}
@@ -408,12 +410,10 @@ const ProductDetail = () => {
                     >
                       {size}
                     </button>
-                  ))
-                ) : (
-                  <span className="no-sizes">Not specified</span>
-                )}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="product_btns">
               <button
@@ -461,73 +461,75 @@ const ProductDetail = () => {
           )}
         </ScrollReveal>
 
-        <ScrollReveal
-          as="section"
-          className="product-detail-section detail-grid"
-        >
-          <div>
-            <h2>Variants</h2>
-            <div className="variant-colours">
-              <span>Colours:</span>
-              {colorOptions.length > 0 ? (
-                colorOptions.map((option) => (
-                  <span className="variant-colour" key={option.id}>
-                    {option.color && (
-                      <span
-                        className="variant-colour-swatch"
-                        style={{ backgroundColor: option.color }}
-                        title={option.name}
-                        aria-label={option.name}
-                      />
-                    )}
-                    {option.name}
-                  </span>
-                ))
-              ) : (
-                <span>Not specified</span>
-              )}
-            </div>
-            <p>
-              Sizes:
-              <span>
-                {product.variants?.sizes?.join("  |  ") || "Not specified"}
-              </span>
-            </p>
-          </div>
-          {ratingCount > 0 && (
-            <div>
-              <h2>Rating</h2>
-              <div
-                className="rating-display"
-                aria-label={`${ratingAverage.toFixed(1)} out of 5 stars, ${ratingCount} ${
-                  ratingCount === 1 ? "review" : "reviews"
-                }`}
-              >
-                <span className="rating-stars" aria-hidden="true">
-                  {Array.from({ length: 5 }, (_, index) => (
-                    <span
-                      className={
-                        displayedRating >= index + 1
-                          ? "full"
-                          : displayedRating >= index + 0.5
-                            ? "half"
-                            : "empty"
-                      }
-                      key={index}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </span>
-                <span>
-                  {`${ratingAverage.toFixed(1)} / 5 (${ratingCount} ${
-                    ratingCount === 1 ? "review" : "reviews"
-                  })`}
-                </span>
+        {(hasVariantOptions || ratingCount > 0) && (
+          <ScrollReveal
+            as="section"
+            className="product-detail-section detail-grid"
+          >
+            {hasVariantOptions && (
+              <div>
+                <h2>Variants</h2>
+                {colorRequired && (
+                  <div className="variant-colours">
+                    <span>Colours:</span>
+                    {colorOptions.map((option) => (
+                      <span className="variant-colour" key={option.id}>
+                        {option.color && (
+                          <span
+                            className="variant-colour-swatch"
+                            style={{ backgroundColor: option.color }}
+                            title={option.name}
+                            aria-label={option.name}
+                          />
+                        )}
+                        {option.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {sizeRequired && (
+                  <p>
+                    Sizes:
+                    <span>{sizeOptions.join("  |  ")}</span>
+                  </p>
+                )}
               </div>
-            </div>
-          )}
-        </ScrollReveal>
+            )}
+            {ratingCount > 0 && (
+              <div>
+                <h2>Rating</h2>
+                <div
+                  className="rating-display"
+                  aria-label={`${ratingAverage.toFixed(1)} out of 5 stars, ${ratingCount} ${
+                    ratingCount === 1 ? "review" : "reviews"
+                  }`}
+                >
+                  <span className="rating-stars" aria-hidden="true">
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <span
+                        className={
+                          displayedRating >= index + 1
+                            ? "full"
+                            : displayedRating >= index + 0.5
+                              ? "half"
+                              : "empty"
+                        }
+                        key={index}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </span>
+                  <span>
+                    {`${ratingAverage.toFixed(1)} / 5 (${ratingCount} ${
+                      ratingCount === 1 ? "review" : "reviews"
+                    })`}
+                  </span>
+                </div>
+              </div>
+            )}
+          </ScrollReveal>
+        )}
 
         {details.some(
           ([, values]) => values && Object.keys(values).length > 0,
