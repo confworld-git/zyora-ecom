@@ -904,6 +904,7 @@
   align-items: center;
   gap: 6px;
   min-height: 38px;
+  font-size: 13px;
 }
 
 .product-edit-variant-stock .product-list-checkbox input {
