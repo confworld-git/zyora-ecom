@@ -22,7 +22,7 @@
   --jewellery-line: rgba(71, 52, 35, 0.12);
   width: min(1440px, calc(100% - 96px));
   margin: 0 auto;
-  padding: 76px 0 112px;
+  padding: 26px 0 112px;
   color: var(--jewellery-ink);
 }
 
