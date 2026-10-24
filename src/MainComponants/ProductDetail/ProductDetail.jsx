@@ -136,6 +136,10 @@ const ProductDetail = () => {
   };
 
   const productName = product.name || product.title;
+  const productTitle = String(product.title || "")
+    .replace(/[\s\-|:–—]*\bZYORA\b[\s\-|:–—]*/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   const { average: ratingAverage, count: ratingCount } = normalizeProductRating(
     product.rating,
   );
@@ -328,7 +332,9 @@ const ProductDetail = () => {
             <small>{product.brand}</small>
             {/* <p className="product-category">{product.category}</p> */}
             <h1>{productName}</h1>
-            <p className="product-title">{product.title}</p>
+            {productTitle && (
+              <p className="product-title">{productTitle}</p>
+            )}
 
             <div className="detail-price">
               <strong>₹{product.price?.selling_price}</strong>
