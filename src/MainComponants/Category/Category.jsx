@@ -862,7 +862,7 @@ const Category = () => {
         }`}
         jsonLd={categoryJsonLd}
       />
-      <ScrollReveal className="category">
+      <div className="category">
         <div id="page_path">
           <p>
             <Link to="/">Home</Link>
@@ -919,7 +919,7 @@ const Category = () => {
         )}
 
         {selectedCategory ? (
-          <ScrollReveal as="section" className="category_products_view">
+          <section as="section" className="category_products_view">
             <div className="categories_list">
               <div className="collection_search">
                 <MdSearch aria-hidden="true" />
@@ -1097,9 +1097,9 @@ const Category = () => {
                 )}
               </div>
             </div>
-          </ScrollReveal>
+          </section>
         ) : (
-          <ScrollReveal as="section" className="category_overview">
+          <div as="section" className="category_overview">
             {loading ? (
               <p className="empty_results" role="status">
                 Loading categories...
@@ -1160,9 +1160,9 @@ const Category = () => {
                   : "No categories available."}
               </p>
             )}
-          </ScrollReveal>
+          </div>
         )}
-      </ScrollReveal>
+      </div>
     </>
   );
 };

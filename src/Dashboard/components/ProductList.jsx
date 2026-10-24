@@ -6,6 +6,7 @@ import "../styles/Management.css";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/products`;
 const requestConfig = { withCredentials: true };
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 const INFO_SECTIONS = [
   ["features_specs", "Features & specifications"],
@@ -316,13 +317,26 @@ const ProductList = ({ onAddProduct }) => {
 
   const addImages = (event) => {
     const files = Array.from(event.target.files || []);
+    event.target.value = "";
     if (files.length === 0) return;
 
+    const validFiles = files.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} is not a supported image.`);
+        return false;
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error(`${file.name} must be 10 MB or smaller.`);
+        return false;
+      }
+      return true;
+    });
     const availableSlots = Math.max(0, 4 - editing.form.images.length);
-    const selectedFiles = files.slice(0, availableSlots);
-    if (selectedFiles.length < files.length) {
+    const selectedFiles = validFiles.slice(0, availableSlots);
+    if (selectedFiles.length < validFiles.length) {
       toast.error("A product can have up to four images.");
     }
+    if (selectedFiles.length === 0) return;
 
     setEditing((current) => ({
       ...current,
@@ -342,7 +356,36 @@ const ProductList = ({ onAddProduct }) => {
         ],
       },
     }));
+  };
+
+  const replaceImage = (event, index) => {
+    const file = event.target.files?.[0];
     event.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Choose a supported image file.");
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error("The image must be 10 MB or smaller.");
+      return;
+    }
+
+    const previousImage = editing.form.images[index];
+    if (!previousImage) return;
+    if (previousImage.file) URL.revokeObjectURL(previousImage.url);
+    const preview = URL.createObjectURL(file);
+
+    setEditing((current) => ({
+      ...current,
+      form: {
+        ...current.form,
+        images: current.form.images.map((image, itemIndex) =>
+          itemIndex === index ? { ...image, url: preview, file } : image,
+        ),
+      },
+    }));
   };
 
   const updateVideo = (event) => {
@@ -567,17 +610,34 @@ const ProductList = ({ onAddProduct }) => {
       data.append(
         "existing_images",
         JSON.stringify(
-          form.images
-            .filter((image) => !image.file)
-            .map(({ id, url, color, alt }) => ({ id, url, color, alt })),
+          form.images.flatMap((image, position) =>
+            image.file
+              ? []
+              : [
+                  {
+                    id: image.id,
+                    url: image.url,
+                    color: image.color,
+                    alt: image.alt,
+                    position,
+                  },
+                ],
+          ),
         ),
       );
-      const uploadedImages = form.images.filter((image) => image.file);
+      const uploadedImages = form.images
+        .map((image, position) => ({ ...image, position }))
+        .filter((image) => image.file);
       uploadedImages.forEach((image) => data.append("images", image.file));
       data.append(
         "image_metadata",
         JSON.stringify(
-          uploadedImages.map(({ id, color, alt }) => ({ id, color, alt })),
+          uploadedImages.map(({ id, color, alt, position }) => ({
+            id,
+            color,
+            alt,
+            position,
+          })),
         ),
       );
       if (form.videoFile) {
@@ -998,7 +1058,7 @@ const ProductList = ({ onAddProduct }) => {
                     accept="image/*"
                     multiple
                     onChange={addImages}
-                    disabled={editing.form.images.length >= 4}
+                    disabled={saving || editing.form.images.length >= 4}
                   />
                 </label>
               </div>
@@ -1061,14 +1121,38 @@ const ProductList = ({ onAddProduct }) => {
                       </label>
                     </div>
                   )}
-                  <button
-                    className="product-image-remove"
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    aria-label={`Remove image ${index + 1}`}
-                  >
-                    Remove
-                  </button>
+                  <div className="product-edit-image-actions">
+                    <label
+                      className="product-image-add"
+                      role="button"
+                      tabIndex={saving ? -1 : 0}
+                      aria-label={`Replace image ${index + 1}`}
+                      aria-disabled={saving}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          event.currentTarget.querySelector("input")?.click();
+                        }
+                      }}
+                    >
+                      Replace
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => replaceImage(event, index)}
+                        disabled={saving}
+                      />
+                    </label>
+                    <button
+                      className="product-image-remove"
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      disabled={saving}
+                      aria-label={`Remove image ${index + 1}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               ))}
             </section>
