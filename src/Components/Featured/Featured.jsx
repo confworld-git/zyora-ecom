@@ -71,7 +71,7 @@ const Featured = () => {
   );
 
   return (
-    <ScrollReveal className="Featured_Collection">
+    <div className="Featured_Collection">
       <h1>
         Featured <span>Collections</span>
       </h1>
@@ -196,7 +196,7 @@ const Featured = () => {
           );
         })
       )}
-    </ScrollReveal>
+    </div>
   );
 };
 
