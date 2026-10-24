@@ -1,17 +1,28 @@
 import "./Jewellery.css";
+import { useMemo, useState } from "react";
 import ParticleBackground from "./ParticleBackground";
 import SEO from "../../SEO";
 import JewelleryList from "./JewelleryList";
+import { useProducts } from "../../Context/ProductContext.jsx";
+import { isImitationJewellery } from "../../utils/productCategory.js";
 
 const Jewellery = () => {
   const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
-  const jewelleryCategories = [
-    "Necklaces",
-    "Earrings",
-    "Bracelets",
-    "Rings",
-    "Anklets",
-  ];
+  const { products } = useProducts();
+  const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const jewelleryCategories = useMemo(
+    () =>
+      [
+        ...new Map(
+          products
+            .filter(isImitationJewellery)
+            .map((product) => String(product.subcategory || "").trim())
+            .filter(Boolean)
+            .map((subcategory) => [subcategory.toLowerCase(), subcategory]),
+        ).values(),
+      ].sort((first, second) => first.localeCompare(second)),
+    [products],
+  );
   const jewelleryJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -47,13 +58,41 @@ const Jewellery = () => {
               pieces that match your style, mood, and personality.
             </p>
             <div className="jewellery-categories">
-              {jewelleryCategories.map((category) => (
-                <p key={category}>{category}</p>
-              ))}
+              {jewelleryCategories.length > 0 && (
+                <div className="jewellery-categories">
+                  <button
+                    type="button"
+                    className={!selectedSubcategory ? "is-selected" : ""}
+                    aria-pressed={!selectedSubcategory}
+                    onClick={() => setSelectedSubcategory("")}
+                  >
+                    All
+                  </button>
+                  {jewelleryCategories.map((subcategory) => (
+                    <button
+                      type="button"
+                      key={subcategory}
+                      className={
+                        selectedSubcategory.toLowerCase() ===
+                        subcategory.toLowerCase()
+                          ? "is-selected"
+                          : ""
+                      }
+                      aria-pressed={
+                        selectedSubcategory.toLowerCase() ===
+                        subcategory.toLowerCase()
+                      }
+                      onClick={() => setSelectedSubcategory(subcategory)}
+                    >
+                      {subcategory}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <section>
-            <JewelleryList />
+            <JewelleryList selectedSubcategory={selectedSubcategory} />
           </section>
         </div>
       </div>

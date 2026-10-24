@@ -5,11 +5,19 @@ import { isImitationJewellery } from "../../utils/productCategory.js";
 import "./Jewellery.css";
 import ScrollReveal from "../../Components/ScrollReveal.jsx";
 
-const JewelleryList = () => {
+const JewelleryList = ({ selectedSubcategory = "" }) => {
   const { products, loading, error } = useProducts();
   const jewelleryProducts = useMemo(
-    () => products.filter(isImitationJewellery),
-    [products],
+    () =>
+      products.filter(
+        (product) =>
+          isImitationJewellery(product) &&
+          (!selectedSubcategory ||
+            String(product.subcategory || "")
+              .trim()
+              .toLowerCase() === selectedSubcategory.trim().toLowerCase()),
+      ),
+    [products, selectedSubcategory],
   );
 
   return (
