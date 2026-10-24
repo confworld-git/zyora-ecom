@@ -255,7 +255,7 @@ const ProductDetail = () => {
           content={product.price?.currency || "INR"}
         />
       </Helmet>
-      <ScrollReveal as="main" className="product-detail-page">
+      <div as="main" className="product-detail-page">
         <div id="page_path">
           <p>
             <Link to="/">Home</Link>
@@ -549,7 +549,7 @@ const ProductDetail = () => {
             </div>
           </ScrollReveal>
         )}
-      </ScrollReveal>
+      </div>
     </>
   );
 };

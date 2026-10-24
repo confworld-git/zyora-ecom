@@ -305,11 +305,11 @@
     gap: 0;
     width: 100%;
     margin: 0;
-    padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+    padding: 8px 6px calc(18px + env(safe-area-inset-bottom));
     box-sizing: border-box;
     border-top: 1px solid rgba(10, 10, 92, 0.1);
     background: #fff;
-    box-shadow: 0 -4px 18px rgba(10, 10, 92, 0.1);
+    box-shadow: 0 -4px 18px rgba(10, 10, 92, 0.137);
   }
 
   .navbar > .navbar-links > li {
@@ -377,13 +377,19 @@
   .navbar > .navbar-links > li {
     flex-basis: 20%;
     padding: 8px 1px;
-    font-size: 10px;
+    font-size: 12px;
+    /* font-weight: 600; */
+    font-weight: bolder;
   }
 
   .nav_icon_link {
     min-height: 32px;
     padding: 0 7px;
     font-size: 9px;
+  }
+
+  #policies-link{
+    display: none;
   }
 
   .nav-login-link {

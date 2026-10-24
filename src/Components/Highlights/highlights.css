@@ -184,7 +184,7 @@
 
 @media (max-width: 600px) {
   .highlights {
-    padding: 40px 18px 68px;
+    padding: 40px 18px 40px;
   }
 
   .highlights > div {

@@ -459,6 +459,10 @@
     flex-basis: auto;
     text-align: left;
   }
+  .zyora-jewellery-badge{
+    top: -4px;
+    left: -4px;
+  }
 }
 
 @media (max-width: 420px) {

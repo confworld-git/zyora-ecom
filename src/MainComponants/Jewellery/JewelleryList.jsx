@@ -84,9 +84,9 @@ const JewelleryList = ({ selectedSubcategory = "" }) => {
                         {product.price.discount_percent}% off
                       </span>
                     ) : null}
-                    <span className="zyora-jewellery-card-cta">
+                    {/* <span className="zyora-jewellery-card-cta">
                       Discover piece <span aria-hidden="true">↗</span>
-                    </span>
+                    </span> */}
                   </div>
 
                   <div className="zyora-jewellery-card-info">

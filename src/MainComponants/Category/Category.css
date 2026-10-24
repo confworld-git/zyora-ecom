@@ -1097,6 +1097,7 @@
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
+    zoom: 0.8;
   }
 
   .mobile_filter_button > svg {
@@ -1230,7 +1231,7 @@
 
   .product_card > small {
     margin: 3px 4px 0;
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .categories_items > .product_card > p.product_description {
@@ -1256,6 +1257,18 @@
   .collection_search > input,
   .sort_row select {
     font-size: 16px;
+  }
+
+  .sort_row{
+    zoom: 0.8;
+  }
+
+  .categories_list > .collection_search{
+    zoom: 0.8;
+    width: 100%;
+  }
+  .categories_list{
+    width: 100%;
   }
 }
 
