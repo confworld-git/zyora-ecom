@@ -338,7 +338,10 @@ const Orders = ({ initialOrderId = "" }) => {
                               </p>
                             ))}
                             <p>
-                              Subtotal {currency(order.subtotal)} · Shipping{" "}
+                              Subtotal {currency(order.subtotal)} · Shipping
+                              {order.shippingRegion
+                                ? ` (${titleCase(order.shippingRegion)}) `
+                                : " "}
                               {currency(order.shippingFee)}
                             </p>
                           </div>

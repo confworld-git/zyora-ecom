@@ -12,29 +12,53 @@ const FIELDS = [
     hint: "Use 0 to make all shipping free.",
   },
   {
-    name: "shippingCharge",
-    label: "Shipping charge for online (₹)",
-    hint: "Apply to online-payment orders",
-  },
-  {
-    name: "shippingChargeforCOD",
-    label: "Shipping charge for COD (₹)",
-    hint: "Apply to cash-on-delivery orders",
-  },
-  {
     name: "platformFee",
     label: "Platform fee (₹)",
     hint: "Added to every order.",
   },
+  {
+    name: "shippingChargeforChennai",
+    label: "Chennai shipping for online payment (₹)",
+    hint: "Charged for delivery addresses in Chennai.",
+  },
+  {
+    name: "shippingChargeforChennaiCOD",
+    label: "Chennai COD shipping (₹)",
+    hint: "Charged for Chennai orders paid by cash on delivery.",
+  },
+  {
+    name: "shippingChargeforTamilNadu",
+    label: "Rest of Tamil Nadu shipping for online payment (₹)",
+    hint: "Charged for Tamil Nadu addresses outside Chennai.",
+  },
+  {
+    name: "shippingChargeforTamilNaduCOD",
+    label: "Rest of Tamil Nadu COD shipping (₹)",
+    hint: "Charged for Tamil Nadu orders outside Chennai paid by COD.",
+  },
+  {
+    name: "shippingChargeforRestofIndia",
+    label: "Rest of India shipping for online payment (₹)",
+    hint: "Charged for delivery addresses outside Tamil Nadu.",
+  },
+  {
+    name: "shippingChargeforRestofIndiaCOD",
+    label: "Rest of India COD shipping (₹)",
+    hint: "Charged for orders outside Tamil Nadu paid by COD.",
+  },
 ];
 
+const getPricingValues = (pricing) =>
+  Object.fromEntries(
+    FIELDS.map(({ name }) => [name, String(pricing[name])]),
+  );
+
+const emptyPricingValues = Object.fromEntries(
+  FIELDS.map(({ name }) => [name, ""]),
+);
+
 const PricingSettings = () => {
-  const [values, setValues] = useState({
-    freeShippingLimit: "",
-    shippingCharge: "",
-    shippingChargeforCOD: "",
-    platformFee: "",
-  });
+  const [values, setValues] = useState(emptyPricingValues);
   const [saved, setSaved] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -49,12 +73,7 @@ const PricingSettings = () => {
 
         if (!cancelled && res.data.success && res.data.pricing) {
           setSaved(res.data.pricing);
-          setValues({
-            freeShippingLimit: String(res.data.pricing.freeShippingLimit),
-            shippingCharge: String(res.data.pricing.shippingCharge),
-            shippingChargeforCOD: String(res.data.pricing.shippingChargeforCOD),
-            platformFee: String(res.data.pricing.platformFee),
-          });
+          setValues(getPricingValues(res.data.pricing));
         } else if (!cancelled) {
           setLoadError("Unable to load saved pricing settings.");
         }
@@ -133,12 +152,7 @@ const PricingSettings = () => {
       }
 
       setSaved(res.data.pricing);
-      setValues({
-        freeShippingLimit: String(res.data.pricing.freeShippingLimit),
-        shippingCharge: String(res.data.pricing.shippingCharge),
-        shippingChargeforCOD: String(res.data.pricing.shippingChargeforCOD),
-        platformFee: String(res.data.pricing.platformFee),
-      });
+      setValues(getPricingValues(res.data.pricing));
       setLoadError("");
       toast.success("Pricing updated");
     } catch (error) {

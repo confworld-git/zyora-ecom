@@ -19,8 +19,6 @@ const API = import.meta.env.VITE_API_BASE_URL;
 
 const PRICING_FIELDS = [
   "freeShippingLimit",
-  "shippingCharge",
-  "shippingChargeforCOD",
   "platformFee",
 ];
 
@@ -93,6 +91,10 @@ const Cart = () => {
   const [pricingLoading, setPricingLoading] = useState(true);
   const [pricingError, setPricingError] = useState("");
   const [pricingRetry, setPricingRetry] = useState(0);
+  const [shippingQuote, setShippingQuote] = useState(null);
+  const [shippingQuoteLoading, setShippingQuoteLoading] = useState(false);
+  const [shippingQuoteError, setShippingQuoteError] = useState("");
+  const [shippingQuoteRetry, setShippingQuoteRetry] = useState(0);
 
   const [selectedCartIds, setSelectedCartIds] = useState(
     () => new Set(cartItems.map((item) => item.cartId)),
@@ -239,15 +241,95 @@ const Cart = () => {
     0,
   );
 
+  const selectedAddress = addresses[selectedAddressIndex];
+  const shippingQuoteKey = selectedAddress
+    ? [
+        selectedAddress.city,
+        selectedAddress.state,
+        selectedAddress.pinCode,
+        paymentMethod,
+        subtotal,
+      ].join("|")
+    : "";
+  const activeShippingQuote =
+    shippingQuote?.key === shippingQuoteKey ? shippingQuote : null;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!pricing || !selectedAddress || subtotal <= 0) {
+      setShippingQuote(null);
+      setShippingQuoteError("");
+      setShippingQuoteLoading(false);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const loadShippingQuote = async () => {
+      setShippingQuoteLoading(true);
+      setShippingQuoteError("");
+
+      try {
+        const response = await axios.post(`${API}/api/config/shipping-quote`, {
+          shippingAddress: selectedAddress,
+          paymentMethod,
+          subtotal,
+        });
+        const quote = response.data?.shippingQuote;
+
+        if (
+          !response.data?.success ||
+          !quote ||
+          typeof quote.regionLabel !== "string" ||
+          !Number.isFinite(Number(quote.shippingFee)) ||
+          Number(quote.shippingFee) < 0
+        ) {
+          throw new Error(
+            response.data?.message || "Invalid shipping quote response",
+          );
+        }
+
+        if (!cancelled) {
+          setShippingQuote({
+            ...quote,
+            shippingFee: Number(quote.shippingFee),
+            key: shippingQuoteKey,
+          });
+        }
+      } catch (error) {
+        console.error("Get shipping quote error:", error);
+        if (!cancelled) {
+          setShippingQuote(null);
+          setShippingQuoteError(
+            error.response?.data?.message ||
+              "Unable to calculate shipping for this address. Please try again.",
+          );
+        }
+      } finally {
+        if (!cancelled) setShippingQuoteLoading(false);
+      }
+    };
+
+    loadShippingQuote();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    pricing,
+    selectedAddress,
+    paymentMethod,
+    subtotal,
+    shippingQuoteKey,
+    shippingQuoteRetry,
+  ]);
+
   const freeShippingLimit = pricing?.freeShippingLimit ?? 0;
-  const shippingCharge =
-    paymentMethod === "cod"
-      ? pricing?.shippingChargeforCOD
-      : pricing?.shippingCharge;
   const shipping =
-    !pricing || subtotal === 0 || subtotal >= freeShippingLimit
+    !pricing || subtotal === 0 || !selectedAddress
       ? 0
-      : shippingCharge;
+      : (activeShippingQuote?.shippingFee ?? 0);
 
   const couponDiscount = appliedCoupon?.discountAmount || 0;
 
@@ -1074,6 +1156,12 @@ const Cart = () => {
                     "Loading…"
                   ) : pricingError ? (
                     "Unavailable"
+                  ) : !selectedAddress ? (
+                    "Select address"
+                  ) : shippingQuoteError ? (
+                    "Unavailable"
+                  ) : shippingQuoteLoading || !activeShippingQuote ? (
+                    "Calculating…"
                   ) : shipping === 0 && subtotal > 0 ? (
                     <span className="free_shipping">FREE</span>
                   ) : (
@@ -1084,6 +1172,26 @@ const Cart = () => {
                   )}
                 </strong>
               </div>
+
+              {shippingQuoteError && (
+                <p className="shipping_message" role="alert">
+                  {shippingQuoteError}{" "}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShippingQuoteRetry((attempt) => attempt + 1)
+                    }
+                  >
+                    Retry
+                  </button>
+                </p>
+              )}
+
+              {activeShippingQuote && (
+                <p className="shipping_message">
+                  Delivery region: {activeShippingQuote.regionLabel}
+                </p>
+              )}
 
               {pricingError && (
                 <p className="shipping_message" role="alert">
@@ -1144,7 +1252,10 @@ const Cart = () => {
 
                 <strong>
                   <i className="bi bi-currency-rupee"></i>
-                  {pricing ? total.toLocaleString("en-IN") : "—"}
+                  {pricing &&
+                  (subtotal === 0 || (selectedAddress && activeShippingQuote))
+                    ? total.toLocaleString("en-IN")
+                    : "—"}
                 </strong>
               </div>
 
@@ -1233,6 +1344,10 @@ const Cart = () => {
                   !pricing ||
                   pricingLoading ||
                   Boolean(pricingError) ||
+                  (Boolean(selectedAddress) &&
+                    (!activeShippingQuote ||
+                      shippingQuoteLoading ||
+                      Boolean(shippingQuoteError))) ||
                   placingOrder
                 }
                 onClick={handlePlaceOrder}
