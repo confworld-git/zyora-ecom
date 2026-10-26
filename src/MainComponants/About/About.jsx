@@ -57,18 +57,6 @@ const About = () => {
           </div>
           {/* <img src={home_img} alt="" /> */}
         </div>
-        {/* <div className="about_marquee" aria-hidden="true">
-          <div className="about_marquee_track">
-            <span>
-              THOUGHTFULLY CURATED ✦ QUALITY MEETS AFFORDABILITY ✦ MADE FOR
-              EVERYDAY MOMENTS ✦
-            </span>
-            <span>
-              THOUGHTFULLY CURATED ✦ QUALITY MEETS AFFORDABILITY ✦ MADE FOR
-              EVERYDAY MOMENTS ✦
-            </span>
-          </div>
-        </div> */}
         <ScrollReveal as="section" className="about_story">
           <div>
             <span className="about_eyebrow">Our Story</span>
@@ -165,7 +153,7 @@ const About = () => {
                 <div style={{ backgroundColor: "#263a69" }}>
                   <i
                     style={{ color: "#4397fd" }}
-                    class="bi bi-shield-fill-check"
+                    className="bi bi-shield-fill-check"
                   ></i>
                 </div>
                 <div>
@@ -175,7 +163,7 @@ const About = () => {
               </div>
               <div>
                 <div style={{ backgroundColor: "#3D3224" }}>
-                  <i style={{ color: "#FBBF24" }} class="bi bi-tags-fill"></i>
+                  <i style={{ color: "#FBBF24" }} className="bi bi-tags-fill"></i>
                 </div>
                 <div>
                   <h1>Honest Pricing</h1>
@@ -184,7 +172,7 @@ const About = () => {
               </div>
               <div>
                 <div style={{ backgroundColor: "#0F373C" }}>
-                  <i style={{ color: "#34D399" }} class="bi bi-headset"></i>
+                  <i style={{ color: "#34D399" }} className="bi bi-headset"></i>
                 </div>
                 <div>
                   <h1>Customer Care</h1>
