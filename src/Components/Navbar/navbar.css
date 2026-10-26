@@ -280,7 +280,7 @@
   outline-offset: 3px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 860px) {
   body:has(.navbar) {
     padding-bottom: calc(58px + env(safe-area-inset-bottom));
   }
