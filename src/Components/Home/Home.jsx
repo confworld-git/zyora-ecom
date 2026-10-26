@@ -10,7 +10,12 @@ const Home = () => {
   return (
     <ScrollReveal className="home-container">
       <div className="hero-copy">
-        <img src={home_pro1} alt="ZYORA | Where Everyday Meets Extraordinary" fetchPriority="high" decoding="async"/>
+        <img
+          src={home_pro1}
+          alt="ZYORA | Where Everyday Meets Extraordinary"
+          fetchPriority="high"
+          decoding="async"
+        />
         <span className="hero-eyebrow">Destination for E-commerce</span>
         <p>
           From cuddly soft toys to smart home essentials, handy stationery to

@@ -1,5 +1,6 @@
 import "./welcome.css";
 import ScrollReveal from "../ScrollReveal.jsx";
+import Globe from "../../assets/Images/Global.jpeg";
 
 const pillars = ["Quality", "Functionality", "Style", "Affordability"];
 
@@ -9,14 +10,9 @@ const Welcome = () => {
       <div className="wl-glow" aria-hidden="true" />
       <div className="wl-inner">
         <div className="wl-copy">
-          {/* <span className="wl-eyebrow" style={{ "--d": "0s" }}>
-            <i /> About us
-          </span> */}
-
           <h1 style={{ "--d": ".08s" }}>
             Welcome to <span>ZYORA</span>
           </h1>
-
           <p className="wl-lead" style={{ "--d": ".16s" }}>
             ZYORA is a growing e-commerce brand committed to making everyday
             shopping simple, convenient and reliable. We carefully select
@@ -40,26 +36,23 @@ const Welcome = () => {
 
         <div className="wl-visual" style={{ "--d": ".2s" }}>
           <div className="wl-frame">
-            <video
+            {/* <video
               className="wl-video"
-              src="https://res.cloudinary.com/zyora/video/upload/v1790328170/globe2_lgz10s.mp4"
+              src="https://res.cloudinary.com/yocetu59/video/upload/v1792993013/globe2.mp4"
               muted
               loop
               playsInline
               autoPlay
+            /> */}
+            <img
+              className="wl-video"
+              fetchPriority="high"
+              decoding="async"
+              src={Globe}
+              alt="ZYORA is a growing e-commerce brand committed to making everyday shopping simple, convenient and reliable."
+              aria-hidden="true"
             />
           </div>
-
-          {/* <div className="wl-goal">
-            <small>Our mission</small>
-            <h2>
-              Our goal is <span>simple</span>
-            </h2>
-            <p>
-              To make quality products accessible to everyone, with a shopping
-              experience you can trust.
-            </p>
-          </div> */}
         </div>
       </div>
     </ScrollReveal>

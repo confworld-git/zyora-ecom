@@ -47,12 +47,12 @@ const Homepage = () => {
         >
           <div className="zyora-marquee-track">
             <span>
-              SOFT TOYS ✦ HOME &amp; KITCHEN ✦ STATIONERY ✦ FASHION ✦ HANDBAGS
-              ✦ JEWELLERY ✦
+              SOFT TOYS ✦ HOME &amp; KITCHEN ✦ STATIONERY ✦ FASHION ✦ HANDBAGS ✦
+              JEWELLERY ✦
             </span>
             <span aria-hidden="true">
-              SOFT TOYS ✦ HOME &amp; KITCHEN ✦ STATIONERY ✦ FASHION ✦ HANDBAGS
-              ✦ JEWELLERY ✦
+              SOFT TOYS ✦ HOME &amp; KITCHEN ✦ STATIONERY ✦ FASHION ✦ HANDBAGS ✦
+              JEWELLERY ✦
             </span>
           </div>
         </ScrollReveal>

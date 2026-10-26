@@ -24,7 +24,7 @@ export default defineConfig({
 
   server: {
     allowedHosts: [
-      '43c5-49-204-142-138.ngrok-free.app'
+      'c818-49-204-118-12.ngrok-free.app'
     ],
 
     proxy: {
