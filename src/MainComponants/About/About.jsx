@@ -55,7 +55,6 @@ const About = () => {
               <br /> that's the whole idea behind ZYORA.
             </p>
           </div>
-          {/* <img src={home_img} alt="" /> */}
         </div>
         <ScrollReveal as="section" className="about_story">
           <div>
