@@ -138,9 +138,9 @@ const Favorites = () => {
                 </button>
                 <img src={product.image} alt={product.name || "Product"} />
                 <h1>{product.name}</h1>
-                <p className="fav_title">
+                {/* <p className="fav_title">
                   {product.title || "Beautiful product from Zyora."}{" "}
-                </p>
+                </p> */}
                 <p className="favourite_price">
                   <i className="bi bi-currency-rupee"></i>
                   {product.price?.toLocaleString("en-IN")}

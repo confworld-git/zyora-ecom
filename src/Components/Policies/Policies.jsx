@@ -45,14 +45,14 @@ If a delivery fails because of an incorrect address, unavailable recipient or re
 Please contact us promptly if you notice an error in your delivery address.
 
 ## 7. Damaged, Missing or Incorrect Items
-If your order arrives damaged, incomplete or with an incorrect product, contact us at [zyoraecommerce@gmail.com](mailto:zyoraecommerce@gmail.com) within 48 hours of delivery, preferably with photographs of the product, packaging and shipping label.
+If your order arrives damaged, incomplete or with an incorrect product, contact us at [support@zyoraecom.in](mailto:support@zyoraecom.in) within 48 hours of delivery, preferably with photographs of the product, packaging and shipping label.
 
 We will review the complaint and arrange an appropriate resolution in accordance with our Return & Refund Policy and applicable law.
 
 ## 8. Contact Information
 For shipping-related questions, please contact:
 - Business name: ZYORA
-- Email: [zyoraecommerce@gmail.com](mailto:zyoraecommerce@gmail.com)
+- Email: [support@zyoraecom.in](mailto:support@zyoraecom.in)
 - Phone: +91 7010423318`,
   },
   {
@@ -61,7 +61,7 @@ For shipping-related questions, please contact:
     content: `At ZYORA, customer satisfaction is important to us. This policy explains the conditions for requesting returns, exchanges, replacements and refunds for products purchased through [www.zyoraecom.in](https://www.zyoraecom.in).
 
 ## 1. Return Eligibility
-Customers may request a return within 2 days from delivery, provided the product is eligible under the product listing and this policy.
+Customers may request a return within 3 days from delivery, provided the product is eligible under the product listing and this policy.
 
 A product may qualify for return or replacement if:
 - It arrives damaged or defective.
@@ -89,7 +89,7 @@ Non-returnable status cannot be used as a blanket reason to refuse remedies requ
 
 ## 4. How to Request a Return
 To request a return or replacement:
-1. Contact [zyoraecommerce@gmail.com](mailto:zyoraecommerce@gmail.com) or use the Contact Us page.
+1. Contact [support@zyoraecom.in](mailto:support@zyoraecom.in) or use the Contact Us page.
 2. Provide your order number, product name and reason for the request.
 3. Attach photographs or videos if the product is damaged, defective or incorrect.
 4. Wait for instructions and confirmation from our support team.
@@ -131,7 +131,7 @@ We will investigate the issue with the relevant payment provider or courier part
 
 ## 10. Contact Us
 For return and refund requests:
-- Email: [zyoraecommerce@gmail.com](mailto:zyoraecommerce@gmail.com)
+- Email: [support@zyoraecom.in](mailto:support@zyoraecom.in)
 - Phone: +91 7010423318`,
   },
   {
@@ -145,7 +145,7 @@ By accessing or using the website, you agree to these terms and applicable laws.
 The website is operated by Suhale A.K, trading under the brand name ZYORA, with its registered or principal business address at Chennai, India.
 
 Customer support details:
-- Email: [zyoraecommerce@gmail.com](mailto:zyoraecommerce@gmail.com)
+- Email: [support@zyoraecom.in](mailto:support@zyoraecom.in)
 - Phone: +91 7010423318
 
 ## 2. Eligibility
@@ -212,7 +212,7 @@ Personal information collected through the website is handled according to our P
 
 ## 13. Complaints and Grievance Redressal
 Customers may submit complaints using the Contact Us page or the customer support details displayed on the website.
-- Email: [zyoraecommerce@gmail.com](mailto:zyoraecommerce@gmail.com)
+- Email: [support@zyoraecom.in](mailto:support@zyoraecom.in)
 - Phone: +91 7010423318
 
 We will acknowledge complaints within the legally required timeframe and seek to resolve them within the applicable statutory period. Under the current e-commerce rules, a consumer complaint is generally required to be acknowledged within 48 hours and redressed within one month.
@@ -319,7 +319,7 @@ Subject to applicable law and its commencement provisions, you may have rights t
 - Raise a privacy grievance or complaint.
 - Exercise other rights available under applicable data-protection law.
 
-To submit a request, contact [zyoraecommerce@gmail.com](mailto:zyoraecommerce@gmail.com).
+To submit a request, contact [support@zyoraecom.in](mailto:support@zyoraecom.in).
 
 We may need to verify your identity before acting on a request.
 

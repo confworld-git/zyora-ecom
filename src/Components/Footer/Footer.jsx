@@ -143,7 +143,7 @@ const Footer = () => {
             <h5 className="footer-connect-heading">Connect With Us</h5>
             <div className="footer-socials">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/zyoraecommerce/"
                 target="_blank"
                 rel="noreferrer"
                 className="instagram"
@@ -153,7 +153,7 @@ const Footer = () => {
               </a>
 
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/profile.php?id=61595436959657"
                 target="_blank"
                 rel="noreferrer"
                 className="facebook"
@@ -163,13 +163,22 @@ const Footer = () => {
               </a>
 
               <a
-                href="https://wa.me/919876543210"
+                href="https://wa.me/917010423318"
                 target="_blank"
                 rel="noreferrer"
                 className="whatsapp"
                 title="WhatsApp"
               >
                 <i className="bi bi-whatsapp"></i>
+              </a>
+              <a
+                href="https://www.youtube.com/@zyoraecom"
+                target="_blank"
+                rel="noreferrer"
+                className="YouTube"
+                title="YouTube"
+              >
+                <i className="bi bi-youtube"></i>
               </a>
             </div>
           </div>

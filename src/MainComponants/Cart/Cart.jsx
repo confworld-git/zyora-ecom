@@ -1033,7 +1033,7 @@ const Cart = () => {
                 </p>
               )}
 
-              <div className="summary_row">
+              {/* <div className="summary_row">
                 <span>
                   Platform Fee{" "}
                   <button
@@ -1049,7 +1049,7 @@ const Cart = () => {
                   <i className="bi bi-currency-rupee"></i>
                   {pricing ? pricing.platformFee.toLocaleString("en-IN") : "—"}
                 </strong>
-              </div>
+              </div> */}
 
               {/* <div className="summary_row">
                 <span>Free shipping above</span>
