@@ -611,7 +611,9 @@
   }
 
   .about_title > div > h1 {
-    font-size: 35px;
+    font-size: 20px;
+    margin-top: -50px;
+    margin-bottom: 50px;
   }
 
   .about_title > div > p{
