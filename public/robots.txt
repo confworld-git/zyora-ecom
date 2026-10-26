@@ -5,4 +5,4 @@ Disallow: /Cart
 Disallow: /Favorites
 Disallow: /Payment_result
 
-Sitemap: www.zyoraecom.in/sitemap.xml
+Sitemap: http://localhost:5000/sitemap.xml

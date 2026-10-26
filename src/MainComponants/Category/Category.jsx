@@ -1033,6 +1033,7 @@ const Category = () => {
                         {product.images?.[0]?.url ? (
                           <img
                             src={product.images[0].url}
+                            loading="lazy"
                             alt={
                               product.images[0].alt ||
                               product.name ||

@@ -280,6 +280,7 @@ const ProductDetail = () => {
                 <img
                   key={image.id}
                   src={image.url}
+                  loading="lazy"
                   alt={image.alt || productName}
                   className={activeImage?.id === image.id ? "selected" : ""}
                   onClick={() => selectImage(image)}
@@ -298,6 +299,7 @@ const ProductDetail = () => {
               >
                 {images[0]?.url && (
                   <img
+                    loading="lazy"
                     className="product-video-poster"
                     src={images[0].url}
                     alt=""
@@ -332,9 +334,7 @@ const ProductDetail = () => {
             <small>{product.brand}</small>
             {/* <p className="product-category">{product.category}</p> */}
             <h1>{productName}</h1>
-            {productTitle && (
-              <p className="product-title">{productTitle}</p>
-            )}
+            {productTitle && <p className="product-title">{productTitle}</p>}
 
             <div className="detail-price">
               <strong>₹{product.price?.selling_price}</strong>
