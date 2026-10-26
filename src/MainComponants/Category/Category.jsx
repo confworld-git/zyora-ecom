@@ -1033,7 +1033,8 @@ const Category = () => {
                         {product.images?.[0]?.url ? (
                           <img
                             src={product.images[0].url}
-                            loading="lazy"
+                            fetchPriority="high"
+                            decoding="async"
                             alt={
                               product.images[0].alt ||
                               product.name ||
@@ -1126,7 +1127,12 @@ const Category = () => {
                     >
                       <span className="category_card_image" aria-hidden="true">
                         {image ? (
-                          <img src={image} alt="" loading="lazy" />
+                          <img
+                            src={image}
+                            alt=""
+                            fetchPriority="high"
+                            decoding="async"
+                          />
                         ) : (
                           <MdCategory className="category_card_image_fallback" />
                         )}

@@ -299,7 +299,8 @@ const ProductDetail = () => {
               >
                 {images[0]?.url && (
                   <img
-                    loading="lazy"
+                    fetchPriority="high"
+                    decoding="async"
                     className="product-video-poster"
                     src={images[0].url}
                     alt=""

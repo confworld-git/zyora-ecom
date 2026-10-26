@@ -26,7 +26,13 @@ export default function ProductZoom({ image }) {
         onMouseLeave={() => setZooming(false)}
         onMouseMove={handleMouseMove}
       >
-        <img src={image} alt="Product" draggable={false} />
+        <img
+          src={image}
+          fetchPriority="high"
+          decoding="async"
+          alt="Product"
+          draggable={false}
+        />
 
         {zooming && (
           <div
