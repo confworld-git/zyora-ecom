@@ -15,7 +15,7 @@ const templatePath = path.join(distPath, "index.html");
 const template = fs.readFileSync(templatePath, "utf-8");
 
 // Load VITE_API_BASE_URL from .env
-const env = loadEnv("production", process.cwd(), "");
+const env = loadEnv("production", path.resolve(__dirname, ".."), "");
 
 const API_BASE_URL = env.VITE_API_BASE_URL;
 
@@ -50,6 +50,8 @@ const routes = [
   "/About_Us",
   "/Contact_Us",
   "/Zyora_Category",
+  "/Jewellery",
+  "/policies",
 ];
 
 
@@ -166,16 +168,12 @@ function writeRoute(route, products = null) {
 // --------------------------------------------------
 
 async function prerender() {
+  const products = await getProducts();
 
   // Static pages
   for (const route of routes) {
-    writeRoute(route);
+    writeRoute(route, products);
   }
-
-
-  // Fetch products
-  const products = await getProducts();
-
 
   // Product pages
   for (const product of products) {
