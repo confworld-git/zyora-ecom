@@ -25,6 +25,7 @@ import { useAuth } from "./Context/AuthContext.jsx";
 
 export const ProfileRedirect = () => {
   const { customer } = useAuth();
+  if (!customer?.customerId) return <Navigate to="/Login" replace />;
   return <Navigate to={`/Profile/${customer.customerId}`} replace />;
 };
 
@@ -57,7 +58,6 @@ export const AppRoutes = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/Favorites" element={<Favorites />} />
           <Route path="/favorites" element={<Favorites />} />
-          <Route path="/Zyora_Category" element={<Category />} />
           <Route path="/Zyora_Category" element={<Category />} />
           <Route path="/shop" element={<Category />} />
           <Route path="/products" element={<Category />} />
@@ -113,11 +113,8 @@ export const AppRoutes = () => {
             path="/Zyora_Category/product/:productId/:slug"
             element={<ProductDetail />}
           />
-          <Route path="/Payment_result" element={<PaymentSuccess />} />
-          <Route path="/Payment_result" element={<PaymentSuccess />} />
           <Route path="/payment_result" element={<PaymentSuccess />} />
           <Route path="/Payment_failure" element={<PaymentFailure />} />
-          <Route path="/payment_failure" element={<PaymentFailure />} />
           <Route
             path="/Dashboard"
             element={
