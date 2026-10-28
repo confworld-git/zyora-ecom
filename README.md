@@ -12,13 +12,14 @@ before choosing **Send to Shiprocket**. If a shipment was deleted in Shiprocket,
 verify that there first, then use **Mark deleted in Shiprocket** to clear its
 stored tracking IDs and unlock order updates or another Shiprocket submission.
 
-The A4 invoice and 4x6-inch shipping label templates are rendered in the browser
-and downloaded directly as PDF files; the generated PDFs are not stored on the
-server. The invoice includes the customer and sender details, order/payment
-status, items and quantities, shipping/platform charges, discounts, and total.
-It is an order summary, not a GST tax invoice. The shipping label includes
-sender and recipient addresses, product details, order number, and print date.
-The label is not a courier-issued or prepaid postage label.
+The A4 invoice and shipping-label HTML templates are rendered in the browser
+and downloaded directly as single-page A4 PDF files; the generated PDFs are not
+stored on the server. All template content is scaled to fit on that one page.
+The invoice includes customer and sender details, order/payment status, items
+and quantities, shipping/platform charges, discounts, and total. It is an order
+summary, not a GST tax invoice. The shipping label includes sender and
+recipient addresses, product details, order number, and print date. The label
+is not a courier-issued or prepaid postage label.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

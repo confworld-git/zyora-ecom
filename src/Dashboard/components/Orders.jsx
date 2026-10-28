@@ -187,7 +187,7 @@ const Orders = ({ initialOrderId = "" }) => {
       await downloadHtmlAsPdf(
         `${API}/${order._id}/shipping-label.html`,
         `${order.orderId}-shipping-label.pdf`,
-        [101.6, 152.4],
+        "a4",
         config,
       );
     } catch (error) {

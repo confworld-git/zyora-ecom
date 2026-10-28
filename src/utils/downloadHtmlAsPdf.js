@@ -53,51 +53,50 @@ const downloadHtmlAsPdf = async (url, filename, pageFormat, config) => {
       throw new Error("The document template is missing its printable page.");
     }
 
-    const templateStyles = [
-      ...frameDocument.head.querySelectorAll('style, link[rel="stylesheet"]'),
-    ];
-    const { default: html2pdf } = await import("html2pdf.js");
-    const pdfBlob = await html2pdf()
-      .set({
-        filename,
-        margin: 0,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          logging: false,
-          onclone: async (clonedDocument) => {
-            const stylesheetLoads = [];
-            for (const style of templateStyles) {
-              const clonedStyle = style.cloneNode(true);
-              if (clonedStyle.tagName === "LINK") {
-                stylesheetLoads.push(
-                  new Promise((resolve) => {
-                    clonedStyle.addEventListener("load", resolve, {
-                      once: true,
-                    });
-                    clonedStyle.addEventListener("error", resolve, {
-                      once: true,
-                    });
-                  }),
-                );
-              }
-              clonedDocument.head.appendChild(clonedStyle);
-            }
-            await Promise.all(stylesheetLoads);
-            await clonedDocument.fonts?.ready;
-          },
-        },
-        jsPDF: {
-          unit: "mm",
-          format: pageFormat,
-          orientation: "portrait",
-        },
-        pagebreak: { mode: ["css", "legacy"], avoid: ["tr", ".totals"] },
-      })
-      .from(root)
-      .outputPdf("blob");
+    const contentHeight = Math.max(
+      root.scrollHeight,
+      root.getBoundingClientRect().height,
+    );
+    root.style.height = `${contentHeight}px`;
+    root.style.minHeight = "0";
+    root.style.overflow = "visible";
+
+    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+      import("html2canvas"),
+      import("jspdf"),
+    ]);
+    const canvas = await html2canvas(root, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+      windowWidth: Math.max(root.scrollWidth, root.offsetWidth),
+      windowHeight: contentHeight,
+    });
+    const pdf = new jsPDF({
+      unit: "mm",
+      format: pageFormat,
+      orientation: "portrait",
+    });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const fitScale = Math.min(
+      pageWidth / canvas.width,
+      pageHeight / canvas.height,
+    );
+    const imageWidth = canvas.width * fitScale;
+    const imageHeight = canvas.height * fitScale;
+    const imageX = (pageWidth - imageWidth) / 2;
+    const imageY = (pageHeight - imageHeight) / 2;
+    pdf.addImage(
+      canvas.toDataURL("image/jpeg", 0.98),
+      "JPEG",
+      imageX,
+      imageY,
+      imageWidth,
+      imageHeight,
+    );
+    const pdfBlob = pdf.output("blob");
     const objectUrl = URL.createObjectURL(pdfBlob);
     const link = document.createElement("a");
     link.href = objectUrl;
