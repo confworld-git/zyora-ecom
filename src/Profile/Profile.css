@@ -614,6 +614,10 @@
   cursor: pointer;
 }
 
+.zyora-order-tracking > .zyora-track-order-btn + .zyora-track-order-btn {
+  margin-left: 8px;
+}
+
 .zyora-track-order-btn:hover:not(:disabled) {
   background: var(--pf-navy-soft);
 }

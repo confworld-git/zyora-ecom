@@ -48,13 +48,13 @@ const Home = ({
             Go to orders <FiArrowUpRight />
           </button>
         </div>
-        <div className="dashboard_welcome-art" aria-hidden="true">
+        {/* <div className="dashboard_welcome-art" aria-hidden="true">
           <span className="dashboard-art-orbit dashboard-art-orbit-one" />
           <span className="dashboard-art-orbit dashboard-art-orbit-two" />
           <span className="dashboard-art-sparkle">✳</span>
           <span className="dashboard-art-monogram">Z</span>
           <span className="dashboard-art-caption">CURATED FOR YOU</span>
-        </div>
+        </div> */}
       </section>
 
       <div className="dashboard_section-heading">

@@ -23,6 +23,7 @@ import { useAuth } from "../Context/AuthContext.jsx";
 import "./Profile.css";
 import SEO from "../SEO.jsx";
 import ScrollReveal from "../Components/ScrollReveal.jsx";
+import downloadHtmlAsPdf from "../utils/downloadHtmlAsPdf.js";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -221,6 +222,27 @@ const OrderTracking = ({ order }) => {
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+
+  const downloadInvoice = async () => {
+    try {
+      setDownloadingInvoice(true);
+      await downloadHtmlAsPdf(
+        `${API}/api/orders/${order._id}/invoice.html`,
+        `${order.orderId}-invoice.pdf`,
+        "a4",
+        { withCredentials: true },
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Unable to download the invoice PDF. Please try again.",
+      );
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
 
   const showTracking = async () => {
     if (expanded) {
@@ -261,13 +283,33 @@ const OrderTracking = ({ order }) => {
       >
         {loading ? "Loading tracking…" : expanded ? "Hide tracking" : "Track order"}
       </button>
+      <button
+        type="button"
+        className="zyora-track-order-btn"
+        onClick={downloadInvoice}
+        disabled={downloadingInvoice}
+      >
+        {downloadingInvoice ? "Preparing invoice PDF…" : "Download invoice PDF"}
+      </button>
       {error && <p className="zyora-profile-error">{error}</p>}
       {expanded && tracking && (
         <div className="zyora-order-tracking-panel">
-          {tracking.awb ? (
+          {tracking.trackingNumber || tracking.awb ? (
             <div className="zyora-tracking-courier">
               <strong>{tracking.courierName || "Courier assigned"}</strong>
-              <span>AWB {tracking.awb}</span>
+              <span>
+                {tracking.shippingMethod === "self" ? "Tracking" : "AWB"}{" "}
+                {tracking.trackingNumber || tracking.awb}
+              </span>
+              {tracking.trackingUrl && (
+                <a
+                  href={tracking.trackingUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Track with carrier
+                </a>
+              )}
               {tracking.shipmentStatus && (
                 <span>Latest update: {tracking.shipmentStatus}</span>
               )}

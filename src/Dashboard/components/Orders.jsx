@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { FiChevronDown } from "react-icons/fi";
 import "../styles/Management.css";
+import downloadHtmlAsPdf from "../../utils/downloadHtmlAsPdf.js";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/admin/orders`;
 const config = { withCredentials: true };
@@ -41,6 +42,7 @@ const Orders = ({ initialOrderId = "" }) => {
   const [busyOrder, setBusyOrder] = useState("");
   const [openDetailsId, setOpenDetailsId] = useState("");
   const [sendingOrder, setSendingOrder] = useState("");
+  const [downloadingOrder, setDownloadingOrder] = useState("");
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -59,17 +61,12 @@ const Orders = ({ initialOrderId = "" }) => {
   }, [fetchOrders]);
 
   useEffect(() => {
-    const closeDetailsOutside = (event) => {
-      if (!event.target.closest(".order-details")) setOpenDetailsId("");
-    };
     const closeDetailsOnEscape = (event) => {
       if (event.key === "Escape") setOpenDetailsId("");
     };
 
-    document.addEventListener("pointerdown", closeDetailsOutside);
     document.addEventListener("keydown", closeDetailsOnEscape);
     return () => {
-      document.removeEventListener("pointerdown", closeDetailsOutside);
       document.removeEventListener("keydown", closeDetailsOnEscape);
     };
   }, []);
@@ -97,7 +94,16 @@ const Orders = ({ initialOrderId = "" }) => {
       paymentStatus: order.paymentStatus,
       paymentMethod: order.paymentMethod,
       stockReservationStatus: order.stockReservationStatus,
+      shippingMethod:
+        order.shippingMethod ||
+        (order.shipment?.awb || order.shipment?.shipmentId
+          ? "shiprocket"
+          : "self"),
+      trackingNumber: order.shipment?.trackingNumber || "",
+      trackingUrl: order.shipment?.trackingUrl || "",
+      courierName: order.shipment?.courierName || "",
       hasShipment: Boolean(order.shipment?.awb || order.shipment?.shipmentId),
+      shiprocketDeletedAt: order.shipment?.shiprocketDeletedAt || null,
       shippingAddress: {
         name: order.shippingAddress?.name || "",
         mobile: order.shippingAddress?.mobile || "",
@@ -128,7 +134,15 @@ const Orders = ({ initialOrderId = "" }) => {
         {
           orderStatus: editing.orderStatus,
           paymentStatus: editing.paymentStatus,
-          shippingAddress: editing.shippingAddress,
+          shippingMethod: editing.shippingMethod,
+          ...(editing.shippingMethod === "self" && {
+            trackingNumber: editing.trackingNumber,
+            trackingUrl: editing.trackingUrl,
+            courierName: editing.courierName,
+          }),
+          ...(!editing.hasShipment && {
+            shippingAddress: editing.shippingAddress,
+          }),
         },
         config,
       );
@@ -143,6 +157,81 @@ const Orders = ({ initialOrderId = "" }) => {
       toast.error(error.response?.data?.message || "Unable to update order");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const downloadOrderInvoice = async (order) => {
+    const key = `${order._id}-invoice`;
+    try {
+      setDownloadingOrder(key);
+      await downloadHtmlAsPdf(
+        `${API}/${order._id}/invoice.html`,
+        `${order.orderId}-invoice.pdf`,
+        "a4",
+        config,
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Unable to download the invoice PDF.",
+      );
+    } finally {
+      setDownloadingOrder("");
+    }
+  };
+
+  const downloadShippingLabel = async (order) => {
+    try {
+      setDownloadingOrder(`${order._id}-label`);
+      await downloadHtmlAsPdf(
+        `${API}/${order._id}/shipping-label.html`,
+        `${order.orderId}-shipping-label.pdf`,
+        [101.6, 152.4],
+        config,
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Unable to download the shipping label PDF",
+      );
+    } finally {
+      setDownloadingOrder("");
+    }
+  };
+
+  const markShiprocketDeleted = async (order) => {
+    if (
+      !window.confirm(
+        `Confirm that shipment ${
+          order.shipment?.awb || order.shipment?.shipmentId || ""
+        } was deleted in Shiprocket? This clears its tracking details and unlocks store order updates.`,
+      )
+    ) {
+      return;
+    }
+    try {
+      setBusyOrder(order._id);
+      const response = await axios.post(
+        `${API}/${order._id}/shiprocket-deleted`,
+        {},
+        config,
+      );
+      setOrders((current) =>
+        current.map((item) =>
+          item._id === order._id ? response.data.order : item,
+        ),
+      );
+      toast.success(response.data.message || "Shiprocket shipment cleared");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Unable to update the Shiprocket shipment",
+      );
+      await fetchOrders();
+    } finally {
+      setBusyOrder("");
     }
   };
 
@@ -277,12 +366,17 @@ const Orders = ({ initialOrderId = "" }) => {
                 <th>Payment</th>
                 <th>Placed</th>
                 <th>Actions</th>
-                <th>Shiprocket</th>
+                <th>Shipping</th>
               </tr>
             </thead>
             <tbody>
               {visibleOrders.map((order) => {
                 const customer = order.customer || {};
+                const shippingMethod =
+                  order.shippingMethod ||
+                  (order.shipment?.awb || order.shipment?.shipmentId
+                    ? "shiprocket"
+                    : "self");
                 return (
                   <tr key={order._id}>
                     <td>
@@ -310,42 +404,6 @@ const Orders = ({ initialOrderId = "" }) => {
                             aria-hidden="true"
                           />
                         </button>
-                        {openDetailsId === order._id && (
-                          <div className="order-detail-popover">
-                            <strong>Delivery address</strong>
-                            <p>
-                              {order.shippingAddress?.name} ·{" "}
-                              {order.shippingAddress?.mobile}
-                              <br />
-                              {[
-                                order.shippingAddress?.houseNumber,
-                                order.shippingAddress?.address,
-                                order.shippingAddress?.locality,
-                                order.shippingAddress?.city,
-                                order.shippingAddress?.state,
-                                order.shippingAddress?.pinCode,
-                              ]
-                                .filter(Boolean)
-                                .join(", ")}
-                            </p>
-                            <strong>Order items</strong>
-                            {order.items?.map((item, index) => (
-                              <p key={`${item.productId}-${index}`}>
-                                {item.name} × {item.quantity} ·{" "}
-                                {currency(item.price)}
-                                {item.size && ` · ${item.size}`}
-                                {item.color && ` · ${item.color}`}
-                              </p>
-                            ))}
-                            <p>
-                              Subtotal {currency(order.subtotal)} · Shipping
-                              {order.shippingRegion
-                                ? ` (${titleCase(order.shippingRegion)}) `
-                                : " "}
-                              {currency(order.shippingFee)}
-                            </p>
-                          </div>
-                        )}
                       </div>
                     </td>
                     <td>
@@ -393,73 +451,122 @@ const Orders = ({ initialOrderId = "" }) => {
                       </div>
                     </td>
                     <td className="shipment-cell">
-                      {["submitting", "unknown"].includes(
-                        order.shipment?.submissionState,
-                      ) ? (
-                        <span className="shipment-state shipment-state-pending">
-                          <strong>
-                            {order.shipment.submissionState === "unknown"
-                              ? "Submission needs review"
-                              : "Submission in progress"}
-                          </strong>
-                          <small>
-                            Verify Shiprocket before attempting a retry
-                          </small>
-                        </span>
-                      ) : order.shipment?.shipmentId || order.shipment?.awb ? (
+                      {shippingMethod === "self" ? (
                         <div className="shipment-assigned">
-                          <span className="shipment-status-dot" aria-hidden="true" />
+                          <span
+                            className="shipment-status-dot"
+                            aria-hidden="true"
+                          />
                           <div>
-                            <strong>
-                              {order.shipment.awb
-                                ? order.shipment.courierName || "Courier assigned"
-                                : "Sent to Shiprocket"}
-                            </strong>
-                            {order.shipment.shiprocketOrderId && (
-                              <small>
-                                Shiprocket order:{" "}
-                                {order.shipment.shiprocketOrderId}
-                              </small>
+                            <strong>Self-shipping</strong>
+                            {order.shipment?.courierName && (
+                              <small>{order.shipment.courierName}</small>
                             )}
-                            <small>
-                              {order.shipment.awb
-                                ? `AWB: ${order.shipment.awb}`
-                                : "Courier assignment and AWB pending"}
-                            </small>
+                            {order.shipment?.trackingNumber ? (
+                              <small>
+                                Tracking: {order.shipment.trackingNumber}
+                              </small>
+                            ) : (
+                              <small>Tracking details not added</small>
+                            )}
+                            {order.shipment?.status && (
+                              <small>{titleCase(order.shipment.status)}</small>
+                            )}
                           </div>
                         </div>
-                      ) : [
-                            "shipped",
-                            "delivered",
-                            "cancelled",
-                            "refunded",
-                          ].includes(
-                            order.orderStatus,
-                          ) ? (
-                        <span className="shipment-state shipment-state-muted">
-                          <strong>{titleCase(order.orderStatus)}</strong>
-                          <small>No shipment details recorded</small>
-                        </span>
-                      ) : order.paymentMethod === "online" &&
-                        order.paymentStatus !== "paid" ? (
-                        <span className="shipment-state shipment-state-pending">
-                          <strong>Payment pending</strong>
-                          <small>Confirm payment before shipping</small>
-                        </span>
                       ) : (
-                        <button
-                          type="button"
-                          disabled={
-                            busyOrder === order._id ||
-                            sendingOrder === order._id
-                          }
-                          onClick={() => sendOrderToShiprocket(order)}
-                          className="shipment-send-button"
-                        >
-                          {sendingOrder === order._id
-                            ? "Sending…"
-                            : "Send to Shiprocket"}
-                        </button>
+                        <>
+                          {["submitting", "unknown"].includes(
+                            order.shipment?.submissionState,
+                          ) ? (
+                            <span className="shipment-state shipment-state-pending">
+                              <strong>
+                                {order.shipment.submissionState === "unknown"
+                                  ? "Submission needs review"
+                                  : "Submission in progress"}
+                              </strong>
+                              <small>
+                                Verify Shiprocket before attempting a retry
+                              </small>
+                            </span>
+                          ) : order.shipment?.shipmentId ||
+                            order.shipment?.awb ? (
+                            <div className="shipment-assigned">
+                              <span
+                                className="shipment-status-dot"
+                                aria-hidden="true"
+                              />
+                              <div>
+                                <strong>
+                                  {order.shipment.awb
+                                    ? order.shipment.courierName ||
+                                      "Courier assigned"
+                                    : "Sent to Shiprocket"}
+                                </strong>
+                                {order.shipment.shiprocketOrderId && (
+                                  <small>
+                                    Shiprocket order:{" "}
+                                    {order.shipment.shiprocketOrderId}
+                                  </small>
+                                )}
+                                <small>
+                                  {order.shipment.awb
+                                    ? `AWB: ${order.shipment.awb}`
+                                    : "Courier assignment and AWB pending"}
+                                </small>
+                              </div>
+                            </div>
+                          ) : [
+                              "shipped",
+                              "delivered",
+                              "cancelled",
+                              "refunded",
+                            ].includes(order.orderStatus) ? (
+                            <span className="shipment-state shipment-state-muted">
+                              <strong>{titleCase(order.orderStatus)}</strong>
+                              <small>No shipment details recorded</small>
+                            </span>
+                          ) : order.paymentMethod === "online" &&
+                            order.paymentStatus !== "paid" ? (
+                            <span className="shipment-state shipment-state-pending">
+                              <strong>Payment pending</strong>
+                              <small>Confirm payment before shipping</small>
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled={
+                                busyOrder === order._id ||
+                                sendingOrder === order._id
+                              }
+                              onClick={() => sendOrderToShiprocket(order)}
+                              className="shipment-send-button"
+                            >
+                              {sendingOrder === order._id
+                                ? "Sending…"
+                                : "Send to Shiprocket"}
+                            </button>
+                          )}
+                          {order.shipment?.shipmentId || order.shipment?.awb ? (
+                            <button
+                              type="button"
+                              className="shipment-reset-button"
+                              disabled={
+                                busyOrder === order._id ||
+                                Boolean(order.shipment?.locked)
+                              }
+                              onClick={() => markShiprocketDeleted(order)}
+                            >
+                              {busyOrder === order._id
+                                ? "Updating…"
+                                : "Mark deleted in Shiprocket"}
+                            </button>
+                          ) : order.shipment?.shiprocketDeletedAt ? (
+                            <small className="shipment-deleted-note">
+                              Previous Shiprocket shipment marked deleted
+                            </small>
+                          ) : null}
+                        </>
                       )}
                     </td>
                   </tr>
@@ -469,6 +576,162 @@ const Orders = ({ initialOrderId = "" }) => {
           </table>
         </div>
       )}
+
+      {openDetailsId &&
+        (() => {
+          const order = orders.find((item) => item._id === openDetailsId);
+          if (!order) return null;
+          const customer = order.customer || {};
+          const address = order.shippingAddress || {};
+          const shippingMethod =
+            order.shippingMethod ||
+            (order.shipment?.awb || order.shipment?.shipmentId
+              ? "shiprocket"
+              : "self");
+          return (
+            <div
+              className="management-modal-backdrop order-details-modal-backdrop"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget)
+                  setOpenDetailsId("");
+              }}
+            >
+              <section
+                className="management-modal order-details-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="order-details-title"
+              >
+                <div className="management-modal-heading">
+                  <div>
+                    <span className="management-eyebrow">ORDER DETAILS</span>
+                    <h2 id="order-details-title">{order.orderId}</h2>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Close order details"
+                    onClick={() => setOpenDetailsId("")}
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="order-details-summary">
+                  <div>
+                    <strong>Customer</strong>
+                    <span>
+                      {customer.name || address.name || "Customer"}
+                    </span>
+                    <span>{customer.email || customer.mobile || "—"}</span>
+                  </div>
+                  <div>
+                    <strong>Order status</strong>
+                    <span>{titleCase(order.orderStatus)}</span>
+                  </div>
+                  <div>
+                    <strong>Payment</strong>
+                    <span>
+                      {titleCase(order.paymentStatus)} ·{" "}
+                      {titleCase(order.paymentMethod)}
+                    </span>
+                  </div>
+                  <div>
+                    <strong>Shipping</strong>
+                    <span>{titleCase(shippingMethod)}</span>
+                  </div>
+                  <div>
+                    <strong>Placed</strong>
+                    <span>{dateLabel(order.createdAt)}</span>
+                  </div>
+                </div>
+                <div className="order-details-content">
+                  <section>
+                    <h3>Delivery address</h3>
+                    <p>
+                      <strong>{address.name || "—"}</strong>
+                      {address.mobile && ` · ${address.mobile}`}
+                      <br />
+                      {[
+                        address.houseNumber,
+                        address.address,
+                        address.locality,
+                        address.city,
+                        address.state,
+                        address.pinCode,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                  </section>
+                  <section>
+                    <h3>Order items</h3>
+                    <div className="order-details-items">
+                      {(order.items || []).map((item, index) => (
+                        <div key={`${item.productId}-${index}`}>
+                          <span>
+                            {item.name}
+                            {(item.size || item.color) && (
+                              <small>
+                                {[item.size, item.color]
+                                  .filter(Boolean)
+                                  .join(" · ")}
+                              </small>
+                            )}
+                          </span>
+                          <span>
+                            {item.quantity} × {currency(item.price)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                  <div className="order-document-actions">
+                    <button
+                      type="button"
+                      disabled={downloadingOrder === `${order._id}-invoice`}
+                      onClick={() => downloadOrderInvoice(order)}
+                    >
+                      {downloadingOrder === `${order._id}-invoice`
+                        ? "Preparing invoice PDF…"
+                        : "Download invoice PDF"}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={downloadingOrder === `${order._id}-label`}
+                      onClick={() => downloadShippingLabel(order)}
+                    >
+                      {downloadingOrder === `${order._id}-label`
+                        ? "Preparing label PDF…"
+                        : "Download label PDF"}
+                    </button>
+                  </div>
+                  <div className="order-details-totals">
+                    <span>
+                      Subtotal <strong>{currency(order.subtotal)}</strong>
+                    </span>
+                    <span>
+                      Shipping <strong>{currency(order.shippingFee)}</strong>
+                    </span>
+                    {Number(order.platformFee) > 0 && (
+                      <span>
+                        Platform fee{" "}
+                        <strong>{currency(order.platformFee)}</strong>
+                      </span>
+                    )}
+                    {Number(order.couponDiscount) > 0 && (
+                      <span>
+                        Discount{" "}
+                        <strong>-{currency(order.couponDiscount)}</strong>
+                      </span>
+                    )}
+                    <span className="order-details-grand-total">
+                      Total <strong>{currency(order.total)}</strong>
+                    </span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          );
+        })()}
 
       {editing && (
         <div
@@ -513,7 +776,9 @@ const Orders = ({ initialOrderId = "" }) => {
                       disabled={
                         (editing.hasShipment &&
                           status !== editing.orderStatus) ||
-                        (["shipped", "delivered"].includes(status) &&
+                        (editing.shippingMethod === "shiprocket" &&
+                          !editing.shiprocketDeletedAt &&
+                          ["shipped", "delivered"].includes(status) &&
                           status !== editing.orderStatus) ||
                         (editing.paymentMethod === "online" &&
                           editing.paymentStatus === "paid" &&
@@ -523,6 +788,69 @@ const Orders = ({ initialOrderId = "" }) => {
                       {titleCase(status)}
                     </option>
                   ))}
+                </select>
+              </label>
+              {editing.shippingMethod === "self" && (
+                <>
+                  <label>
+                    Carrier name
+                    <input
+                      value={editing.courierName}
+                      maxLength={120}
+                      onChange={(event) =>
+                        setEditing({
+                          ...editing,
+                          courierName: event.target.value,
+                        })
+                      }
+                      placeholder="Optional"
+                    />
+                  </label>
+                  <label>
+                    Tracking number
+                    <input
+                      value={editing.trackingNumber}
+                      maxLength={120}
+                      onChange={(event) =>
+                        setEditing({
+                          ...editing,
+                          trackingNumber: event.target.value,
+                        })
+                      }
+                      placeholder="Enter tracking ID"
+                    />
+                  </label>
+                  <label className="management-form-wide">
+                    Tracking URL
+                    <input
+                      type="url"
+                      value={editing.trackingUrl}
+                      maxLength={500}
+                      onChange={(event) =>
+                        setEditing({
+                          ...editing,
+                          trackingUrl: event.target.value,
+                        })
+                      }
+                      placeholder="https://carrier.example/track/..."
+                    />
+                  </label>
+                </>
+              )}
+              <label>
+                Shipping method
+                <select
+                  value={editing.shippingMethod}
+                  onChange={(event) =>
+                    setEditing({
+                      ...editing,
+                      shippingMethod: event.target.value,
+                    })
+                  }
+                  disabled={editing.hasShipment}
+                >
+                  <option value="self">Self-shipping</option>
+                  <option value="shiprocket">Shiprocket</option>
                 </select>
               </label>
               <label>

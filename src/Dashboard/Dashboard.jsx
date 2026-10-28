@@ -145,7 +145,7 @@ const Dashboard = () => {
       <section className="dashboard_secton">
         <aside className="dashboard_left_section">
           <div className="dashboard_brand">
-            <span className="dashboard_brand-mark" aria-hidden="true">Z</span>
+            {/* <span className="dashboard_brand-mark" aria-hidden="true">Z</span> */}
             <div>
               <h1>ZYORA</h1>
               <span>STORE ADMIN</span>
@@ -170,10 +170,6 @@ const Dashboard = () => {
             ))}
           </nav>
           <div className="dashboard_sidebar-footer">
-            <div className="dashboard_store-status">
-              <span className="dashboard_status-dot" />
-              <span>Store management</span>
-            </div>
             <button className="dashboard-logout" onClick={handleLogout} type="button">
               <RiLogoutCircleLine />
               <span>Sign out</span>
