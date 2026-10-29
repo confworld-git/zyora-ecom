@@ -793,7 +793,7 @@ const Orders = ({ initialOrderId = "" }) => {
               {editing.shippingMethod === "self" && (
                 <>
                   <label>
-                    Carrier name
+                    Courier name
                     <input
                       value={editing.courierName}
                       maxLength={120}

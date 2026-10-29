@@ -217,7 +217,7 @@ const trackingSteps = [
   ["delivered", "Delivered"],
 ];
 
-const OrderTracking = ({ order }) => {
+const OrderTracking = ({ order, onTrackingUpdate }) => {
   const [tracking, setTracking] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -256,7 +256,9 @@ const OrderTracking = ({ order }) => {
         `${API}/api/orders/${order._id}/track`,
         { withCredentials: true },
       );
-      setTracking(response.data.tracking);
+      const latestTracking = response.data.tracking;
+      setTracking(latestTracking);
+      onTrackingUpdate(order._id, latestTracking);
       setExpanded(true);
     } catch {
       setError("Unable to load tracking right now. Please try again.");
@@ -378,6 +380,20 @@ const OrdersTab = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const updateOrderTracking = (orderId, tracking) => {
+    setOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order._id === orderId
+          ? {
+              ...order,
+              orderStatus: tracking.orderStatus ?? order.orderStatus,
+              paymentStatus: tracking.paymentStatus ?? order.paymentStatus,
+            }
+          : order,
+      ),
+    );
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -489,7 +505,10 @@ const OrdersTab = () => {
 
               <strong>Total {formatPrice(order.total)}</strong>
             </footer>
-            <OrderTracking order={order} />
+            <OrderTracking
+              order={order}
+              onTrackingUpdate={updateOrderTracking}
+            />
           </article>
         ))}
       </div>

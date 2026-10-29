@@ -19,8 +19,8 @@ import Orders from "./components/Orders";
 import StockManagement from "./components/StockManagement";
 import { RiStockLine } from "react-icons/ri";
 import ProductList from "./components/ProductList";
-import { FiTruck } from "react-icons/fi";
-import CourierList from "./components/CourierList";
+// import { FiTruck } from "react-icons/fi";
+// import CourierList from "./components/CourierList";
 
 const Dashboard = () => {
   const [enquiryData, setEnquiryData] = useState([]);
@@ -38,7 +38,7 @@ const Dashboard = () => {
   const navigation = [
     { id: "home", label: "Overview", icon: <RiHome4Line /> },
     { id: "orders", label: "Orders", icon: <TiShoppingCart /> },
-    { id: "couriers", label: "Couriers", icon: <FiTruck /> },
+    // { id: "couriers", label: "Couriers", icon: <FiTruck /> },
     { id: "stock", label: "Inventory", icon: <RiStockLine /> },
     { id: "products", label: "Products", icon: <AiOutlineProduct /> },
     { id: "enquiry", label: "Enquiries", icon: <LuMessageCircleQuestion /> },
@@ -185,7 +185,7 @@ const Dashboard = () => {
             </div>
             <div className="dashboard_topbar-meta">
               <span className="dashboard_today">{today}</span>
-              <span className="dashboard_admin-avatar" role="img" aria-label="Administrator">A</span>
+              {/* <span className="dashboard_admin-avatar" role="img" aria-label="Administrator">Admin</span> */}
             </div>
           </header>
           <div className="dashboard_content">
@@ -201,7 +201,7 @@ const Dashboard = () => {
             {activeSection === "orders" && (
               <Orders initialOrderId={orderIdFromAlert} />
             )}
-            {activeSection === "couriers" && <CourierList />}
+            {/* {activeSection === "couriers" && <CourierList />} */}
             {activeSection === "stock" && <StockManagement />}
             {activeSection === "products" && (
               <ProductList onAddProduct={() => setActiveSection("add_product")} />

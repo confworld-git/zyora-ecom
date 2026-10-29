@@ -50,9 +50,9 @@ const CourierList = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchCouriers();
-  }, [fetchCouriers]);
+  // useEffect(() => {
+  //   fetchCouriers();
+  // }, [fetchCouriers]);
 
   const visibleCouriers = useMemo(() => {
     const query = search.trim().toLowerCase();
