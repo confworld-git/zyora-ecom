@@ -10,7 +10,10 @@ import logo from "../assets/Logo/Zyora_logo.jpeg";
 import ScrollReveal from "./ScrollReveal.jsx";
 
 const Homepage = () => {
-  const siteUrl = (import.meta.env.VITE_API_DOMAIN || "").replace(/\/$/, "");
+  const siteUrl = (
+    import.meta.env.VITE_SITE_URL || "https://zyoraecom.in"
+  ).replace(/\/+$/, "");
+
   const homepageJsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -18,15 +21,17 @@ const Homepage = () => {
         "@type": "Organization",
         "@id": `${siteUrl}/#organization`,
         name: "ZYORA",
-        url: siteUrl,
-        ...(siteUrl && { logo: new URL(logo, siteUrl).href }),
+        url: `${siteUrl}/`,
+        logo: new URL(logo, `${siteUrl}/`).href,
       },
       {
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
         name: "ZYORA",
-        url: siteUrl,
-        publisher: { "@id": `${siteUrl}/#organization` },
+        url: `${siteUrl}/`,
+        publisher: {
+          "@id": `${siteUrl}/#organization`,
+        },
       },
     ],
   };
@@ -34,9 +39,9 @@ const Homepage = () => {
   return (
     <>
       <SEO
-        title="ZYORA | Destination for E-commerce"
-        description="Shop at ZYORA for quality, functional and affordable products for everyday life. Discover home and kitchen essentials, stationery, handbags, soft toys, fashion, footwear, electronics, watches, beauty, sports and fitness products, and more. Enjoy competitive prices, secure payments, reliable delivery and easy 7-day returns."
-        canonical={import.meta.env.VITE_API_DOMAIN}
+        title="ZYORA | Shop Fashion, Handbags, Jewellery & Lifestyle Essentials"
+        description="Discover handbags, jewellery, soft toys, stationery and home essentials at ZYORA. Shop everyday products online with secure payments and convenient delivery."
+        canonical={`${siteUrl}/`}
         jsonLd={homepageJsonLd}
       />
       <main className="zyora-homepage">
