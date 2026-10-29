@@ -184,8 +184,25 @@ const Orders = ({ initialOrderId = "" }) => {
   const downloadShippingLabel = async (order) => {
     try {
       setDownloadingOrder(`${order._id}-label`);
+      const amountInWords = window.prompt(
+        "Enter the COD amount in words (or enter Prepaid for an online-paid order):",
+      );
+      if (amountInWords === null) return;
+
+      const weight = window.prompt("Enter the package weight:");
+      if (weight === null) return;
+
+      if (!amountInWords.trim() || !weight.trim()) {
+        toast.error("Amount in words and package weight are required");
+        return;
+      }
+
+      const params = new URLSearchParams({
+        amountInWords: amountInWords.trim(),
+        weight: weight.trim(),
+      });
       await downloadHtmlAsPdf(
-        `${API}/${order._id}/shipping-label.html`,
+        `${API}/${order._id}/shipping-label.html?${params}`,
         `${order.orderId}-shipping-label.pdf`,
         "a4",
         config,
