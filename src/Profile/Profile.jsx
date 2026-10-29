@@ -291,7 +291,7 @@ const OrderTracking = ({ order, onTrackingUpdate }) => {
         onClick={downloadInvoice}
         disabled={downloadingInvoice}
       >
-        {downloadingInvoice ? "Preparing invoice PDF…" : "Download invoice PDF"}
+        {downloadingInvoice ? "Preparing invoice PDF…" : "Download invoice"}
       </button>
       {error && <p className="zyora-profile-error">{error}</p>}
       {expanded && tracking && (

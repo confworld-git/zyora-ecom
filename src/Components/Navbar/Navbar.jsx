@@ -97,10 +97,10 @@ const Navbar = () => {
               <i className="bi bi-person-fill"></i>
             </span>
             <span className="nav-user-greeting">
-              <small>Welcome</small>
-              <strong>
+              <strong>Profile</strong>
+              {/* <strong>
                 {customer?.name?.trim()?.split(/\s+/)[0] || "there"}
-              </strong>
+              </strong> */}
             </span>
           </div>
         ) : (

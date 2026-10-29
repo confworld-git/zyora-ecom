@@ -599,6 +599,9 @@
 
 .zyora-order-tracking {
   padding: 10px 20px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .zyora-track-order-btn {
@@ -612,10 +615,6 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-}
-
-.zyora-order-tracking > .zyora-track-order-btn + .zyora-track-order-btn {
-  margin-left: 8px;
 }
 
 .zyora-track-order-btn:hover:not(:disabled) {
@@ -859,6 +858,11 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .zyora-profile-layout {
+    gap: 12px;
   }
 
   .zyora-profile-avatar {
@@ -876,7 +880,7 @@
 
   .zyora-profile-header-actions .zyora-profile-btn {
     /* flex: 1 1 calc(50% - 10px); */
-    padding: 11px 14px;
+    padding: 10px;
   }
 
   .zyora-profile-header-actions .zyora-profile-btn-label {
@@ -886,6 +890,8 @@
 
   .zyora-profile-panel {
     padding: 22px 18px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .zyora-profile-form {
@@ -920,5 +926,44 @@
   .zyora-order-card,
   .zyora-address-card {
     transition: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .zyora-profile-tabs button {
+    font-size: 10px;
+    padding: 8px 6px;
+    gap: 6px;
+    box-sizing: border-box;
+  }
+  .zyora-profile-tabs button.active svg {
+    font-size: 14px;
+  }
+  .zyora-profile-tabs button svg {
+    font-size: 14px;
+  }
+  .zyora-profile-tabs {
+    padding: 4px;
+    box-sizing: border-box;
+    border-radius: 500px;
+  }
+  .zyora-profile-btn > span {
+    display: none;
+  }
+  .zyora-profile-btn.outline {
+    background: var(--pf-orange);
+    color: #fff;
+    /* border-radius: 50%; */
+    border: none;
+  }
+  .zyora-address-card.is-default {
+    margin-top: 8px;
+  }
+  .zyora-profile-btn.outline.danger {
+    background: red;
+    color: #fff;
+  }
+  .zyora-address-grid {
+    grid-template-columns: 1fr;
   }
 }
