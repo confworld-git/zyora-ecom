@@ -600,6 +600,13 @@
 .zyora-order-tracking {
   padding: 10px 20px 18px;
   display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.zyora-order-tracking > :first-child {
+  display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -851,6 +858,11 @@
 @media (max-width: 600px) {
   .zyora-profile-page {
     padding: 20px 12px 60px;
+  }
+
+  .zyora-tracking-courier {
+    flex-direction: column;
+    margin-bottom: 30px;
   }
 
   .zyora-profile-header {

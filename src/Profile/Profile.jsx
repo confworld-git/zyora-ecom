@@ -252,10 +252,9 @@ const OrderTracking = ({ order, onTrackingUpdate }) => {
     try {
       setLoading(true);
       setError("");
-      const response = await axios.get(
-        `${API}/api/orders/${order._id}/track`,
-        { withCredentials: true },
-      );
+      const response = await axios.get(`${API}/api/orders/${order._id}/track`, {
+        withCredentials: true,
+      });
       const latestTracking = response.data.tracking;
       setTracking(latestTracking);
       onTrackingUpdate(order._id, latestTracking);
@@ -276,23 +275,29 @@ const OrderTracking = ({ order, onTrackingUpdate }) => {
 
   return (
     <div className="zyora-order-tracking">
-      <button
-        type="button"
-        className="zyora-track-order-btn"
-        aria-expanded={expanded}
-        onClick={showTracking}
-        disabled={loading}
-      >
-        {loading ? "Loading tracking…" : expanded ? "Hide tracking" : "Track order"}
-      </button>
-      <button
-        type="button"
-        className="zyora-track-order-btn"
-        onClick={downloadInvoice}
-        disabled={downloadingInvoice}
-      >
-        {downloadingInvoice ? "Preparing invoice PDF…" : "Download invoice"}
-      </button>
+      <div>
+        <button
+          type="button"
+          className="zyora-track-order-btn"
+          aria-expanded={expanded}
+          onClick={showTracking}
+          disabled={loading}
+        >
+          {loading
+            ? "Loading tracking…"
+            : expanded
+              ? "Hide tracking"
+              : "Track order"}
+        </button>
+        <button
+          type="button"
+          className="zyora-track-order-btn"
+          onClick={downloadInvoice}
+          disabled={downloadingInvoice}
+        >
+          {downloadingInvoice ? "Preparing invoice PDF…" : "Download invoice"}
+        </button>
+      </div>
       {error && <p className="zyora-profile-error">{error}</p>}
       {expanded && tracking && (
         <div className="zyora-order-tracking-panel">
@@ -300,16 +305,12 @@ const OrderTracking = ({ order, onTrackingUpdate }) => {
             <div className="zyora-tracking-courier">
               <strong>{tracking.courierName || "Courier assigned"}</strong>
               <span>
-                {tracking.shippingMethod === "self" ? "Tracking" : "AWB"}{" "}
+                {tracking.shippingMethod === "self" ? "Tracking ID:" : "AWB:"}{" "}
                 {tracking.trackingNumber || tracking.awb}
               </span>
               {tracking.trackingUrl && (
-                <a
-                  href={tracking.trackingUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Track with carrier
+                <a href={tracking.trackingUrl} target="_blank" rel="noreferrer">
+                  Track order in detail
                 </a>
               )}
               {tracking.shipmentStatus && (
@@ -355,9 +356,10 @@ const OrderTracking = ({ order, onTrackingUpdate }) => {
                   <li key={`${event.timestamp}-${event.status}-${index}`}>
                     <strong>{event.status}</strong>
                     {event.location && <span>{event.location}</span>}
-                    {event.description && event.description !== event.status && (
-                      <p>{event.description}</p>
-                    )}
+                    {event.description &&
+                      event.description !== event.status && (
+                        <p>{event.description}</p>
+                      )}
                     <time dateTime={event.timestamp}>
                       {new Date(event.timestamp).toLocaleString("en-IN", {
                         dateStyle: "medium",
