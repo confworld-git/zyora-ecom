@@ -5,4 +5,4 @@ Disallow: /Cart
 Disallow: /Favorites
 Disallow: /Payment_result
 
-Sitemap: https://backend.zyoraecom.in/sitemap.xml
+Sitemap: https://zyoraecom.in/sitemap.xml

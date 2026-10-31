@@ -180,7 +180,7 @@ const Footer = () => {
               >
                 <i className="bi bi-youtube"></i>
               </a>
-              <a
+              {/* <a
                 href="https://www.amazon.in/l/27943762031?me=A37Q1THERBAC3W&tag=ShopReferral_10e6f4d0-2692-4bc0-8495-d078e650cc96&ref=ls_srb_sn"
                 target="_blank"
                 rel="noreferrer"
@@ -188,7 +188,7 @@ const Footer = () => {
                 title="Amazon"
               >
                 <i className="bi bi-amazon"></i>
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
