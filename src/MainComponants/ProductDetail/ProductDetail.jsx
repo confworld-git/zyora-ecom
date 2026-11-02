@@ -239,25 +239,19 @@ const ProductDetail = () => {
       />
       <Helmet>
         <meta property="og:type" content="product" />
-
         <meta
           property="og:title"
           content={`${productName} | ${product.brand || "ZYORA"} | ZYORA`}
         />
-
         <meta property="og:description" content={seoDescription} />
-
         <meta property="og:url" content={productUrl} />
-
         {productImages[0] && (
           <meta property="og:image" content={productImages[0]} />
         )}
-
         <meta
           property="product:price:amount"
           content={String(product.price?.selling_price ?? "")}
         />
-
         <meta
           property="product:price:currency"
           content={product.price?.currency || "INR"}
