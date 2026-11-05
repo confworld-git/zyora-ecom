@@ -181,7 +181,7 @@ const linkify = (text) =>
   });
 
 const Faq = () => {
-  const { brand, title, faqs, contact } = faq_content[0];
+  const { title, faqs, contact } = faq_content[0];
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
