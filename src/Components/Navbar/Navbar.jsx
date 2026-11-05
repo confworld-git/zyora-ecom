@@ -53,6 +53,10 @@ const Navbar = () => {
           <Link to="/policies">Policies</Link>
         </li>
 
+        <li id="faq-link">
+          <Link to="/frequently-asked-questions">FAQs</Link>
+        </li>
+
         <li>
           <Link to="/Contact_Us">Contact Us</Link>
         </li>

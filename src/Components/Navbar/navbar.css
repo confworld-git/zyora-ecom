@@ -392,6 +392,10 @@
     display: none;
   }
 
+  #faq-link{
+    display: none;
+  }
+
   .nav-login-link {
     min-height: 32px;
     padding: 0 9px;

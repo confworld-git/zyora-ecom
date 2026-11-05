@@ -22,6 +22,7 @@ import "./index.css";
 import Policies from "./Components/Policies/Policies.jsx";
 import { PRODUCT_ROUTE_PATTERN } from "./utils/productSlug.js";
 import Banner from "./Banner/Banner.jsx";
+import Faq from "./FAQ/Faq.jsx";
 
 import { useAuth } from "./Context/AuthContext.jsx";
 
@@ -65,6 +66,7 @@ export const AppRoutes = () => {
           <Route path="/products" element={<Category />} />
           <Route path="/Jewellery" element={<Jewellery />} />
           <Route path="/jewellery" element={<Jewellery />} />
+          <Route path="/frequently-asked-questions" element={<Faq />} />
           <Route path="/orders" element={<Navigate to="/Profile" replace />} />
           <Route
             path="/track-order"
