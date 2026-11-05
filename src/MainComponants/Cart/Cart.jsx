@@ -19,10 +19,7 @@ import { normalizeProductCategory } from "../../utils/productCategory.js";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
-const PRICING_FIELDS = [
-  "freeShippingLimit",
-  "platformFee",
-];
+const PRICING_FIELDS = ["freeShippingLimit", "platformFee"];
 
 const loadRazorpayCheckout = () =>
   new Promise((resolve) => {
@@ -275,9 +272,8 @@ const Cart = () => {
           (coupon.subcategories || []).reduce(
             (sum, subcategory) =>
               sum +
-              (subcategorySubtotals[
-                normalizeProductCategory(subcategory)
-              ] || 0),
+              (subcategorySubtotals[normalizeProductCategory(subcategory)] ||
+                0),
             0,
           ),
         ];
@@ -289,30 +285,26 @@ const Cart = () => {
         coupon.code,
         (coupon.categories || []).reduce(
           (sum, category) =>
-            sum +
-            (categorySubtotals[normalizeProductCategory(category)] || 0),
+            sum + (categorySubtotals[normalizeProductCategory(category)] || 0),
           0,
         ),
       ];
     }),
   );
-  const eligibleCoupons = availableCoupons.filter(
-    (coupon) => {
-      if (coupon.applicability === "subcategories") {
-        return (coupon.subcategories || []).some(
-          (subcategory) =>
-            (subcategorySubtotals[
-              normalizeProductCategory(subcategory)
-            ] || 0) > 0,
-        );
-      }
-      if (coupon.applicability !== "categories") return true;
-      return (coupon.categories || []).some(
-        (category) =>
-          (categorySubtotals[normalizeProductCategory(category)] || 0) > 0,
+  const eligibleCoupons = availableCoupons.filter((coupon) => {
+    if (coupon.applicability === "subcategories") {
+      return (coupon.subcategories || []).some(
+        (subcategory) =>
+          (subcategorySubtotals[normalizeProductCategory(subcategory)] || 0) >
+          0,
       );
-    },
-  );
+    }
+    if (coupon.applicability !== "categories") return true;
+    return (coupon.categories || []).some(
+      (category) =>
+        (categorySubtotals[normalizeProductCategory(category)] || 0) > 0,
+    );
+  });
 
   const selectedAddress = addresses[selectedAddressIndex];
   const shippingQuoteKey = selectedAddress

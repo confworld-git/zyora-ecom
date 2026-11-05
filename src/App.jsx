@@ -21,6 +21,7 @@ import CustomerRoute from "./ProtectedRoute/CustomerRoute.jsx";
 import "./index.css";
 import Policies from "./Components/Policies/Policies.jsx";
 import { PRODUCT_ROUTE_PATTERN } from "./utils/productSlug.js";
+import Banner from "./Banner/Banner.jsx";
 
 import { useAuth } from "./Context/AuthContext.jsx";
 
@@ -110,10 +111,7 @@ export const AppRoutes = () => {
               </CustomerRoute>
             }
           />
-          <Route
-            path={PRODUCT_ROUTE_PATTERN}
-            element={<ProductDetail />}
-          />
+          <Route path={PRODUCT_ROUTE_PATTERN} element={<ProductDetail />} />
           <Route path="/payment_result" element={<PaymentSuccess />} />
           <Route path="/Payment_failure" element={<PaymentFailure />} />
           <Route
@@ -146,6 +144,7 @@ export const AppRoutes = () => {
 const App = () => {
   return (
     <BrowserRouter>
+      <Banner />
       <AppRoutes />
     </BrowserRouter>
   );
