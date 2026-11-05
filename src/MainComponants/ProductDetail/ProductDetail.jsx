@@ -1,5 +1,5 @@
 import "./ProductDetail.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useCart } from "../../Context/CartContext.jsx";
@@ -10,11 +10,10 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO.jsx";
 import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import { normalizeProductRating } from "../../utils/productRating.js";
-import {
-  createProductUrl,
-  getProductId,
-} from "../../utils/productSlug.js";
+import axios from "axios";
+import { createProductUrl, getProductId } from "../../utils/productSlug.js";
 import { createProductSeoTitle } from "../../utils/productSeo.js";
+import { isImitationJewellery } from "../../utils/productCategory.js";
 
 const ProductDetail = () => {
   const { addToCart, isCartSyncing } = useCart();
@@ -47,6 +46,48 @@ const ProductDetail = () => {
   const product = getProductById(id);
   const [selectionsByProduct, setSelectionsByProduct] = useState({});
   const selection = selectionsByProduct[id] || {};
+  const [jewelCoupon, setJewelCoupon] = useState(null);
+  const [percent, setPercent] = useState(null);
+  const showJewelCoupon = isImitationJewellery(product);
+
+  useEffect(() => {
+    if (!showJewelCoupon) {
+      setJewelCoupon(null);
+      setPercent(null);
+      return;
+    }
+
+    let cancelled = false;
+    const fetchCoupons = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/coupons`,
+        );
+        const coupon = (
+          Array.isArray(response.data?.coupons) ? response.data.coupons : []
+        ).find(
+          (item) =>
+            typeof item?.code === "string" && item.code.startsWith("JEWEL"),
+        );
+
+        if (!cancelled) {
+          setJewelCoupon(coupon?.code || null);
+          setPercent(coupon?.discountValue ?? null);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Error fetching coupons:", error);
+          setJewelCoupon(null);
+          setPercent(null);
+        }
+      }
+    };
+
+    fetchCoupons();
+    return () => {
+      cancelled = true;
+    };
+  }, [showJewelCoupon]);
 
   const updateSelection = (key, value) => {
     setSelectionsByProduct((current) => ({
@@ -215,7 +256,9 @@ const ProductDetail = () => {
     .filter((image) => typeof image === "string" && image.trim());
   const rawSellingPrice = product.price?.selling_price;
   const sellingPrice =
-    rawSellingPrice !== undefined && rawSellingPrice !== null && rawSellingPrice !== ""
+    rawSellingPrice !== undefined &&
+    rawSellingPrice !== null &&
+    rawSellingPrice !== ""
       ? Number(rawSellingPrice)
       : Number.NaN;
   const hasSellingPrice = Number.isFinite(sellingPrice) && sellingPrice >= 0;
@@ -331,7 +374,12 @@ const ProductDetail = () => {
         type="product"
         additionalMeta={[
           ...(hasSellingPrice
-            ? [{ property: "product:price:amount", content: String(sellingPrice) }]
+            ? [
+                {
+                  property: "product:price:amount",
+                  content: String(sellingPrice),
+                },
+              ]
             : []),
           ...(currency
             ? [{ property: "product:price:currency", content: currency }]
@@ -428,6 +476,21 @@ const ProductDetail = () => {
                   : `In stock (${productStockQuantity})`}
               </strong>
             </p>
+            {showJewelCoupon && jewelCoupon && (
+              <p className="copy_coupon">
+                Use Coupon Code{" "}
+                <span
+                  onClick={() => {
+                    navigator.clipboard.writeText(jewelCoupon);
+                    toast.success("Coupon code copied!");
+                  }}
+                  title="Click to copy coupon code"
+                >
+                  {jewelCoupon}
+                </span>{" "}
+                to get {percent}% off !
+              </p>
+            )}
             {colorRequired && (
               <div className="color-selection">
                 <h3>

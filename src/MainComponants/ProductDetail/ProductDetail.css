@@ -315,6 +315,34 @@ main.product-detail-state a:hover {
   color: var(--pd-red);
 }
 
+.product-detail-page .copy_coupon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff4ef;
+  color: var(--pd-mute);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.product-detail-page .copy_coupon span {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--pd-acc-d);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  border: 1px dashed rgba(255, 74, 18, 0.45);
+  cursor: pointer;
+}
+
 /* colour & size blocks */
 .color-selection,
 .size-selection {

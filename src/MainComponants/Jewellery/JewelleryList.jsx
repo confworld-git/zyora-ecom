@@ -5,7 +5,7 @@ import { isImitationJewellery } from "../../utils/productCategory.js";
 import { createProductPath, getProductId } from "../../utils/productSlug.js";
 import "./Jewellery.css";
 
-const JewelleryList = ({ selectedSubcategory = "" }) => {
+const JewelleryList = ({ selectedSubcategory = "",}) => {
   const { products, loading, error } = useProducts();
   const jewelleryProducts = useMemo(
     () =>
