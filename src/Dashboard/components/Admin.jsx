@@ -3,8 +3,19 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import PricingSettings from "./PricingSettings";
+import { PRODUCT_CATEGORIES } from "../../utils/productCategory.js";
+import { useProducts } from "../../Context/ProductContext.jsx";
 
 const Admin = () => {
+  const { products } = useProducts();
+  const couponCategories = [
+    ...new Set([
+      ...PRODUCT_CATEGORIES,
+      ...(products || [])
+        .map((product) => String(product.category || "").trim())
+        .filter(Boolean),
+    ]),
+  ].sort((a, b) => a.localeCompare(b));
   const [formData, setFormData] = useState({
     currentPassword: "",
     newEmail: "",
@@ -84,6 +95,8 @@ const Admin = () => {
     code: "",
     discountType: "",
     discountValue: "",
+    applicability: "all",
+    categories: [],
     minimumOrderValue: "",
     maximumDiscount: "",
     expiryDate: "",
@@ -102,6 +115,14 @@ const Admin = () => {
     }));
   };
 
+  const handleCouponCategoriesChange = (e) => {
+    const categories = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value,
+    );
+    setCouponData((prev) => ({ ...prev, categories }));
+  };
+
   const handleCouponSubmit = async (e) => {
     e.preventDefault();
 
@@ -114,6 +135,8 @@ const Admin = () => {
       expiryDate,
       usageLimit,
       status,
+      applicability,
+      categories,
     } = couponData;
 
     if (!code.trim()) {
@@ -174,6 +197,11 @@ const Admin = () => {
       return;
     }
 
+    if (applicability === "categories" && categories.length === 0) {
+      toast.error("Select at least one category");
+      return;
+    }
+
     try {
       setCouponLoading(true);
 
@@ -186,6 +214,8 @@ const Admin = () => {
           minimumOrderValue: Number(minimumOrderValue),
           maximumDiscount:
             discountType === "percentage" ? Number(maximumDiscount) : null,
+          applicability,
+          categories: applicability === "categories" ? categories : [],
           expiryDate,
           usageLimit: Number(usageLimit),
           status,
@@ -201,6 +231,8 @@ const Admin = () => {
           code: "",
           discountType: "",
           discountValue: "",
+          applicability: "all",
+          categories: [],
           minimumOrderValue: "",
           maximumDiscount: "",
           expiryDate: "",
@@ -313,6 +345,36 @@ const Admin = () => {
               required
             />
           </div>
+          <div className="form-group">
+            <label>Applies To *</label>
+            <select
+              name="applicability"
+              value={couponData.applicability}
+              onChange={handleCouponChange}
+              required
+            >
+              <option value="all">All products</option>
+              <option value="categories">Selected categories</option>
+            </select>
+          </div>
+          {couponData.applicability === "categories" && (
+            <div className="form-group">
+              <label>Eligible Categories *</label>
+              <select
+                multiple
+                value={couponData.categories}
+                onChange={handleCouponCategoriesChange}
+                required
+              >
+                {couponCategories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <small>Use Ctrl or Command to select multiple categories.</small>
+            </div>
+          )}
           <div className="form-group">
             <label>Discount Type *</label>
 

@@ -43,6 +43,7 @@ const CouponPopup = ({
   open,
   onClose,
   coupons,
+  couponSubtotals,
   loading,
   error,
   subtotal,
@@ -84,7 +85,9 @@ const CouponPopup = ({
           <div className="cp_list">
             {coupons.map((coupon) => {
               const isApplied = appliedCoupon?.code === coupon.code;
-              const info = getCouponInfo(coupon, subtotal);
+              const eligibleSubtotal =
+                couponSubtotals?.[coupon.code] ?? subtotal;
+              const info = getCouponInfo(coupon, eligibleSubtotal);
               const isPercent = coupon.discountType === "percentage";
 
               return (
@@ -123,18 +126,30 @@ const CouponPopup = ({
                     </div>
 
                     <dl className="cp_details">
+                      <div>
+                        <dt>Applies to</dt>
+                        <dd>
+                          {coupon.applicability === "categories"
+                            ? (coupon.categories || []).join(", ")
+                            : "All products"}
+                        </dd>
+                      </div>
                       {info.min > 0 && (
                         <div>
-                          <dt>Minimum order</dt>
+                          <dt>
+                            {coupon.applicability === "categories"
+                              ? "Minimum eligible order"
+                              : "Minimum order"}
+                          </dt>
                           <dd>{formatINR(info.min)}</dd>
                         </div>
                       )}
-                      {/* {isPercent && info.max > 0 && (
+                      {isPercent && info.max > 0 && (
                         <div>
                           <dt>Maximum discount</dt>
                           <dd>{formatINR(info.max)}</dd>
                         </div>
-                      )} */}
+                      )}
                       {coupon.expiryDate && (
                         <div>
                           <dt>Valid till</dt>
@@ -145,7 +160,7 @@ const CouponPopup = ({
 
                     {info.usable ? (
                       <p className="cp_foot cp_good">
-                        Saves {formatINR(info.estimated.toFixed(2))} on this bag
+                        Saves {formatINR(info.estimated.toFixed(2))} on eligible items
                       </p>
                     ) : (
                       <p className="cp_foot cp_bad">{info.reason}</p>

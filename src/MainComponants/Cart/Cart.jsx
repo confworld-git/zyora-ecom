@@ -15,6 +15,7 @@ import { useAuth } from "../../Context/AuthContext.jsx";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext.jsx";
 import { createProductPath } from "../../utils/productSlug.js";
+import { normalizeProductCategory } from "../../utils/productCategory.js";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -84,7 +85,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { customer, isLoggedIn } = useAuth();
-  const { refreshProducts } = useProducts();
+  const { refreshProducts, getProductById } = useProducts();
   const { addToWishlist, isInWishlist, isWishlistSyncing } = useWishlist();
   const [placingOrder, setPlacingOrder] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
@@ -240,6 +241,46 @@ const Cart = () => {
     (sum, item) =>
       sum + (Number(item.price) || 0) * (Number(item.quantity) || 0),
     0,
+  );
+  const couponCartItems = selectedItems.map((item) => ({
+    productId: String(item.productId ?? item.id),
+    quantity: item.quantity,
+  }));
+  const couponItemsKey = couponCartItems
+    .map((item) => `${item.productId}:${item.quantity}`)
+    .sort()
+    .join("|");
+  const categorySubtotals = {};
+  selectedItems.forEach((item) => {
+    const category = normalizeProductCategory(
+      getProductById(item.productId ?? item.id)?.category,
+    );
+    if (!category) return;
+    categorySubtotals[category] =
+      (categorySubtotals[category] || 0) +
+      (Number(item.price) || 0) * (Number(item.quantity) || 0);
+  });
+  const couponSubtotals = Object.fromEntries(
+    availableCoupons.map((coupon) => {
+      if (coupon.applicability !== "categories") return [coupon.code, subtotal];
+      return [
+        coupon.code,
+        (coupon.categories || []).reduce(
+          (sum, category) =>
+            sum +
+            (categorySubtotals[normalizeProductCategory(category)] || 0),
+          0,
+        ),
+      ];
+    }),
+  );
+  const eligibleCoupons = availableCoupons.filter(
+    (coupon) =>
+      coupon.applicability !== "categories" ||
+      (coupon.categories || []).some(
+        (category) =>
+          (categorySubtotals[normalizeProductCategory(category)] || 0) > 0,
+      ),
   );
 
   const selectedAddress = addresses[selectedAddressIndex];
@@ -410,7 +451,7 @@ const Cart = () => {
 
       const response = await axios.post(
         `${API}/api/coupons/apply`,
-        { code, cartTotal: subtotal },
+        { code, items: couponCartItems },
         { withCredentials: true },
       );
 
@@ -468,7 +509,7 @@ const Cart = () => {
       try {
         const response = await axios.post(
           `${API}/api/coupons/apply`,
-          { code: appliedCoupon.code, cartTotal: subtotal },
+          { code: appliedCoupon.code, items: couponCartItems },
           { withCredentials: true },
         );
 
@@ -497,7 +538,7 @@ const Cart = () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subtotal]);
+  }, [subtotal, couponItemsKey]);
 
   // ---------- Free shipping celebration ----------
   const [celebrate, setCelebrate] = useState(false);
@@ -1010,7 +1051,7 @@ const Cart = () => {
                 onClick={() => setShowCouponPopup(true)}
               >
                 <span className="offers_icon">♧</span>
-                <span>{availableCoupons.length} Offers On Your Bag</span>
+                <span>{eligibleCoupons.length} Offers On Your Bag</span>
                 <span className="offers_arrow">›</span>
               </button>
 
@@ -1471,7 +1512,8 @@ const Cart = () => {
       <CouponPopup
         open={showCouponPopup}
         onClose={() => setShowCouponPopup(false)}
-        coupons={availableCoupons}
+        coupons={eligibleCoupons}
+        couponSubtotals={couponSubtotals}
         loading={couponsLoading}
         error={couponsError}
         subtotal={subtotal}

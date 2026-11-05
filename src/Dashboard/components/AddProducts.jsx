@@ -4,23 +4,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import { parseLooseJson, productJsonToFormFields } from "./productJson.js";
+import { PRODUCT_CATEGORIES } from "../../utils/productCategory.js";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
-
-const categories = [
-  "Electronics",
-  "Fashion",
-  "Footwear",
-  "Watches",
-  "Home & Kitchen",
-  "Sports & Fitness",
-  "Beauty",
-  "Stationery",
-  "Handbags",
-  "Accessories",
-  "Soft Toys",
-  "Immitation Jewellery",
-];
 
 function AddProduct() {
   const { refreshProducts } = useProducts();
@@ -888,7 +874,7 @@ function AddProduct() {
                 >
                   <option value="">Select category</option>
 
-                  {categories.map((category) => (
+                  {PRODUCT_CATEGORIES.map((category) => (
                     <option key={category} value={category}>
                       {category}
                     </option>
@@ -916,7 +902,7 @@ function AddProduct() {
                 />
 
                 <datalist id="category-options">
-                  {categories.map((category) => (
+                  {PRODUCT_CATEGORIES.map((category) => (
                     <option key={category} value={category} />
                   ))}
                 </datalist>

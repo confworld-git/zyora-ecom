@@ -13,7 +13,9 @@ import { normalizeProductRating } from "../../utils/productRating.js";
 import axios from "axios";
 import { createProductUrl, getProductId } from "../../utils/productSlug.js";
 import { createProductSeoTitle } from "../../utils/productSeo.js";
-import { isImitationJewellery } from "../../utils/productCategory.js";
+import {
+  normalizeProductCategory,
+} from "../../utils/productCategory.js";
 
 const ProductDetail = () => {
   const { addToCart, isCartSyncing } = useCart();
@@ -46,14 +48,14 @@ const ProductDetail = () => {
   const product = getProductById(id);
   const [selectionsByProduct, setSelectionsByProduct] = useState({});
   const selection = selectionsByProduct[id] || {};
-  const [jewelCoupon, setJewelCoupon] = useState(null);
-  const [percent, setPercent] = useState(null);
-  const showJewelCoupon = isImitationJewellery(product);
+  const [productCoupon, setProductCoupon] = useState(null);
+  const productCategory = product?.category || "";
+  const displayedCoupon =
+    productCoupon?.category === productCategory ? productCoupon.coupon : null;
 
   useEffect(() => {
-    if (!showJewelCoupon) {
-      setJewelCoupon(null);
-      setPercent(null);
+    if (!productCategory) {
+      setProductCoupon(null);
       return;
     }
 
@@ -63,22 +65,44 @@ const ProductDetail = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/coupons`,
         );
-        const coupon = (
+        const applicableCoupons = (
           Array.isArray(response.data?.coupons) ? response.data.coupons : []
-        ).find(
-          (item) =>
-            typeof item?.code === "string" && item.code.startsWith("JEWEL"),
-        );
+        )
+          .filter(
+            (item) =>
+              item?.applicability !== "categories" ||
+              (item.categories || []).some(
+                (category) =>
+                  normalizeProductCategory(category) ===
+                  normalizeProductCategory(productCategory),
+              ),
+          )
+          .sort((first, second) => {
+            const price = Number(product?.price?.selling_price) || 0;
+            const estimate = (coupon) => {
+              const value = Number(coupon.discountValue) || 0;
+              const discount =
+                coupon.discountType === "percentage"
+                  ? (price * value) / 100
+                  : value;
+              const capped =
+                coupon.discountType === "percentage" &&
+                coupon.maximumDiscount != null
+                  ? Math.min(discount, Number(coupon.maximumDiscount))
+                  : discount;
+              return Math.min(capped, price);
+            };
+            return estimate(second) - estimate(first);
+          });
+        const coupon = applicableCoupons[0];
 
         if (!cancelled) {
-          setJewelCoupon(coupon?.code || null);
-          setPercent(coupon?.discountValue ?? null);
+          setProductCoupon({ category: productCategory, coupon: coupon || null });
         }
       } catch (error) {
         if (!cancelled) {
           console.error("Error fetching coupons:", error);
-          setJewelCoupon(null);
-          setPercent(null);
+          setProductCoupon({ category: productCategory, coupon: null });
         }
       }
     };
@@ -87,7 +111,7 @@ const ProductDetail = () => {
     return () => {
       cancelled = true;
     };
-  }, [showJewelCoupon]);
+  }, [productCategory, product]);
 
   const updateSelection = (key, value) => {
     setSelectionsByProduct((current) => ({
@@ -476,19 +500,29 @@ const ProductDetail = () => {
                   : `In stock (${productStockQuantity})`}
               </strong>
             </p>
-            {showJewelCoupon && jewelCoupon && (
+            {displayedCoupon && (
               <p className="copy_coupon">
-                Use Coupon Code{" "}
+                {displayedCoupon.discountType === "percentage"
+                  ? `${displayedCoupon.discountValue}% off`
+                  : `₹${displayedCoupon.discountValue} off`}{" "}
+                with{" "}
                 <span
                   onClick={() => {
-                    navigator.clipboard.writeText(jewelCoupon);
+                    navigator.clipboard.writeText(displayedCoupon.code);
                     toast.success("Coupon code copied!");
                   }}
                   title="Click to copy coupon code"
                 >
-                  {jewelCoupon}
+                  {displayedCoupon.code}
                 </span>{" "}
-                to get {percent}% off !
+                {displayedCoupon.applicability === "categories"
+                  ? `on ${displayedCoupon.categories.join(", ")}`
+                  : "on all products"}
+                {Number(displayedCoupon.minimumOrderValue) > 0 &&
+                  ` (min. eligible order ₹${displayedCoupon.minimumOrderValue})`}
+                {displayedCoupon.discountType === "percentage" &&
+                  Number(displayedCoupon.maximumDiscount) > 0 &&
+                  ` (up to ₹${displayedCoupon.maximumDiscount})`}
               </p>
             )}
             {colorRequired && (

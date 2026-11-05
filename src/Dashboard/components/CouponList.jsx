@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import "../styles/CouponList.css";
+import { PRODUCT_CATEGORIES } from "../../utils/productCategory.js";
+import { useProducts } from "../../Context/ProductContext.jsx";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/coupons`;
 const cfg = { withCredentials: true };
@@ -30,6 +32,15 @@ const STATE_LABEL = {
 };
 
 const CouponList = () => {
+  const { products } = useProducts();
+  const couponCategories = [
+    ...new Set([
+      ...PRODUCT_CATEGORIES,
+      ...(products || [])
+        .map((product) => String(product.category || "").trim())
+        .filter(Boolean),
+    ]),
+  ].sort((a, b) => a.localeCompare(b));
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -106,6 +117,8 @@ const CouponList = () => {
       discountValue: c.discountValue,
       minimumOrderValue: c.minimumOrderValue,
       maximumDiscount: c.maximumDiscount ?? "",
+      applicability: c.applicability || "all",
+      categories: c.categories || [],
       expiryDate: toInputDate(c.expiryDate),
       usageLimit: c.usageLimit,
       usedCount: c.usedCount,
@@ -113,6 +126,14 @@ const CouponList = () => {
 
   const handleEditChange = (e) =>
     setEditing((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const handleEditCategoriesChange = (e) => {
+    const categories = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value,
+    );
+    setEditing((prev) => ({ ...prev, categories }));
+  };
 
   const saveEdit = async (e) => {
     e.preventDefault();
@@ -134,6 +155,8 @@ const CouponList = () => {
       return toast.error(
         `Usage limit can't be below the ${d.usedCount} already used`,
       );
+    if (d.applicability === "categories" && d.categories.length === 0)
+      return toast.error("Select at least one category");
 
     try {
       setSaving(true);
@@ -144,6 +167,8 @@ const CouponList = () => {
           minimumOrderValue: Number(d.minimumOrderValue),
           maximumDiscount:
             d.discountType === "percentage" ? Number(d.maximumDiscount) : null,
+          applicability: d.applicability,
+          categories: d.applicability === "categories" ? d.categories : [],
           expiryDate: d.expiryDate,
           usageLimit: Number(d.usageLimit),
         },
@@ -211,6 +236,7 @@ const CouponList = () => {
               <tr>
                 <th>Code</th>
                 <th>Discount</th>
+                <th>Applies to</th>
                 <th>Min. order</th>
                 <th>Used</th>
                 <th>Expires</th>
@@ -238,6 +264,11 @@ const CouponList = () => {
                       {c.discountType === "percentage"
                         ? `${c.discountValue}% (up to ₹${c.maximumDiscount})`
                         : `₹${c.discountValue} off`}
+                    </td>
+                    <td>
+                      {c.applicability === "categories"
+                        ? (c.categories || []).join(", ")
+                        : "All products"}
                     </td>
                     <td>₹{c.minimumOrderValue}</td>
                     <td>
@@ -305,6 +336,36 @@ const CouponList = () => {
                   }
                 />
               </div>
+
+              <div className="form-group">
+                <label>Applies To</label>
+                <select
+                  name="applicability"
+                  value={editing.applicability}
+                  onChange={handleEditChange}
+                >
+                  <option value="all">All products</option>
+                  <option value="categories">Selected categories</option>
+                </select>
+              </div>
+
+              {editing.applicability === "categories" && (
+                <div className="form-group">
+                  <label>Eligible Categories</label>
+                  <select
+                    multiple
+                    value={editing.categories}
+                    onChange={handleEditCategoriesChange}
+                  >
+                    {couponCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  <small>Use Ctrl or Command to select multiple categories.</small>
+                </div>
+              )}
 
               <div className="form-group">
                 <label>Minimum Order Value</label>
