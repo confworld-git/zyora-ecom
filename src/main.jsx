@@ -1,5 +1,5 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { AuthProvider } from "./Context/AuthContext.jsx";
@@ -8,11 +8,13 @@ import { ProductProvider } from "./Context/ProductContext.jsx";
 import { WishlistProvider } from "./Context/WishlistContext";
 import { HelmetProvider } from "react-helmet-async";
 
-createRoot(document.getElementById("root")).render(
+const rootElement = document.getElementById("root");
+const initialProducts = window.__ZYORA_INITIAL_PRODUCTS__ ?? null;
+const app = (
   <StrictMode>
     <HelmetProvider>
       <AuthProvider>
-        <ProductProvider>
+        <ProductProvider initialProducts={initialProducts}>
           <WishlistProvider>
             <CartProvider>
               <App />
@@ -21,5 +23,11 @@ createRoot(document.getElementById("root")).render(
         </ProductProvider>
       </AuthProvider>
     </HelmetProvider>
-  </StrictMode>,
+  </StrictMode>
 );
+
+if (rootElement.hasChildNodes()) {
+  hydrateRoot(rootElement, app);
+} else {
+  createRoot(rootElement).render(app);
+}

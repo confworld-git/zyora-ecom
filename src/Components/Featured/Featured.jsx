@@ -1,5 +1,5 @@
 import "./Featured.css";
-import ScrollReveal from "../ScrollReveal.jsx";
+import { createProductPath, getProductId } from "../../utils/productSlug.js";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useProducts } from "../../Context/ProductContext";
@@ -129,16 +129,9 @@ const Featured = () => {
 
               <div className="collections_imgs">
                 {categoryProducts.map((product, index) => {
-                  const productId = product.id || product._id;
-                  const slug = (product.name || product.title)
-                    ?.toLowerCase()
-                    .trim()
-                    .replace(/[^a-z0-9]+/g, "-")
-                    .replace(/^-+|-+$/g, "") || "product";
-
-                  const productUrl = `/Zyora_Category/product/${encodeURIComponent(
-                    productId,
-                  )}/${encodeURIComponent(slug)}`;
+                  const productId = getProductId(product);
+                  const productUrl = createProductPath(product);
+                  if (!productUrl) return null;
                   const categoryUrl = `/Zyora_Category?category=${encodeURIComponent(
                     category,
                   )}`;

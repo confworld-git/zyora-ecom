@@ -3,6 +3,9 @@ Allow: /
 Disallow: /Dashboard
 Disallow: /Cart
 Disallow: /Favorites
-Disallow: /Payment_result
+Disallow: /Profile
+Disallow: /Login
+Disallow: /payment_result
+Disallow: /Payment_failure
 
 Sitemap: https://zyoraecom.in/sitemap.xml

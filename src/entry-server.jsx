@@ -8,6 +8,24 @@ import { CartProvider } from "./Context/CartContext.jsx";
 
 import { AppRoutes } from "./App.jsx";
 
+const extractHeadTags = (markup) => {
+  const headTags = [];
+  let html = markup;
+
+  while (true) {
+    html = html.trimStart();
+    const match = html.match(
+      /^<(title|meta|link|script)\b[^>]*(?:\/>|>(?:[\s\S]*?)<\/\1>)/i,
+    );
+    if (!match) break;
+
+    headTags.push(match[0]);
+    html = html.slice(match[0].length);
+  }
+
+  return { html, head: headTags.join("\n") };
+};
+
 export function render(url, initialProducts = null) {
   const helmetContext = {};
 
@@ -27,10 +45,12 @@ export function render(url, initialProducts = null) {
     </HelmetProvider>
   );
 
-  const html = renderToString(app);
+  const renderedMarkup = renderToString(app);
+  const { html, head } = extractHeadTags(renderedMarkup);
 
   return {
     html,
+    head,
     helmet: helmetContext.helmet || null,
   };
 }

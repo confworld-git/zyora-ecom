@@ -23,6 +23,19 @@ is not a courier-issued or prepaid postage label.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Production static rendering
+
+Run `npm run build:ssg` to create the production client build, SSR bundle, and
+prerendered public pages and product pages in `dist/`. The build reads
+`VITE_API_BASE_URL` for the backend API and `VITE_API_DOMAIN` for canonical
+frontend URLs; configure these in the production environment without committing
+secrets. The prerender step also writes a sitemap containing the generated
+product URLs. Deploy the contents of `dist/` at the frontend domain root so
+the existing `.htaccess` can serve generated files directly and use the SPA
+fallback for routes without a static file. The build validates each prerendered
+product title, canonical URL, Product JSON-LD URL, and sitemap entry, and fails
+if generated page metadata is missing, duplicated, or inconsistent.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

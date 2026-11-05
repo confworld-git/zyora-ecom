@@ -53,17 +53,8 @@ export const WishlistProvider = ({ children }) => {
   const { getProductById, loading: productsLoading } = useProducts();
   const { customer, isLoggedIn, loading: authLoading } = useAuth();
   const customerId = customer?.id ? String(customer.id) : null;
-  const [wishlistItems, setWishlistItems] = useState(() => {
-    if (typeof window === "undefined") return [];
-
-    try {
-      const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-      console.error("Failed to parse saved wishlist:", error);
-      return [];
-    }
-  });
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [wishlistStorageLoaded, setWishlistStorageLoaded] = useState(false);
 
   const wishlistItemsRef = useRef(wishlistItems);
   const activeCustomerRef = useRef(null);
@@ -72,6 +63,21 @@ export const WishlistProvider = ({ children }) => {
   const saveQueueRef = useRef(Promise.resolve());
   const [syncingCustomerId, setSyncingCustomerId] = useState(null);
   const [syncedCustomerId, setSyncedCustomerId] = useState(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      // Defer browser-only state until after hydration to keep the SSR tree stable.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setWishlistItems(Array.isArray(parsed) ? parsed : []);
+    } catch (error) {
+      console.error("Failed to parse saved wishlist:", error);
+      setWishlistItems([]);
+    } finally {
+      setWishlistStorageLoaded(true);
+    }
+  }, []);
 
   const isWishlistSyncing =
     isLoggedIn &&
@@ -94,6 +100,8 @@ export const WishlistProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    if (!wishlistStorageLoaded) return;
+
     try {
       localStorage.setItem(
         WISHLIST_STORAGE_KEY,
@@ -102,7 +110,7 @@ export const WishlistProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to save wishlist:", error);
     }
-  }, [wishlistItems]);
+  }, [wishlistItems, wishlistStorageLoaded]);
 
   // Load a customer's wishlist and merge guest favorites on first sign-in.
   useEffect(() => {

@@ -23,8 +23,11 @@ import {
 import { useProducts } from "../../Context/ProductContext.jsx";
 import SEO from "../../SEO.jsx";
 import { normalizeProductRating } from "../../utils/productRating.js";
-import ScrollReveal from "../../Components/ScrollReveal.jsx";
 import { isImitationJewellery } from "../../utils/productCategory.js";
+import {
+  createProductPath,
+  getProductId,
+} from "../../utils/productSlug.js";
 
 const categoryImageAssets = import.meta.glob("../../assets/Category/*", {
   eager: true,
@@ -92,7 +95,6 @@ const Category = () => {
       }
     };
 
-    void refreshProducts();
     window.addEventListener("focus", refreshWhenVisible);
     document.addEventListener("visibilitychange", refreshWhenVisible);
 
@@ -507,18 +509,6 @@ const Category = () => {
     setSearchParams({});
   };
 
-  const getColorLabel = (color) => {
-    if (!color) {
-      return "";
-    }
-
-    if (String(color).startsWith("#")) {
-      return String(color).toUpperCase();
-    }
-
-    return color;
-  };
-
   const getSizeLabel = (size) => {
     const normalizedSize = String(size).toUpperCase();
 
@@ -558,16 +548,13 @@ const Category = () => {
     mainEntity: {
       "@type": "ItemList",
       itemListElement: filteredProducts.flatMap((product, index) => {
-        const productId = product.id || product._id;
+        const productId = getProductId(product);
         const productName = product.name || product.title;
 
         if (!productId || !productName) return [];
 
-        const slug = productName
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
+        const productPath = createProductPath(product);
+        if (!productPath) return [];
 
         return [
           {
@@ -576,7 +563,7 @@ const Category = () => {
             item: {
               "@type": "Product",
               name: productName,
-              url: `${siteUrl}/Zyora_Category/product/${encodeURIComponent(productId)}/${encodeURIComponent(slug)}`,
+              url: `${siteUrl}${productPath}`,
             },
           },
         ];
@@ -585,21 +572,14 @@ const Category = () => {
   };
 
   const openProduct = (product) => {
-    const productId = product.id || product._id;
+    const productPath = createProductPath(product);
 
-    if (!productId) {
+    if (!productPath) {
       console.error("Product ID missing:", product);
-
       return;
     }
 
-    const slug = (product.name || product.title)
-      ?.toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-    navigate(`/Zyora_Category/product/${productId}/${slug}`, {
+    navigate(productPath, {
       state: {
         from: selectedCategory
           ? `/Zyora_Category?category=${encodeURIComponent(
@@ -1006,7 +986,9 @@ const Category = () => {
                   <p className="empty_results">No products available.</p>
                 ) : (
                   filteredProducts.map((product, index) => {
-                    const productId = product.id || product._id;
+                    const productId = getProductId(product);
+                    const productPath = createProductPath(product);
+                    if (!productPath) return null;
                     const rating = normalizeProductRating(product.rating);
                     const hasStock =
                       product.stock?.in_stock === true &&

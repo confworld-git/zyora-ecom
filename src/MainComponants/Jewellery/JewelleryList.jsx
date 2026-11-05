@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import { isImitationJewellery } from "../../utils/productCategory.js";
+import { createProductPath, getProductId } from "../../utils/productSlug.js";
 import "./Jewellery.css";
-import ScrollReveal from "../../Components/ScrollReveal.jsx";
 
 const JewelleryList = ({ selectedSubcategory = "" }) => {
   const { products, loading, error } = useProducts();
@@ -41,15 +41,11 @@ const JewelleryList = ({ selectedSubcategory = "" }) => {
         ) : (
           <div className="zyora-jewellery-grid">
             {jewelleryProducts.map((product, index) => {
-              const productId = product.id || product._id;
+              const productId = getProductId(product);
               const productName = product.name || product.title;
-              const slug = (productName || "product")
-                .toLowerCase()
-                .trim()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/^-+|-+$/g, "");
+              const productPath = createProductPath(product);
 
-              if (!productId) return null;
+              if (!productPath) return null;
 
               const sellingPrice = Number(product.price?.selling_price);
               const mrp = Number(product.price?.mrp);
@@ -59,7 +55,7 @@ const JewelleryList = ({ selectedSubcategory = "" }) => {
                   className="zyora-jewellery-card"
                   key={productId}
                   style={{ "--card-index": Math.min(index, 8) }}
-                  to={`/Zyora_Category/product/${encodeURIComponent(productId)}/${encodeURIComponent(slug)}`}
+                  to={productPath}
                   state={{ from: "/Jewellery" }}
                 >
                   <div className="zyora-jewellery-image-wrap">

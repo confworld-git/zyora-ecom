@@ -20,6 +20,7 @@ import Profile from "./Profile/Profile.jsx";
 import CustomerRoute from "./ProtectedRoute/CustomerRoute.jsx";
 import "./index.css";
 import Policies from "./Components/Policies/Policies.jsx";
+import { PRODUCT_ROUTE_PATTERN } from "./utils/productSlug.js";
 
 import { useAuth } from "./Context/AuthContext.jsx";
 
@@ -110,7 +111,7 @@ export const AppRoutes = () => {
             }
           />
           <Route
-            path="/Zyora_Category/product/:productId/:slug"
+            path={PRODUCT_ROUTE_PATTERN}
             element={<ProductDetail />}
           />
           <Route path="/payment_result" element={<PaymentSuccess />} />

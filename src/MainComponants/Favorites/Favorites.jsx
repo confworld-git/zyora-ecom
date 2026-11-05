@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import toast from "react-hot-toast";
 import ScrollReveal from "../../Components/ScrollReveal.jsx";
+import { createProductPath } from "../../utils/productSlug.js";
 
 const Favorites = () => {
   const {
@@ -18,23 +19,14 @@ const Favorites = () => {
   const navigate = useNavigate();
 
   const openProduct = (product) => {
-    const productId = product.id || product._id;
+    const productPath = createProductPath(product);
 
-    if (!productId) {
+    if (!productPath) {
       console.error("Product ID missing:", product);
       return;
     }
 
-    const slug = (product.name || product.title || "product")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-    navigate(
-      `/Zyora_Category/product/${encodeURIComponent(productId)}/${encodeURIComponent(slug || "product")}`,
-      { state: { selectedImage: product.image } },
-    );
+    navigate(productPath, { state: { selectedImage: product.image } });
   };
 
   const handleAddToCart = (event, product) => {

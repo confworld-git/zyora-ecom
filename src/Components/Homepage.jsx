@@ -10,9 +10,9 @@ import logo from "../assets/Logo/Zyora_logo.jpeg";
 import ScrollReveal from "./ScrollReveal.jsx";
 
 const Homepage = () => {
-  const siteUrl = (
-    import.meta.env.VITE_SITE_URL || "https://zyoraecom.in"
-  ).replace(/\/+$/, "");
+  const siteUrl = new URL(
+    import.meta.env.VITE_API_DOMAIN || "https://zyoraecom.in",
+  ).origin;
 
   const homepageJsonLd = {
     "@context": "https://schema.org",

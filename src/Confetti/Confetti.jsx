@@ -7,52 +7,66 @@ const CONFETTI_COLORS = [
 ];
 const EMOJIS = ["🎉", "🎊", "✨", "🎈", "💫", "🌟", "⚡️"];
 
+const createRandom = (seed) => {
+  let state = 2166136261;
+  for (const character of String(seed)) {
+    state = Math.imul(state ^ character.charCodeAt(0), 16777619);
+  }
+
+  return () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
+};
+
 const generateConfetti = (side, seed) =>
   Array.from({ length: 90 }, (_, i) => {
+    const random = createRandom(`${side}-${seed}-${i}`);
     const baseAngle = side === "left" ? -55 : -125;
-    const angle = baseAngle + (Math.random() * 55 - 27.5);
-    const power = 200 + Math.random() * 320;
+    const angle = baseAngle + (random() * 55 - 27.5);
+    const power = 200 + random() * 320;
     const rad = (angle * Math.PI) / 180;
-    const isEmoji = Math.random() > 0.9;
-    const gravityBias = 0.6 + Math.random() * 0.8;
+    const isEmoji = random() > 0.9;
+    const gravityBias = 0.6 + random() * 0.8;
     return {
       id: `${side}-${seed}-${i}`,
       isEmoji,
-      emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
-      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      emoji: EMOJIS[Math.floor(random() * EMOJIS.length)],
+      color: CONFETTI_COLORS[Math.floor(random() * CONFETTI_COLORS.length)],
       peakX: Math.cos(rad) * power,
       peakY: Math.sin(rad) * power,
       // wind/drift sway sampled at two points on the way down, not just one linear drift
-      swayX1: (Math.random() * 70 - 35),
-      swayX2: (Math.random() * 130 - 65),
-      fallX: Math.cos(rad) * power * 0.25 + (Math.random() * 90 - 45),
-      fallDistance: (380 + Math.random() * 320) * gravityBias,
-      rotateMid: Math.random() * 300 - 150,
-      rotateEnd: Math.random() * 1080 - 540,
-      flipDur: 0.4 + Math.random() * 0.6, // independent flutter speed
-      delay: Math.random() * 0.6,
-      duration: (2.4 + Math.random() * 1.6) / gravityBias,
-      size: isEmoji ? 16 + Math.random() * 10 : 5 + Math.random() * 8,
-      shape: Math.random() > 0.6 ? "50%" : Math.random() > 0.5 ? "2px" : "0",
+      swayX1: random() * 70 - 35,
+      swayX2: random() * 130 - 65,
+      fallX: Math.cos(rad) * power * 0.25 + (random() * 90 - 45),
+      fallDistance: (380 + random() * 320) * gravityBias,
+      rotateMid: random() * 300 - 150,
+      rotateEnd: random() * 1080 - 540,
+      flipDur: 0.4 + random() * 0.6,
+      delay: random() * 0.6,
+      duration: (2.4 + random() * 1.6) / gravityBias,
+      size: isEmoji ? 16 + random() * 10 : 5 + random() * 8,
+      shape: random() > 0.6 ? "50%" : random() > 0.5 ? "2px" : "0",
     };
   });
 
 const generateStreamers = (side, seed) =>
   Array.from({ length: 12 }, (_, i) => {
+    const random = createRandom(`stream-${side}-${seed}-${i}`);
     const baseAngle = side === "left" ? -55 : -125;
-    const angle = baseAngle + (Math.random() * 55 - 27.5);
-    const power = 240 + Math.random() * 300;
+    const angle = baseAngle + (random() * 55 - 27.5);
+    const power = 240 + random() * 300;
     const rad = (angle * Math.PI) / 180;
     return {
       id: `stream-${side}-${seed}-${i}`,
-      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      color: CONFETTI_COLORS[Math.floor(random() * CONFETTI_COLORS.length)],
       peakX: Math.cos(rad) * power,
       peakY: Math.sin(rad) * power,
-      swayX: Math.random() * 100 - 50,
-      fallDistance: 360 + Math.random() * 300,
-      rotateEnd: Math.random() * 620 - 310,
-      delay: Math.random() * 0.5,
-      duration: 2.6 + Math.random() * 1.4,
+      swayX: random() * 100 - 50,
+      fallDistance: 360 + random() * 300,
+      rotateEnd: random() * 620 - 310,
+      delay: random() * 0.5,
+      duration: 2.6 + random() * 1.4,
     };
   });
 

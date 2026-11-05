@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "./Policies.css";
 import ScrollToElementContext from "../../ProtectedRoute/ScrollToElementContext.js";
+import SEO from "../../SEO.jsx";
 
 const policies = [
   {
@@ -423,6 +424,10 @@ const Policies = () => {
   const requestedPolicy = searchParams.get("policy");
   const selectedPolicy =
     policies.find((policy) => policy.id === requestedPolicy) ?? policies[0];
+  const siteUrl = (
+    import.meta.env.VITE_API_DOMAIN || "https://zyoraecom.in"
+  ).replace(/\/+$/, "");
+  const policyDescription = `${selectedPolicy.title} for ZYORA customers. Read current information about shopping with ZYORA, including customer terms, privacy, shipping, returns and refunds.`;
 
   const selectPolicy = (policyId) => {
     setSearchParams({ policy: policyId });
@@ -439,7 +444,20 @@ const Policies = () => {
   }, [scrollRequest, scrollToElement, selectedPolicy.id]);
 
   return (
-    <div as="main" className="policies-page">
+    <>
+      <SEO
+        title={`${selectedPolicy.title} | ZYORA Policies`}
+        description={policyDescription}
+        canonical={`${siteUrl}/policies`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: `${selectedPolicy.title} | ZYORA Policies`,
+          description: policyDescription,
+          url: `${siteUrl}/policies`,
+        }}
+      />
+      <div as="main" className="policies-page">
       <header className="policies-heading">
         <p className="policies-eyebrow">ZYORA CUSTOMER CARE</p>
         <h1>Policies</h1>
@@ -484,7 +502,8 @@ const Policies = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

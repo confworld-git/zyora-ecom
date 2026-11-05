@@ -100,19 +100,8 @@ export const CartProvider = ({ children }) => {
 
   const customerId = customer?.id ? String(customer.id) : null;
 
-  const [cartItems, setCartItems] = useState(() => {
-    if (typeof window === "undefined") {
-      return [];
-    }
-
-    try {
-      const saved = localStorage.getItem(CART_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch (err) {
-      console.error("Failed to parse saved cart:", err);
-      return [];
-    }
-  });
+  const [cartItems, setCartItems] = useState([]);
+  const [cartStorageLoaded, setCartStorageLoaded] = useState(false);
 
   const cartItemsRef = useRef(cartItems);
   const activeCustomerRef = useRef(null);
@@ -123,6 +112,21 @@ export const CartProvider = ({ children }) => {
   const [syncedCustomerId, setSyncedCustomerId] = useState(null);
 
   const saveQueueRef = useRef(Promise.resolve());
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CART_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      // Defer browser-only state until after hydration to keep the SSR tree stable.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCartItems(Array.isArray(parsed) ? parsed : []);
+    } catch (err) {
+      console.error("Failed to parse saved cart:", err);
+      setCartItems([]);
+    } finally {
+      setCartStorageLoaded(true);
+    }
+  }, []);
 
   const updateCartItems = useCallback((update) => {
     const currentItems = cartItemsRef.current;
@@ -176,12 +180,14 @@ export const CartProvider = ({ children }) => {
 
   // Save cart to localStorage
   useEffect(() => {
+    if (!cartStorageLoaded) return;
+
     try {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
     } catch (err) {
       console.error("Failed to save cart:", err);
     }
-  }, [cartItems]);
+  }, [cartItems, cartStorageLoaded]);
 
   // Load the signed-in customer's cart and merge guest cart exactly once.
   useEffect(() => {

@@ -9,14 +9,23 @@ import ProductZoom from "./ProductZoom.jsx";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import SEO from "../../SEO.jsx";
 import ScrollReveal from "../../Components/ScrollReveal.jsx";
-import { Helmet } from "react-helmet-async";
 import { normalizeProductRating } from "../../utils/productRating.js";
+import {
+  createProductUrl,
+  getProductId,
+} from "../../utils/productSlug.js";
+import { createProductSeoTitle } from "../../utils/productSeo.js";
 
 const ProductDetail = () => {
   const { addToCart, isCartSyncing } = useCart();
   const { toggleWishlist, isInWishlist, isWishlistSyncing } = useWishlist();
-  const { loading, error: productsError, getProductById } = useProducts();
-  const { productId, slug } = useParams();
+  const {
+    products,
+    loading,
+    error: productsError,
+    getProductById,
+  } = useProducts();
+  const { productId } = useParams();
   const location = useLocation();
   const categoryPath = location.state?.from?.startsWith(
     "/Zyora_Category?category=",
@@ -136,6 +145,8 @@ const ProductDetail = () => {
   };
 
   const productName = product.name || product.title;
+  const canonicalProductId = getProductId(product);
+  const seoTitle = createProductSeoTitle(product, products);
   const productTitle = String(product.title || "")
     .replace(/[\s\-|:–—]*\bZYORA\b[\s\-|:–—]*/gi, " ")
     .replace(/\s+/g, " ")
@@ -194,69 +205,140 @@ const ProductDetail = () => {
     .trim()
     .slice(0, 155);
 
-  const frontendUrl = (
-    import.meta.env.VITE_API_DOMAIN || window.location.origin
-  ).replace(/\/$/, "");
+  const siteOrigin = new URL(
+    import.meta.env.VITE_API_DOMAIN || "https://zyoraecom.in",
+  ).origin;
+  const productUrl = createProductUrl(product, siteOrigin);
 
-  const productUrl = `${frontendUrl}/Zyora_Category/product/${encodeURIComponent(
-    product.id,
-  )}/${encodeURIComponent(slug)}`;
+  const productImages = images
+    .map((image) => (typeof image === "string" ? image : image?.url))
+    .filter((image) => typeof image === "string" && image.trim());
+  const rawSellingPrice = product.price?.selling_price;
+  const sellingPrice =
+    rawSellingPrice !== undefined && rawSellingPrice !== null && rawSellingPrice !== ""
+      ? Number(rawSellingPrice)
+      : Number.NaN;
+  const hasSellingPrice = Number.isFinite(sellingPrice) && sellingPrice >= 0;
+  const currency =
+    typeof product.price?.currency === "string" &&
+    /^[A-Z]{3}$/i.test(product.price.currency.trim())
+      ? product.price.currency.trim().toUpperCase()
+      : undefined;
+  const colorStock = product.variants?.colorStock;
+  let structuredAvailability;
 
-  const productImages = images.map((image) => image.url).filter(Boolean);
+  if (
+    Array.isArray(colorStock) &&
+    colorStock.length > 0 &&
+    colorStock.every(
+      (entry) =>
+        entry.quantity !== undefined &&
+        entry.quantity !== null &&
+        entry.quantity !== "" &&
+        Number.isFinite(Number(entry.quantity)),
+    )
+  ) {
+    const hasAvailableColor = colorStock.some(
+      (entry) => entry.enabled !== false && Number(entry.quantity) > 0,
+    );
+    structuredAvailability = hasAvailableColor
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock";
+  } else if (typeof product.stock?.in_stock === "boolean") {
+    const quantity = Number(product.stock.quantity);
+    const hasQuantity =
+      product.stock.quantity !== undefined &&
+      product.stock.quantity !== null &&
+      product.stock.quantity !== "";
+    if (!hasQuantity || Number.isFinite(quantity)) {
+      const isAvailable =
+        product.stock.in_stock && (!hasQuantity || quantity > 0);
+      structuredAvailability = isAvailable
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock";
+    }
+  } else if (
+    product.stock?.quantity !== undefined &&
+    product.stock?.quantity !== null &&
+    product.stock?.quantity !== ""
+  ) {
+    const quantity = Number(product.stock.quantity);
+    if (Number.isFinite(quantity)) {
+      structuredAvailability =
+        quantity > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock";
+    }
+  }
 
-  const productJsonLd = {
-    "@context": "https://schema.org",
+  const productSchema = {
     "@type": "Product",
     name: productName,
+    url: productUrl,
     description: seoDescription,
-    sku: product.id,
-    ...(productImages.length > 0 && {
-      image: productImages,
+    ...(productImages.length > 0 && { image: productImages }),
+    ...(product.sku && { sku: String(product.sku) }),
+    ...(!product.sku &&
+      canonicalProductId && { productID: String(canonicalProductId) }),
+    ...(product.brand && {
+      brand: { "@type": "Brand", name: String(product.brand) },
     }),
-    brand: {
-      "@type": "Brand",
-      name: product.brand || "ZYORA",
-    },
-    offers: {
-      "@type": "Offer",
-      url: productUrl,
-      priceCurrency: product.price?.currency || "INR",
-      price: String(product.price?.selling_price ?? ""),
-      availability: !isOutOfStock
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-      itemCondition: "https://schema.org/NewCondition",
-    },
+    ...((hasSellingPrice || structuredAvailability) && {
+      offers: {
+        "@type": "Offer",
+        url: productUrl,
+        ...(hasSellingPrice && { price: String(sellingPrice) }),
+        ...(currency && { priceCurrency: currency }),
+        ...(structuredAvailability && {
+          availability: structuredAvailability,
+        }),
+      },
+    }),
+  };
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      productSchema,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: `${(
+              import.meta.env.VITE_API_DOMAIN || "https://zyoraecom.in"
+            ).replace(/\/+$/, "")}/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: productName,
+            item: productUrl,
+          },
+        ],
+      },
+    ],
   };
 
   return (
     <>
       <SEO
-        title={`${product.name} | ${product.brand || "ZYORA"} | ZYORA`}
+        title={seoTitle}
         description={seoDescription}
-        canonical={`${import.meta.env.VITE_API_DOMAIN}/Zyora_Category/product/${product.id}/${slug}`}
+        canonical={productUrl}
+        image={productImages[0]}
+        type="product"
+        additionalMeta={[
+          ...(hasSellingPrice
+            ? [{ property: "product:price:amount", content: String(sellingPrice) }]
+            : []),
+          ...(currency
+            ? [{ property: "product:price:currency", content: currency }]
+            : []),
+        ]}
         jsonLd={productJsonLd}
       />
-      <Helmet>
-        <meta property="og:type" content="product" />
-        <meta
-          property="og:title"
-          content={`${productName} | ${product.brand || "ZYORA"} | ZYORA`}
-        />
-        <meta property="og:description" content={seoDescription} />
-        <meta property="og:url" content={productUrl} />
-        {productImages[0] && (
-          <meta property="og:image" content={productImages[0]} />
-        )}
-        <meta
-          property="product:price:amount"
-          content={String(product.price?.selling_price ?? "")}
-        />
-        <meta
-          property="product:price:currency"
-          content={product.price?.currency || "INR"}
-        />
-      </Helmet>
       <div as="main" className="product-detail-page">
         <div id="page_path">
           <p>
@@ -264,7 +346,7 @@ const ProductDetail = () => {
             <MdKeyboardArrowRight />
             <Link to={productListPath}>{productListLabel}</Link>
             <MdKeyboardArrowRight />
-            <span aria-current="page">{slug}</span>
+            <span aria-current="page">{productName}</span>
           </p>
         </div>
         <ScrollReveal as="section" className="product-detail-hero">

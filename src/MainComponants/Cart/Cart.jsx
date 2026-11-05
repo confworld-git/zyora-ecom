@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "../../Context/AuthContext.jsx";
 import { useProducts } from "../../Context/ProductContext.jsx";
 import { useWishlist } from "../../Context/WishlistContext.jsx";
+import { createProductPath } from "../../utils/productSlug.js";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -357,19 +358,18 @@ const Cart = () => {
 
   const openCartProduct = (item) => {
     const productId = item.productId ?? item.id;
+    const productPath = createProductPath({
+      id: productId,
+      name: item.name,
+      title: item.title,
+    });
 
-    if (!productId) {
+    if (!productPath) {
       console.error("Product ID missing from cart item:", item);
       return;
     }
 
-    const slug = (item.name || item.title)
-      ?.toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-    navigate(`/Zyora_Category/product/${productId}/${slug}`, {
+    navigate(productPath, {
       state: { selectedImage: item.image },
     });
   };
