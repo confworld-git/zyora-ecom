@@ -65,6 +65,7 @@ const staticRoutes = [
   "/Contact_Us",
   "/Zyora_Category",
   "/Jewellery",
+  "/frequently-asked-questions",
   "/policies",
 ];
 const productsEndpoint = new URL(

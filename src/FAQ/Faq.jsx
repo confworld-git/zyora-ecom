@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import "./Faq.css";
+import SEO from "../SEO.jsx";
 
 const faq_content = [
   {
@@ -158,6 +159,22 @@ const faq_content = [
   },
 ];
 
+const siteUrl = new URL(
+  import.meta.env.VITE_API_DOMAIN || "https://zyoraecom.in",
+).origin;
+const canonicalUrl = `${siteUrl}/frequently-asked-questions`;
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  name: "Frequently Asked Questions",
+  url: canonicalUrl,
+  mainEntity: faq_content[0].faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
 const LINK_RE =
   /(https?:\/\/[^\s,]*[^\s,.]|[\w.+-]+@[\w-]+(?:\.[\w-]+)+|\+91 \d{10})/g;
 
@@ -209,16 +226,6 @@ const Faq = () => {
     );
   }, [faqs, query, category]);
 
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: f.question,
-      acceptedAnswer: { "@type": "Answer", text: f.answer },
-    })),
-  };
-
   const clear = () => {
     setQuery("");
     setCategory("All");
@@ -226,11 +233,12 @@ const Faq = () => {
 
   return (
     <main className="zfaq">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      <SEO
+        title="Frequently Asked Questions | ZYORA"
+        description="Find answers about ZYORA orders, shipping, payments, returns, refunds, and customer support. Get help with shopping and delivery across India."
+        canonical={canonicalUrl}
+        jsonLd={faqJsonLd}
       />
-      
       <header className="faq-heading">
         <p className="policies-eyebrow">ZYORA HELP CENTER</p>
         <h1>Frequently Asked Questions</h1>
