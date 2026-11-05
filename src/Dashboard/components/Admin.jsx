@@ -3,18 +3,29 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import PricingSettings from "./PricingSettings";
-import { PRODUCT_CATEGORIES } from "../../utils/productCategory.js";
 import { useProducts } from "../../Context/ProductContext.jsx";
 
 const Admin = () => {
-  const { products } = useProducts();
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+  } = useProducts();
+  const availableProducts =
+    productsLoading || productsError ? [] : products;
   const couponCategories = [
-    ...new Set([
-      ...PRODUCT_CATEGORIES,
-      ...(products || [])
+    ...new Set(
+      availableProducts
         .map((product) => String(product.category || "").trim())
         .filter(Boolean),
-    ]),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+  const couponSubcategories = [
+    ...new Set(
+      availableProducts
+        .map((product) => String(product.subcategory || "").trim())
+        .filter(Boolean),
+    ),
   ].sort((a, b) => a.localeCompare(b));
   const [formData, setFormData] = useState({
     currentPassword: "",
@@ -97,6 +108,7 @@ const Admin = () => {
     discountValue: "",
     applicability: "all",
     categories: [],
+    subcategories: [],
     minimumOrderValue: "",
     maximumDiscount: "",
     expiryDate: "",
@@ -112,15 +124,20 @@ const Admin = () => {
     setCouponData((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "applicability"
+        ? { categories: [], subcategories: [] }
+        : {}),
     }));
   };
 
   const handleCouponCategoriesChange = (e) => {
-    const categories = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value,
-    );
+    const categories = e.target.value ? [e.target.value] : [];
     setCouponData((prev) => ({ ...prev, categories }));
+  };
+
+  const handleCouponSubcategoriesChange = (e) => {
+    const subcategories = e.target.value ? [e.target.value] : [];
+    setCouponData((prev) => ({ ...prev, subcategories }));
   };
 
   const handleCouponSubmit = async (e) => {
@@ -137,6 +154,7 @@ const Admin = () => {
       status,
       applicability,
       categories,
+      subcategories,
     } = couponData;
 
     if (!code.trim()) {
@@ -201,6 +219,10 @@ const Admin = () => {
       toast.error("Select at least one category");
       return;
     }
+    if (applicability === "subcategories" && subcategories.length === 0) {
+      toast.error("Select at least one subcategory");
+      return;
+    }
 
     try {
       setCouponLoading(true);
@@ -216,6 +238,8 @@ const Admin = () => {
             discountType === "percentage" ? Number(maximumDiscount) : null,
           applicability,
           categories: applicability === "categories" ? categories : [],
+          subcategories:
+            applicability === "subcategories" ? subcategories : [],
           expiryDate,
           usageLimit: Number(usageLimit),
           status,
@@ -233,6 +257,7 @@ const Admin = () => {
           discountValue: "",
           applicability: "all",
           categories: [],
+          subcategories: [],
           minimumOrderValue: "",
           maximumDiscount: "",
           expiryDate: "",
@@ -355,24 +380,67 @@ const Admin = () => {
             >
               <option value="all">All products</option>
               <option value="categories">Selected categories</option>
+              <option value="subcategories">Selected subcategories</option>
             </select>
           </div>
           {couponData.applicability === "categories" && (
             <div className="form-group">
               <label>Eligible Categories *</label>
               <select
-                multiple
-                value={couponData.categories}
+                value={couponData.categories[0] || ""}
                 onChange={handleCouponCategoriesChange}
+                disabled={
+                  productsLoading ||
+                  Boolean(productsError) ||
+                  couponCategories.length === 0
+                }
                 required
               >
+                <option value="" disabled>
+                  {productsLoading
+                    ? "Loading categories..."
+                    : productsError
+                      ? "Unable to load categories."
+                      : couponCategories.length === 0
+                        ? "No categories found in products"
+                        : "Select a category"}
+                </option>
                 {couponCategories.map((category) => (
                   <option key={category} value={category}>
                     {category}
                   </option>
                 ))}
               </select>
-              <small>Use Ctrl or Command to select multiple categories.</small>
+            </div>
+          )}
+          {couponData.applicability === "subcategories" && (
+            <div className="form-group">
+              <label>Eligible Subcategories *</label>
+              <select
+                value={couponData.subcategories[0] || ""}
+                onChange={handleCouponSubcategoriesChange}
+                disabled={
+                  productsLoading ||
+                  Boolean(productsError) ||
+                  couponSubcategories.length === 0
+                }
+                required
+              >
+                <option value="" disabled>
+                  {productsLoading
+                    ? "Loading subcategories..."
+                    : productsError
+                      ? "Unable to load subcategories."
+                      : couponSubcategories.length === 0
+                        ? "No subcategories found in products"
+                        : "Select a subcategory"}
+                </option>
+                {couponSubcategories.map((subcategory) => (
+                  <option key={subcategory} value={subcategory}>
+                    {subcategory}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
           <div className="form-group">

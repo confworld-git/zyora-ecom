@@ -251,18 +251,40 @@ const Cart = () => {
     .sort()
     .join("|");
   const categorySubtotals = {};
+  const subcategorySubtotals = {};
   selectedItems.forEach((item) => {
-    const category = normalizeProductCategory(
-      getProductById(item.productId ?? item.id)?.category,
-    );
-    if (!category) return;
-    categorySubtotals[category] =
-      (categorySubtotals[category] || 0) +
+    const product = getProductById(item.productId ?? item.id);
+    const itemSubtotal =
       (Number(item.price) || 0) * (Number(item.quantity) || 0);
+    const category = normalizeProductCategory(product?.category);
+    const subcategory = normalizeProductCategory(product?.subcategory);
+    if (category) {
+      categorySubtotals[category] =
+        (categorySubtotals[category] || 0) + itemSubtotal;
+    }
+    if (subcategory) {
+      subcategorySubtotals[subcategory] =
+        (subcategorySubtotals[subcategory] || 0) + itemSubtotal;
+    }
   });
   const couponSubtotals = Object.fromEntries(
     availableCoupons.map((coupon) => {
-      if (coupon.applicability !== "categories") return [coupon.code, subtotal];
+      if (coupon.applicability === "subcategories") {
+        return [
+          coupon.code,
+          (coupon.subcategories || []).reduce(
+            (sum, subcategory) =>
+              sum +
+              (subcategorySubtotals[
+                normalizeProductCategory(subcategory)
+              ] || 0),
+            0,
+          ),
+        ];
+      }
+      if (coupon.applicability !== "categories") {
+        return [coupon.code, subtotal];
+      }
       return [
         coupon.code,
         (coupon.categories || []).reduce(
@@ -275,12 +297,21 @@ const Cart = () => {
     }),
   );
   const eligibleCoupons = availableCoupons.filter(
-    (coupon) =>
-      coupon.applicability !== "categories" ||
-      (coupon.categories || []).some(
+    (coupon) => {
+      if (coupon.applicability === "subcategories") {
+        return (coupon.subcategories || []).some(
+          (subcategory) =>
+            (subcategorySubtotals[
+              normalizeProductCategory(subcategory)
+            ] || 0) > 0,
+        );
+      }
+      if (coupon.applicability !== "categories") return true;
+      return (coupon.categories || []).some(
         (category) =>
           (categorySubtotals[normalizeProductCategory(category)] || 0) > 0,
-      ),
+      );
+    },
   );
 
   const selectedAddress = addresses[selectedAddressIndex];

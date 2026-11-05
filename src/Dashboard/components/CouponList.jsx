@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import "../styles/CouponList.css";
-import { PRODUCT_CATEGORIES } from "../../utils/productCategory.js";
 import { useProducts } from "../../Context/ProductContext.jsx";
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/coupons`;
@@ -32,14 +31,26 @@ const STATE_LABEL = {
 };
 
 const CouponList = () => {
-  const { products } = useProducts();
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+  } = useProducts();
+  const availableProducts =
+    productsLoading || productsError ? [] : products;
   const couponCategories = [
     ...new Set([
-      ...PRODUCT_CATEGORIES,
-      ...(products || [])
+      ...availableProducts
         .map((product) => String(product.category || "").trim())
         .filter(Boolean),
     ]),
+  ].sort((a, b) => a.localeCompare(b));
+  const couponSubcategories = [
+    ...new Set(
+      availableProducts
+        .map((product) => String(product.subcategory || "").trim())
+        .filter(Boolean),
+    ),
   ].sort((a, b) => a.localeCompare(b));
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,20 +130,35 @@ const CouponList = () => {
       maximumDiscount: c.maximumDiscount ?? "",
       applicability: c.applicability || "all",
       categories: c.categories || [],
+      subcategories: c.subcategories || [],
       expiryDate: toInputDate(c.expiryDate),
       usageLimit: c.usageLimit,
       usedCount: c.usedCount,
     });
 
   const handleEditChange = (e) =>
-    setEditing((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setEditing((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+      ...(e.target.name === "applicability"
+        ? { categories: [], subcategories: [] }
+        : {}),
+    }));
 
-  const handleEditCategoriesChange = (e) => {
-    const categories = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value,
-    );
-    setEditing((prev) => ({ ...prev, categories }));
+  const handleEditCategoryChange = (e) => {
+    const category = e.target.value;
+    setEditing((prev) => ({
+      ...prev,
+      categories: category ? [category] : [],
+    }));
+  };
+
+  const handleEditSubcategoryChange = (e) => {
+    const subcategory = e.target.value;
+    setEditing((prev) => ({
+      ...prev,
+      subcategories: subcategory ? [subcategory] : [],
+    }));
   };
 
   const saveEdit = async (e) => {
@@ -157,6 +183,8 @@ const CouponList = () => {
       );
     if (d.applicability === "categories" && d.categories.length === 0)
       return toast.error("Select at least one category");
+    if (d.applicability === "subcategories" && d.subcategories.length === 0)
+      return toast.error("Select at least one subcategory");
 
     try {
       setSaving(true);
@@ -169,6 +197,8 @@ const CouponList = () => {
             d.discountType === "percentage" ? Number(d.maximumDiscount) : null,
           applicability: d.applicability,
           categories: d.applicability === "categories" ? d.categories : [],
+          subcategories:
+            d.applicability === "subcategories" ? d.subcategories : [],
           expiryDate: d.expiryDate,
           usageLimit: Number(d.usageLimit),
         },
@@ -268,6 +298,8 @@ const CouponList = () => {
                     <td>
                       {c.applicability === "categories"
                         ? (c.categories || []).join(", ")
+                        : c.applicability === "subcategories"
+                          ? (c.subcategories || []).join(", ")
                         : "All products"}
                     </td>
                     <td>₹{c.minimumOrderValue}</td>
@@ -346,6 +378,7 @@ const CouponList = () => {
                 >
                   <option value="all">All products</option>
                   <option value="categories">Selected categories</option>
+                  <option value="subcategories">Selected subcategories</option>
                 </select>
               </div>
 
@@ -353,17 +386,91 @@ const CouponList = () => {
                 <div className="form-group">
                   <label>Eligible Categories</label>
                   <select
-                    multiple
-                    value={editing.categories}
-                    onChange={handleEditCategoriesChange}
+                    value={
+                      editing.categories.length === 1
+                        ? editing.categories[0]
+                        : ""
+                    }
+                    onChange={handleEditCategoryChange}
+                    disabled={
+                      productsLoading ||
+                      Boolean(productsError) ||
+                      couponCategories.length === 0
+                    }
                   >
+                    <option value="" disabled>
+                      {editing.categories.length > 1
+                        ? "Choose a category to replace the current selection"
+                        : productsLoading
+                          ? "Loading categories..."
+                          : productsError
+                            ? "Unable to load categories."
+                            : "Select a category"}
+                    </option>
                     {couponCategories.map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
                     ))}
                   </select>
-                  <small>Use Ctrl or Command to select multiple categories.</small>
+                  {editing.categories.length > 1 && (
+                    <small>
+                      Existing category selections are preserved unless you
+                      choose a replacement.
+                    </small>
+                  )}
+                  {couponCategories.length === 0 && !productsLoading && (
+                    <small>
+                      {productsError ||
+                        "No categories found in products."}
+                    </small>
+                  )}
+                </div>
+              )}
+
+              {editing.applicability === "subcategories" && (
+                <div className="form-group">
+                  <label>Eligible Subcategory</label>
+                  <select
+                    value={
+                      editing.subcategories.length === 1
+                        ? editing.subcategories[0]
+                        : ""
+                    }
+                    onChange={handleEditSubcategoryChange}
+                    disabled={
+                      productsLoading ||
+                      Boolean(productsError) ||
+                      couponSubcategories.length === 0
+                    }
+                  >
+                    <option value="" disabled>
+                      {editing.subcategories.length > 1
+                        ? "Choose a subcategory to replace the current selection"
+                        : productsLoading
+                          ? "Loading subcategories..."
+                          : productsError
+                            ? "Unable to load subcategories."
+                            : "Select a subcategory"}
+                    </option>
+                    {couponSubcategories.map((subcategory) => (
+                      <option key={subcategory} value={subcategory}>
+                        {subcategory}
+                      </option>
+                    ))}
+                  </select>
+                  {editing.subcategories.length > 1 && (
+                    <small>
+                      Existing subcategory selections are preserved unless you
+                      choose a replacement.
+                    </small>
+                  )}
+                  {couponSubcategories.length === 0 && !productsLoading && (
+                    <small>
+                      {productsError ||
+                        "No subcategories found in products."}
+                    </small>
+                  )}
                 </div>
               )}
 

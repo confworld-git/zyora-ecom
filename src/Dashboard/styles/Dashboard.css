@@ -1620,14 +1620,15 @@
 
 .admin-settings-card .form-group select {
   width: 100%;
-  min-height: 42px;
-  padding: 0 13px;
+  min-height: 40px;
+  padding: 0 11px;
   border: 1px solid #e5dbd1;
   border-radius: 9px;
-  background: #fffdfa;
+  background: #fff;
   color: #302923;
   font: inherit;
   font-size: 12px;
+  box-sizing: border-box;
   cursor: pointer;
 }
 

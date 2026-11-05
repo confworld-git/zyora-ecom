@@ -246,15 +246,25 @@
   font-size: 11px;
 }
 
-.coupon-modal .form-group input {
+.coupon-modal .form-group input,
+.coupon-modal .form-group select {
+  width: 100%;
   min-height: 40px;
+  padding: 0 11px;
   border-color: #e5dbd1;
   border-radius: 9px;
   background: #fff;
+  color: #302923;
+  font: inherit;
   font-size: 12px;
 }
 
-.coupon-modal .form-group input:focus {
+.coupon-modal .form-group select {
+  cursor: pointer;
+}
+
+.coupon-modal .form-group input:focus,
+.coupon-modal .form-group select:focus {
   border-color: #bd8b70;
   outline: none;
   box-shadow: 0 0 0 3px rgba(166, 83, 53, 0.1);

@@ -131,13 +131,16 @@ const CouponPopup = ({
                         <dd>
                           {coupon.applicability === "categories"
                             ? (coupon.categories || []).join(", ")
-                            : "All products"}
+                            : coupon.applicability === "subcategories"
+                              ? (coupon.subcategories || []).join(", ")
+                              : "All products"}
                         </dd>
                       </div>
                       {info.min > 0 && (
                         <div>
                           <dt>
-                            {coupon.applicability === "categories"
+                            {coupon.applicability === "categories" ||
+                            coupon.applicability === "subcategories"
                               ? "Minimum eligible order"
                               : "Minimum order"}
                           </dt>

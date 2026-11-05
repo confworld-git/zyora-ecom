@@ -50,11 +50,15 @@ const ProductDetail = () => {
   const selection = selectionsByProduct[id] || {};
   const [productCoupon, setProductCoupon] = useState(null);
   const productCategory = product?.category || "";
+  const productSubcategory = product?.subcategory || "";
   const displayedCoupon =
-    productCoupon?.category === productCategory ? productCoupon.coupon : null;
+    productCoupon?.category === productCategory &&
+    productCoupon?.subcategory === productSubcategory
+      ? productCoupon.coupon
+      : null;
 
   useEffect(() => {
-    if (!productCategory) {
+    if (!productCategory && !productSubcategory) {
       setProductCoupon(null);
       return;
     }
@@ -69,13 +73,23 @@ const ProductDetail = () => {
           Array.isArray(response.data?.coupons) ? response.data.coupons : []
         )
           .filter(
-            (item) =>
-              item?.applicability !== "categories" ||
-              (item.categories || []).some(
-                (category) =>
-                  normalizeProductCategory(category) ===
-                  normalizeProductCategory(productCategory),
-              ),
+            (item) => {
+              if (item?.applicability === "categories") {
+                return (item.categories || []).some(
+                  (category) =>
+                    normalizeProductCategory(category) ===
+                    normalizeProductCategory(productCategory),
+                );
+              }
+              if (item?.applicability === "subcategories") {
+                return (item.subcategories || []).some(
+                  (subcategory) =>
+                    normalizeProductCategory(subcategory) ===
+                    normalizeProductCategory(productSubcategory),
+                );
+              }
+              return true;
+            },
           )
           .sort((first, second) => {
             const price = Number(product?.price?.selling_price) || 0;
@@ -97,12 +111,20 @@ const ProductDetail = () => {
         const coupon = applicableCoupons[0];
 
         if (!cancelled) {
-          setProductCoupon({ category: productCategory, coupon: coupon || null });
+          setProductCoupon({
+            category: productCategory,
+            subcategory: productSubcategory,
+            coupon: coupon || null,
+          });
         }
       } catch (error) {
         if (!cancelled) {
           console.error("Error fetching coupons:", error);
-          setProductCoupon({ category: productCategory, coupon: null });
+          setProductCoupon({
+            category: productCategory,
+            subcategory: productSubcategory,
+            coupon: null,
+          });
         }
       }
     };
@@ -111,7 +133,7 @@ const ProductDetail = () => {
     return () => {
       cancelled = true;
     };
-  }, [productCategory, product]);
+  }, [productCategory, productSubcategory, product]);
 
   const updateSelection = (key, value) => {
     setSelectionsByProduct((current) => ({
@@ -517,7 +539,9 @@ const ProductDetail = () => {
                 </span>{" "}
                 {displayedCoupon.applicability === "categories"
                   ? `on ${displayedCoupon.categories.join(", ")}`
-                  : "on all products"}
+                  : displayedCoupon.applicability === "subcategories"
+                    ? `on ${displayedCoupon.subcategories.join(", ")}`
+                    : "on all products"}
                 {Number(displayedCoupon.minimumOrderValue) > 0 &&
                   ` (min. eligible order ₹${displayedCoupon.minimumOrderValue})`}
                 {displayedCoupon.discountType === "percentage" &&
