@@ -19,7 +19,7 @@
   background: var(--surface);
   line-height: 1.65;
   min-height: 100vh;
-  padding: 30px 60px;
+  padding: 40px 60px;
 }
 
 .zfaq *,
@@ -132,13 +132,6 @@
   font-size: 11px;
 }
 
-.faq-heading > :last-child {
-  margin: 0;
-  color: #726e7a;
-  font-size: 15px;
-  padding: 0;
-}
-
 .zfaq-search input {
   width: 100%;
   height: 56px;
@@ -180,7 +173,7 @@
   grid-template-columns: minmax(0, 1fr) 340px;
   gap: 48px;
   align-items: start;
-  padding: 56px 0 96px;
+  padding: 16px 0 56px;
 }
 
 .zfaq-tags {
@@ -493,7 +486,7 @@
   .zfaq-body {
     grid-template-columns: 1fr;
     gap: 40px;
-    padding-top: 40px;
+    padding-top: 20px;
   }
   .zfaq-contact {
     position: static;
@@ -505,7 +498,7 @@
     padding: 48px 0 96px;
   }
   .zfaq {
-    padding: 20px 20px;
+    padding: 30px 20px;
   }
   .faq-heading > h1 {
     line-height: 1;

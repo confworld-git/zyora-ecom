@@ -392,9 +392,9 @@
     display: none;
   }
 
-  #faq-link {
+  /* #faq-link {
     display: none;
-  }
+  } */
 
   .nav-login-link {
     min-height: 32px;
