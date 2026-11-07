@@ -2,20 +2,37 @@ import "./Banner.css";
 import banner_img from "../assets/Banner/banner.gif";
 import { useEffect, useState } from "react";
 
+const STORAGE_KEY = "bannerLastClosedDate";
+
+const getTodayString = () => {
+  const d = new Date();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
+};
+
 const Banner = () => {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    const bannerStatus = localStorage.getItem("showBanner");
+    try {
+      const lastClosed = localStorage.getItem(STORAGE_KEY);
 
-    if (bannerStatus !== "closed") {
+      if (lastClosed !== getTodayString()) {
+        setShowBanner(true);
+      }
+    } catch (e) {
       setShowBanner(true);
     }
   }, []);
 
   const closeBanner = () => {
     setShowBanner(false);
-    localStorage.setItem("showBanner", "closed");
+    try {
+      localStorage.setItem(STORAGE_KEY, getTodayString());
+    } catch (e) {
+      // ignore storage errors
+    }
   };
 
   if (!showBanner) return null;

@@ -412,6 +412,13 @@
   }
 }
 
+.translate_control .goog-te-combo {
+  width: 90px;
+  padding: 10px 10px;
+  font-size: 9px;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 420px) {
   .navbar {
     padding: 9px 12px 0;
@@ -422,13 +429,42 @@
     flex-basis: 20%;
     padding: 8px 1px;
     font-size: 10px;
-    /* font-weight: 600; */
-    font-weight: bolder;
+    font-weight: 900;
+  }
+
+  .nav_icon_link{
+    min-height: 30px;
+  }
+
+  .translate_control .goog-te-combo {
+    width: 70px;
+    padding: 5px;
+    font-size: 8px !important;
+  }
+
+  #google_translate_element select.goog-te-combo,
+  .translate_control
+    #google_translate_element
+    .goog-te-gadget
+    select.goog-te-combo {
+    font-size: 10px !important;
+  }
+
+  #google_translate_element .goog-te-gadget {
+    font-size: 10px !important;
+  }
+
+  .nav_icon_link::after {
+    display: none;
+  }
+
+  .nav_icon_link > svg {
+    font-size: 16px;
   }
 
   .nav_icon_link {
-    padding: 0px 5px;
-    font-size: 8px;
+    border-radius: 50%;
+    font-size: 8px !important;
   }
 
   #policies-link {
@@ -513,11 +549,4 @@
 
 #google_translate_element .goog-te-gadget .goog-te-combo {
   font-size: 12px !important;
-}
-
-.translate_control .goog-te-combo {
-  width: 90px;
-  padding: 10px 10px;
-  font-size: 9px;
-  text-overflow: ellipsis;
 }
