@@ -15,18 +15,50 @@ const Navbar = () => {
   const { totalItems } = useCart();
   const { wishlistItems } = useWishlist();
   const totalFavorites = wishlistItems.length;
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    const container = document.getElementById("google_translate_element");
+
+    const setEnglishLabel = () => {
+      const select = container?.querySelector("select.goog-te-combo");
+      if (select && select.options[0] && select.options[0].text !== "English") {
+        select.options[0].text = "English";
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    const observer = new MutationObserver(setEnglishLabel);
+    if (container) {
+      observer.observe(container, { childList: true, subtree: true });
+    }
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
+    window.googleTranslateElementInit = () => {
+      if (!window.google?.translate?.TranslateElement) {
+        return;
+      }
+
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          autoDisplay: false,
+        },
+        "google_translate_element",
+      );
+
+      setEnglishLabel();
     };
+
+    if (window.google?.translate?.TranslateElement) {
+      window.googleTranslateElementInit();
+    } else if (!document.getElementById("google-translate-script")) {
+      const script = document.createElement("script");
+      script.id = "google-translate-script";
+      script.src =
+        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -35,7 +67,6 @@ const Navbar = () => {
         <img src={Zyora_logo} alt="Zyora Logo" className="zyora-logo" />
       </Link>
 
-      {/* <img src={Zyora_logo} alt="Zyora Logo" className="zyora-logo" /> */}
       <ul className="navbar-links" aria-label="Main navigation">
         <li>
           <Link to="/About_Us">About Us</Link>
@@ -120,6 +151,9 @@ const Navbar = () => {
             </Link>
           </div>
         )}
+        <div className="translate_control">
+          <div id="google_translate_element"></div>
+        </div>
       </div>
     </nav>
   );

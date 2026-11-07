@@ -424,3 +424,61 @@
     transition: none;
   }
 }
+
+.goog-te-combo {
+  background-color: #1b1b7a !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 600px !important;
+  padding: 8px 10px !important;
+}
+
+#google_translate_element .goog-te-gadget {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: white !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  white-space: nowrap;
+}
+
+#google_translate_element .goog-te-gadget .goog-te-combo {
+  max-width: 180px;
+  min-height: 34px;
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 6px;
+  background-color: white;
+  color: #24314a;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#google_translate_element .goog-te-gadget .goog-te-combo:focus-visible {
+  outline: none;
+}
+
+#google_translate_element .goog-te-gadget span,
+#google_translate_element .goog-te-gadget > a,
+#google_translate_element .goog-logo-link,
+#google_translate_element .goog-te-gadget .goog-te-combo ~ * {
+  display: none !important;
+}
+
+#google_translate_element .goog-te-gadget {
+  font-size: 0 !important;
+}
+
+#google_translate_element .goog-te-gadget .goog-te-combo {
+  font-size: 12px !important;
+}
+
+.translate_control .goog-te-combo {
+  width: 90px;
+  padding: 10px 10px;
+  font-size: 9px;
+  text-overflow: ellipsis;
+}
