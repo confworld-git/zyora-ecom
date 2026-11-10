@@ -146,7 +146,7 @@ export const AppRoutes = () => {
 const App = () => {
   return (
     <BrowserRouter>
-      <Banner />
+      {/* <Banner /> */}
       <AppRoutes />
     </BrowserRouter>
   );
