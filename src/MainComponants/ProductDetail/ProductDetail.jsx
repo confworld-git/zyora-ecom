@@ -13,9 +13,7 @@ import { normalizeProductRating } from "../../utils/productRating.js";
 import axios from "axios";
 import { createProductUrl, getProductId } from "../../utils/productSlug.js";
 import { createProductSeoTitle } from "../../utils/productSeo.js";
-import {
-  normalizeProductCategory,
-} from "../../utils/productCategory.js";
+import { normalizeProductCategory } from "../../utils/productCategory.js";
 
 const ProductDetail = () => {
   const { addToCart, isCartSyncing } = useCart();
@@ -72,25 +70,23 @@ const ProductDetail = () => {
         const applicableCoupons = (
           Array.isArray(response.data?.coupons) ? response.data.coupons : []
         )
-          .filter(
-            (item) => {
-              if (item?.applicability === "categories") {
-                return (item.categories || []).some(
-                  (category) =>
-                    normalizeProductCategory(category) ===
-                    normalizeProductCategory(productCategory),
-                );
-              }
-              if (item?.applicability === "subcategories") {
-                return (item.subcategories || []).some(
-                  (subcategory) =>
-                    normalizeProductCategory(subcategory) ===
-                    normalizeProductCategory(productSubcategory),
-                );
-              }
-              return true;
-            },
-          )
+          .filter((item) => {
+            if (item?.applicability === "categories") {
+              return (item.categories || []).some(
+                (category) =>
+                  normalizeProductCategory(category) ===
+                  normalizeProductCategory(productCategory),
+              );
+            }
+            if (item?.applicability === "subcategories") {
+              return (item.subcategories || []).some(
+                (subcategory) =>
+                  normalizeProductCategory(subcategory) ===
+                  normalizeProductCategory(productSubcategory),
+              );
+            }
+            return true;
+          })
           .sort((first, second) => {
             const price = Number(product?.price?.selling_price) || 0;
             const estimate = (coupon) => {
@@ -272,6 +268,34 @@ const ProductDetail = () => {
 
     if (addToCart(id, selectedColor, selectedSize, selectedImage)) {
       toast.success("Added to cart");
+
+      const price = Number(product.price?.selling_price) || 0;
+      const mrp = Number(product.price?.mrp) || 0;
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ ecommerce: null });
+      window.dataLayer.push({
+        event: "add_to_cart",
+        ecommerce: {
+          currency: currency || "INR",
+          value: price * 1,
+          items: [
+            {
+              item_id: String(canonicalProductId ?? id),
+              item_name: productName,
+              item_brand: product.brand || undefined,
+              item_category: product.category || undefined,
+              item_category2: product.subcategory || undefined,
+              item_variant:
+                [selectedColor, selectedSize].filter(Boolean).join(" / ") ||
+                undefined,
+              price,
+              discount: mrp > price ? mrp - price : 0,
+              quantity: 1,
+            },
+          ],
+        },
+      });
     } else {
       toast.error("Unable to add this product to cart");
     }

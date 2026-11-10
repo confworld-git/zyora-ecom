@@ -1,6 +1,6 @@
 import "./PaymentSuccess.css";
 import Canferri from "../../Confetti/Confetti";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext.jsx";
 import axios from "axios";
@@ -27,6 +27,7 @@ export default function PaymentSuccess({ onDownload, onHome }) {
   const [loading, setLoading] = useState(Boolean(orderId));
   const [loadError, setLoadError] = useState(null);
   const [retry, setRetry] = useState(0);
+  const purchaseTrackedRef = useRef(null);
 
   useEffect(() => {
     if (!orderId) return;
@@ -98,6 +99,51 @@ export default function PaymentSuccess({ onDownload, onHome }) {
   const isProcessing =
     !isCashOnDelivery && !paymentFailed && !paymentComplete;
   const canRefreshStatus = isProcessing || isRefunding;
+
+useEffect(() => {
+  if (loading || !order?.orderId) return;
+  if (!paymentComplete || order.orderStatus === "cancelled") return;
+  if (!Array.isArray(order.items) || order.items.length === 0) return;
+
+  const value = Number(order.total);
+  if (!Number.isFinite(value)) return;
+
+  const key = `purchase_tracked_${order.orderId}`;
+  try {
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, "1");
+  } catch {
+    if (purchaseTrackedRef.current === order.orderId) return; // fallback
+  }
+  purchaseTrackedRef.current = order.orderId;
+
+  const items = order.items
+    .filter((item) => item.productId)
+    .map((item) => ({
+      item_id: String(item.productId),
+      item_name: item.name,
+      item_variant:
+        [item.color, item.size].filter(Boolean).join(" / ") || undefined,
+      price: Number(item.price) || 0,
+      quantity: Number(item.quantity) || 1,
+    }));
+
+  const shipping = Number(order.shippingFee ?? order.shipping) || 0; // verify field name
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ ecommerce: null });
+  window.dataLayer.push({
+    event: "purchase",
+    ecommerce: {
+      transaction_id: String(order.orderId),
+      value: Math.max(0, value - shipping),
+      shipping,
+      coupon: order.couponCode || undefined, // verify field name
+      currency: "INR",
+      items,
+    },
+  });
+}, [loading, order, paymentComplete]);
 
   return (
     <ScrollReveal className="ps-page">
@@ -300,8 +346,8 @@ export default function PaymentSuccess({ onDownload, onHome }) {
               className="ps-primary"
               onClick={() =>
                 navigate(
-                  customer?.id
-                    ? `/Profile/${customer.id}?tab=orders`
+                  customer?.customerId
+                    ? `/Profile/${customer.customerId}?tab=orders`
                     : "/Login",
                 )
               }
