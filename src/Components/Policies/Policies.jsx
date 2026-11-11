@@ -121,9 +121,9 @@ If the order has already been dispatched, cancellation may not be possible throu
 Any cancellation charges must comply with applicable law and the terms disclosed at checkout.
 
 ## 8. Replacement or Exchange
-Where an exchange or replacement is available, it will depend on stock availability and product eligibility.
+ZYORA does not offer exchanges or replacements for purchased products. Customers are advised to carefully review the product description, specifications, size, colour and other details before placing an order.
 
-If the same item is unavailable, we will communicate the available options, such as a refund or another mutually agreed resolution, subject to applicable law.
+Returns and refunds will be considered only as per our Return & Refund Policy and in compliance with applicable laws.
 
 ## 9. Late, Missing or Incorrect Refunds
 If you have not received an approved refund within the communicated period, please contact us with your order number and refund confirmation details.
