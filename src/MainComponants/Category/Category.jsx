@@ -57,6 +57,84 @@ const clothingSizeLabels = {
   XXXL: "XXXL",
 };
 
+const normalizeVariantName = (value) =>
+  String(value ?? "").trim().toLowerCase();
+
+const isVariantAvailable = (product, color) => {
+  const colorStock = product.variants?.colorStock;
+  if (!Array.isArray(colorStock) || colorStock.length === 0) {
+    return true;
+  }
+
+  const normalizedColor = normalizeVariantName(color);
+  const stock = colorStock.find(
+    (item) => normalizeVariantName(item.color) === normalizedColor,
+  );
+
+  return (
+    Boolean(stock) &&
+    stock.enabled !== false &&
+    Number(stock.quantity) > 0
+  );
+};
+
+const getAvailableVariantNames = (product) => {
+  const colors = product.variants?.colours || [];
+  const colorStock = product.variants?.colorStock;
+
+  if (!Array.isArray(colorStock) || colorStock.length === 0) {
+    return colors.filter(Boolean).map((color) => String(color).trim());
+  }
+
+  return colors
+    .map((color) => String(color ?? "").trim())
+    .filter((color) => isVariantAvailable(product, color));
+};
+
+const hasAvailableVariant = (product) => {
+  const colors = product.variants?.colours || [];
+  const colorStock = product.variants?.colorStock;
+
+  if (colors.length === 0) {
+    return (
+      product.stock?.in_stock === true &&
+      Number(product.stock?.quantity) > 0
+    );
+  }
+
+  if (!Array.isArray(colorStock) || colorStock.length === 0) {
+    return colors.length > 0;
+  }
+
+  return getAvailableVariantNames(product).length > 0;
+};
+
+const getFirstAvailableVariantImage = (product) => {
+  const images = product.images || [];
+  const availableNames = getAvailableVariantNames(product);
+
+  if (availableNames.length === 0) {
+    return images[0] || null;
+  }
+
+  for (const color of availableNames) {
+    const normalizedColor = normalizeVariantName(color);
+    const matchingImage = images.find((image, index) => {
+      const explicitColor = normalizeVariantName(image.variantColor);
+      if (explicitColor && explicitColor === normalizedColor) return true;
+
+      const colorIndex = (product.variants?.colours || []).findIndex(
+        (item) => normalizeVariantName(item) === normalizedColor,
+      );
+      return colorIndex === index;
+    });
+
+    if (matchingImage) return matchingImage;
+  }
+
+  return null;
+};
+
 const getCategoryIcon = (category) => {
   const name = String(category || "")
     .trim()
@@ -274,7 +352,7 @@ const Category = () => {
         String(selectedCategory).toLowerCase() ===
           String(category).toLowerCase();
 
-      return matchesSearch && matchesCategory;
+      return matchesSearch && matchesCategory && hasAvailableVariant(product);
     });
   }, [categoryProducts, searchTerm, selectedCategory]);
 
@@ -295,9 +373,13 @@ const Category = () => {
 
     availableProducts.forEach((product) => {
       const images = product.images || [];
-      (product.variants?.colours || []).forEach((color, index) => {
+      getAvailableVariantNames(product).forEach((color) => {
         const name = String(color ?? "").trim();
-        if (!name || !images[index]) return;
+        if (!name) return;
+        const imageIndex = (product.variants?.colours || []).findIndex(
+          (item) => normalizeVariantName(item) === normalizeVariantName(name),
+        );
+        if (!images[imageIndex] && !getFirstAvailableVariantImage(product)) return;
 
         const normalizedName = name.toLowerCase();
         if (!colorsByName.has(normalizedName)) {
@@ -387,10 +469,10 @@ const Category = () => {
       const matchesColor =
         !activeColors.length ||
         activeColors.some((selectedColor) =>
-          productColors.some(
+          getAvailableVariantNames(product).some(
             (productColor) =>
-              String(productColor).toLowerCase() ===
-              String(selectedColor).toLowerCase(),
+              normalizeVariantName(productColor) ===
+              normalizeVariantName(selectedColor),
           ),
         );
 
@@ -404,8 +486,7 @@ const Category = () => {
           ),
         );
 
-      const hasStock =
-        product.stock?.in_stock === true && Number(product.stock?.quantity) > 0;
+      const hasStock = hasAvailableVariant(product);
       const matchesStock = !filters.inStock || hasStock;
       const rating = normalizeProductRating(product.rating);
       const matchesRating =
@@ -990,9 +1071,9 @@ const Category = () => {
                     const productPath = createProductPath(product);
                     if (!productPath) return null;
                     const rating = normalizeProductRating(product.rating);
-                    const hasStock =
-                      product.stock?.in_stock === true &&
-                      Number(product.stock?.quantity) > 0;
+                    const hasStock = hasAvailableVariant(product);
+                    const availableVariantImage =
+                      getFirstAvailableVariantImage(product);
 
                     return (
                       <div
@@ -1012,13 +1093,13 @@ const Category = () => {
                           }
                         }}
                       >
-                        {product.images?.[0]?.url ? (
+                        {availableVariantImage?.url ? (
                           <img
-                            src={product.images[0].url}
+                            src={availableVariantImage.url}
                             fetchPriority="high"
                             decoding="async"
                             alt={
-                              product.images[0].alt ||
+                              availableVariantImage.alt ||
                               product.name ||
                               product.title ||
                               "Product"

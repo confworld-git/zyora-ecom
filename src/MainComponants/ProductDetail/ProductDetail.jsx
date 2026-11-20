@@ -157,14 +157,14 @@ const ProductDetail = () => {
   const productOutOfStock =
     product.stock?.in_stock !== true || productStockQuantity <= 0;
   const images = product.images || [];
+  const colourNames = (product.variants?.colours || []).map((name) =>
+    String(name ?? "").trim(),
+  );
   const videoUrl =
     typeof product.video === "string"
       ? product.video
       : product.video?.url || "";
   const isVideoSelected = selection.showVideo === true && Boolean(videoUrl);
-  const colourNames = (product.variants?.colours || []).map((name) =>
-    String(name ?? "").trim(),
-  );
 
   // Colour #1 belongs to image #1, colour #2 to image #2, and so on.
   // Images after the last colour (extra angles, a second chain in the same
