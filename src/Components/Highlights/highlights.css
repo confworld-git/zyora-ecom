@@ -1,7 +1,7 @@
 .highlights {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 48px 48px 56px;
+  padding: 0px 48px 56px;
   background: white;
 }
 
@@ -19,6 +19,7 @@
   position: relative;
   overflow: hidden;
   height: 100%;
+  /* cursor: pointer; */
   transition:
     transform 200ms ease,
     box-shadow 200ms ease;

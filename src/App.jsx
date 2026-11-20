@@ -21,7 +21,7 @@ import CustomerRoute from "./ProtectedRoute/CustomerRoute.jsx";
 import "./index.css";
 import Policies from "./Components/Policies/Policies.jsx";
 import { PRODUCT_ROUTE_PATTERN } from "./utils/productSlug.js";
-import Banner from "./Banner/Banner.jsx";
+// import Banner from "./Banner/Banner.jsx";
 import Faq from "./FAQ/Faq.jsx";
 
 import { useAuth } from "./Context/AuthContext.jsx";

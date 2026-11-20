@@ -4,6 +4,23 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useProducts } from "../../Context/ProductContext";
 import { isImitationJewellery } from "../../utils/productCategory.js";
+import { useCart } from "../../Context/CartContext.jsx";
+
+const isProductAvailable = (product) => {
+  if (product.stock?.in_stock !== true || product.stock?.quantity <= 0) {
+    return false;
+  }
+
+  const colorStock = product.variants?.colorStock;
+
+  if (!Array.isArray(colorStock) || colorStock.length === 0) {
+    return false;
+  }
+
+  return colorStock.some(
+    (variant) => variant.enabled === true && variant.quantity > 0,
+  );
+};
 
 const PRODUCTS_PER_CATEGORY = 4;
 
@@ -31,15 +48,21 @@ const FILTERS = [
 ];
 
 const Featured = () => {
+  const { addToCart } = useCart();
   const { products, loading, error } = useProducts();
   const [activeFilter, setActiveFilter] = useState("all");
 
   const visibleProducts = useMemo(() => {
     const list = Array.isArray(products) ? products : [];
-    return list.filter((product) => product && !isImitationJewellery(product));
+
+    return list.filter(
+      (product) =>
+        product &&
+        !isImitationJewellery(product) &&
+        isProductAvailable(product),
+    );
   }, [products]);
 
-  // No slicing here. The limit is applied per category below.
   const filteredProducts = useMemo(() => {
     switch (activeFilter) {
       case "new":
@@ -70,10 +93,44 @@ const Featured = () => {
     [filteredProducts],
   );
 
+  const getAvailableVariants = (product) => {
+    const colorStock = product.variants?.colorStock || [];
+    const colours = product.variants?.colours || [];
+    const images = product.images || [];
+
+    return colorStock
+      .filter((variant) => variant.enabled === true && variant.quantity > 0)
+      .map((variant) => {
+        // Prefer an explicit image-to-variant match.
+        const matchingImages = images.filter(
+          (image) => image.variantColor === variant.color,
+        );
+
+        // Otherwise, use the same index in colours and images.
+        const colorIndex = colours.indexOf(variant.color);
+
+        const variantImages =
+          matchingImages.length > 0
+            ? matchingImages
+            : colorIndex >= 0 && images[colorIndex]
+              ? [images[colorIndex]]
+              : [];
+
+        return {
+          ...variant,
+          images: variantImages,
+        };
+      });
+  };
+
+  const handleCart = (id, selectedColor, selectedSize, selectedImage) => {
+    addToCart(id, selectedColor, selectedSize, selectedImage);
+  };
+
   return (
     <div className="Featured_Collection">
       <h1>
-        Featured <span>Collections</span>
+        Shop by <span>category</span>
       </h1>
 
       <p>Handpicked selections tailored to your lifestyle</p>
@@ -135,6 +192,10 @@ const Featured = () => {
                   const categoryUrl = `/Zyora_Category?category=${encodeURIComponent(
                     category,
                   )}`;
+                  const availableVariants = getAvailableVariants(product);
+                  const firstAvailableVariant = availableVariants[0];
+
+                  const selectedImage = firstAvailableVariant?.images?.[0]?.url;
 
                   return (
                     <Link
@@ -144,15 +205,10 @@ const Featured = () => {
                       to={productUrl}
                       state={{ from: categoryUrl }}
                     >
-                      {product.images?.[0]?.url ? (
+                      {selectedImage ? (
                         <img
-                          src={product.images[0].url}
-                          alt={
-                            product.images[0].alt ||
-                            product.name ||
-                            product.title ||
-                            "Product"
-                          }
+                          src={selectedImage}
+                          alt={`${firstAvailableVariant.color} - ${product.name || product.title}`}
                         />
                       ) : (
                         <div className="featured_no_image">
@@ -179,6 +235,27 @@ const Featured = () => {
                               {product.price.discount_percent}% off
                             </p>
                           ) : null}
+                          <button
+                            type="button"
+                            className="add_to"
+                            disabled={!firstAvailableVariant}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              if (!firstAvailableVariant) return;
+
+                              handleCart(
+                                productId,
+                                firstAvailableVariant.color,
+                                product.variants?.sizes?.[0] || "",
+                                selectedImage,
+                              );
+                            }}
+                            aria-label="Add to cart"
+                          >
+                            +
+                          </button>
                         </div>
                       </div>
                     </Link>

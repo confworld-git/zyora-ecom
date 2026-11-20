@@ -11,7 +11,7 @@ const Welcome = () => {
       <div className="wl-inner">
         <div className="wl-copy">
           <h1 style={{ "--d": ".08s" }}>
-            Welcome to <span>ZYORA</span>
+            Meet <span>ZYORA</span>
           </h1>
           <p className="wl-lead" style={{ "--d": ".16s" }}>
             ZYORA is a growing e-commerce brand committed to making everyday

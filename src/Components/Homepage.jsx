@@ -61,9 +61,9 @@ const Homepage = () => {
             </span>
           </div>
         </ScrollReveal>
-        <Welcome />
-        <Highlights />
         <Featured />
+        <Highlights />
+        <Welcome />
         <Why />
       </main>
     </>
