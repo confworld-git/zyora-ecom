@@ -70,7 +70,7 @@ function AddProduct() {
       return;
     }
 
-    const fields = productJsonToFormFields(data, categories);
+    const fields = productJsonToFormFields(data, PRODUCT_CATEGORIES);
 
     if (data.category && !fields.category) {
       toast.error(
