@@ -11,6 +11,11 @@ const isProductAvailable = (product) => {
     return false;
   }
 
+  const colours = product.variants?.colours || [];
+  if (colours.length === 0) {
+    return true;
+  }
+
   const colorStock = product.variants?.colorStock;
 
   if (!Array.isArray(colorStock) || colorStock.length === 0) {
@@ -209,8 +214,16 @@ const Featured = () => {
                   )}`;
                   const availableVariants = getAvailableVariants(product);
                   const firstAvailableVariant = availableVariants[0];
-
-                  const selectedImage = firstAvailableVariant?.images?.[0]?.url;
+                  const productImage = product.images?.[0];
+                  const selectedImage =
+                    firstAvailableVariant?.images?.[0]?.url ||
+                    (typeof productImage === "string"
+                      ? productImage
+                      : productImage?.url) ||
+                    product.image;
+                  const canAddToCart =
+                    Boolean(firstAvailableVariant) ||
+                    (product.variants?.colours?.length || 0) === 0;
 
                   return (
                     <Link
@@ -223,7 +236,11 @@ const Featured = () => {
                       {selectedImage ? (
                         <img
                           src={selectedImage}
-                          alt={`${firstAvailableVariant.color} - ${product.name || product.title}`}
+                          alt={
+                            firstAvailableVariant?.color
+                              ? `${firstAvailableVariant.color} - ${product.name || product.title}`
+                              : product.name || product.title
+                          }
                         />
                       ) : (
                         <div className="featured_no_image">
@@ -253,16 +270,16 @@ const Featured = () => {
                           <button
                             type="button"
                             className="add_to"
-                            disabled={!firstAvailableVariant}
+                            disabled={!canAddToCart}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
 
-                              if (!firstAvailableVariant) return;
+                              if (!canAddToCart) return;
 
                               handleCart(
                                 productId,
-                                firstAvailableVariant.color,
+                                firstAvailableVariant?.color || "",
                                 product.variants?.sizes?.[0] || "",
                                 selectedImage,
                               );
