@@ -52,6 +52,19 @@ const Featured = () => {
   const { products, loading, error } = useProducts();
   const [activeFilter, setActiveFilter] = useState("all");
 
+  const getProductTimestamp = (product) => {
+    if (product.createdAt) {
+      const date = new Date(product.createdAt).getTime();
+      if (!Number.isNaN(date)) return date;
+    }
+
+    if (product._id && /^[a-f\d]{24}$/i.test(product._id)) {
+      return parseInt(product._id.substring(0, 8), 16) * 1000;
+    }
+
+    return 0;
+  };
+
   const visibleProducts = useMemo(() => {
     const list = Array.isArray(products) ? products : [];
 
@@ -66,10 +79,12 @@ const Featured = () => {
   const filteredProducts = useMemo(() => {
     switch (activeFilter) {
       case "new":
-        return [...visibleProducts].sort(
-          (first, second) =>
-            new Date(second.createdAt || 0) - new Date(first.createdAt || 0),
-        );
+        return visibleProducts
+          .filter(
+            (product) =>
+              product.category?.trim().toLowerCase() === "kids play zone",
+          )
+          .sort((a, b) => getProductTimestamp(b) - getProductTimestamp(a));
 
       case "bestseller":
         return visibleProducts.filter((product) => product.is_best_seller);
